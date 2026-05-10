@@ -1,8 +1,8 @@
 package com.tracnghiem.entity.id;
 
-import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Objects;
+
+import javax.persistence.Embeddable;
 
 @Embeddable
 public class BangDiemId implements Serializable {

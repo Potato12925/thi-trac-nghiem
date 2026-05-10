@@ -1,6 +1,9 @@
 package com.tracnghiem.entity;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "GiaoVien")
@@ -24,7 +27,7 @@ public class GiaoVien {
 
     public GiaoVien() {
     }
-    
+
 
     public String getMaGV() {
         return maGV;

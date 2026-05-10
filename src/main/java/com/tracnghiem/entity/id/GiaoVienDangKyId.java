@@ -58,11 +58,13 @@ public class GiaoVienDangKyId implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
+        if (this == obj) {
+			return true;
+		}
 
-        if (!(obj instanceof GiaoVienDangKyId))
-            return false;
+        if (!(obj instanceof GiaoVienDangKyId)) {
+			return false;
+		}
 
         GiaoVienDangKyId other = (GiaoVienDangKyId) obj;
 
