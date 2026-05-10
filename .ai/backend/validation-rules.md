@@ -16,4 +16,4 @@ Use:
 
 - @NotBlank
 - @Size
-- Jakarta Validation
+- javax Validation

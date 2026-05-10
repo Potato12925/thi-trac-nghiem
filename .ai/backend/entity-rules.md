@@ -1,5 +1,6 @@
 # Entity Rules
 
+- Create in src\main\java\com\entity
 - Use @Entity
 - Use @Table(name="")
 - Use @Id

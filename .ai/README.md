@@ -1,24 +1,102 @@
-# AI Context Routing Guide
+# AI Context Routing + Project Architecture Guide
 
-Purpose:
+## Purpose
+
+This guide combines:
+
+- Context routing optimization
+- Spring MVC architecture rules
+- Hibernate ORM conventions
+- Business rules for Thi Trac Nghiem system
+- Code generation standards
+
+Goals:
 
 - Minimize token usage
 - Load only required context
-- Keep architecture consistent
+- Keep layered architecture consistent
+- Generate maintainable Maven projects
+- Preserve Eclipse compatibility
 
 ---
 
 # Core Context
 
-Always read:
+Always load:
 
 - .ai/core/stack.md
 - .ai/core/architecture.md
 - .ai/core/naming.md
 
+Global architecture:
+
+Controller -> Service -> Repository -> Database
+
+Rules:
+
+- Controller handles request/response only
+- Service contains business logic
+- Repository handles Hibernate access
+- JSP handles UI rendering only
+
+Forbidden:
+
+- SQL inside Controller
+- Business logic inside JSP
+- Repository access from Controller
+
 ---
 
-# CRUD Module
+# Project Stack
+
+Project uses:
+
+- Java
+- Spring MVC
+- Maven
+- Hibernate ORM
+- SQL Server
+- JSP + JSTL
+- Apache Tomcat
+- Eclipse IDE
+
+---
+
+# Maven Project Structure
+
+Always generate:
+
+src/main/
+├───java
+│   ├───com
+│   │   └───tracnghiem
+│   │       ├───config
+│   │       ├───controller
+│   │       ├───dao
+│   │       ├───entity
+│   │       │   └───id
+│   │       ├───repository
+│   │       ├───service
+│   │       └───utils
+│   ├───config
+│   └───utils
+├───resources
+└──webapp
+    ├───META-INF
+    └───WEB-INF
+        ├───configs
+        └───views
+---
+
+# Context Routing Rules
+
+Load only required rules/modules.
+
+Never load all .md files unless absolutely necessary.
+
+---
+
+# CRUD Module Context
 
 Read:
 
@@ -34,7 +112,7 @@ Read:
 
 - .ai/frontend/jsp-rules.md
 
-- Required database table files only
+- Required table schema only
 
 Use for:
 
@@ -47,7 +125,7 @@ Use for:
 
 ---
 
-# Entity Generation
+# Entity Generation Context
 
 Read:
 
@@ -59,18 +137,25 @@ Read:
 Use for:
 
 - Hibernate entities
+- Entity relationships
 - Mapping annotations
-- Relationships
+
+Rules:
+
+- Use @Entity
+- Use @Table(name="...")
+- Use manual business keys
+- Use LAZY fetch by default
 
 Avoid:
 
 - JSP rules
-- Auth rules
+- Authentication rules
 - Exam rules
 
 ---
 
-# Controller Tasks
+# Controller Context
 
 Read:
 
@@ -78,15 +163,22 @@ Read:
 - .ai/backend/controller-rules.md
 - .ai/backend/validation-rules.md
 
-Use for:
+Rules:
 
-- Request mapping
-- Validation
-- Form binding
+- Use @Controller
+- Use @ModelAttribute
+- Use @Valid
+- Use DTO for form binding
+
+Avoid:
+
+- HttpServletRequest parameter extraction
+- Business logic
+- Repository access
 
 ---
 
-# Service Tasks
+# Service Context
 
 Read:
 
@@ -94,15 +186,22 @@ Read:
 - .ai/backend/service-rules.md
 - .ai/backend/transaction-rules.md
 
+Rules:
+
+- Use @Service
+- Use @Transactional only here
+- Handle business validation here
+
 Use for:
 
 - Business logic
-- Transactions
-- Service interfaces
+- Exam logic
+- Random question generation
+- Score calculation
 
 ---
 
-# Repository Tasks
+# Repository Context
 
 Read:
 
@@ -110,31 +209,40 @@ Read:
 - .ai/backend/repository-rules.md
 - .ai/database/database-rules.md
 
-- Required table files only
+Rules:
+
+- Use Hibernate SessionFactory
+- Use HQL
+- No raw JDBC
+- No Spring Data JPA
 
 Use for:
 
 - HQL queries
-- Hibernate repositories
-- Database access
+- Data access
 
 ---
 
-# JSP / Frontend
+# JSP / Frontend Context
 
 Read:
 
 - .ai/frontend/jsp-rules.md
 
-Use for:
+Rules:
 
-- JSP pages
+- JSP + JSTL only
 - Bootstrap UI
-- Form binding
+- Spring Form Tag Library
+- No Java scriptlets
+
+Views location:
+
+/WEB-INF/views/
 
 ---
 
-# Authentication / Authorization
+# Authentication Context
 
 Read:
 
@@ -147,41 +255,112 @@ Read:
 Use for:
 
 - Login
-- Session handling
-- Role permissions
+- Session
+- Authorization
 - Interceptors
+
+Session convention:
+
+session.setAttribute("LOGIN_USER", user);
+session.setAttribute("ROLE", role);
+
+Roles:
+
+- PGV
+- GIANGVIEN
+- SINHVIEN
 
 ---
 
-# Exam Module
+# Authorization Rules
+
+Use interceptor-based authorization.
+
+Structure:
+
+interceptor/
+├── AuthInterceptor
+├── RoleInterceptor
+
+Permissions:
+
+PGV:
+
+- Full access
+- Create accounts
+- Manage teachers
+- Manage subjects
+- No exam participation
+
+GIANGVIEN:
+
+- Manage own questions
+- Register exams
+- View scores
+- Trial exams without saving scores
+
+SINHVIEN:
+
+- Take exams
+- View exam history
+
+---
+
+# Exam Module Context
 
 Read:
 
 - .ai/business/exam-rules.md
 
-- .ai/database/tables/bode.md
-- .ai/database/tables/baithi.md
-- .ai/database/tables/chitiet-baithi.md
-- .ai/database/tables/giaovien-dangky.md
-- .ai/database/tables/bangdiem.md
+- bode.md
+- baithi.md
+- chitiet-baithi.md
+- bangdiem.md
+- giaovien-dangky.md
 
 Use for:
 
-- Random questions
-- Scoring
+- Random question generation
 - Exam timer
+- Auto scoring
 - Question distribution
+
+---
+
+# Exam Business Rules
+
+Question distribution:
+
+LEVEL A:
+
+- Minimum 70% A
+- Maximum 30% B
+
+LEVEL B:
+
+- Minimum 70% B
+- Maximum 30% C
+
+LEVEL C:
+
+- 100% C
+
+Rules:
+
+- Questions must not duplicate
+- Questions randomized
+- Equal score per question
+- Max score = 10
+- Auto submit when time expires
+- Students can review previous attempts
 
 ---
 
 # Database Loading Rules
 
-Rules:
+Never load all tables.
 
-- Never load all database table files
-- Load only related tables
-- Load relationships.md only for joins or entity mappings
-- Prefer isolated schema context
+Only load related tables.
 
 Examples:
 
@@ -190,59 +369,146 @@ Student CRUD:
 - sinhvien.md
 - lop.md
 
-Exam Service:
-
-- bode.md
-- baithi.md
-- chitiet-baithi.md
-
 Authentication:
 
 - taikhoan.md
 - giaovien.md
 
+Exam:
+
+- bode.md
+- bangdiem.md
+- giaovien-dangky.md
+
+Use relationships.md only for joins.
+
 ---
 
-# Bug Fixing
+# Validation Rules
 
-Read:
+Validation flow:
 
-- Only files related to the bug
+Controller -> DTO Validation
+Service -> Business Validation
+Repository -> Database Validation
 
-Always read:
+Use Jakarta Validation:
 
-- .ai/core/architecture.md
+@NotBlank
+@Size
+@Pattern
+
+---
+
+# Repository Query Rules
+
+Use HQL whenever possible.
 
 Avoid:
 
-- Loading unrelated modules
-- Re-reading all rules
+- SELECT \*
+- Native SQL
+- Business logic inside query
+
+Example:
+
+FROM Subject s
+WHERE s.subjectId = :subjectId
+
+---
+
+# Naming Convention
+
+Controller:
+
+- SubjectController
+- StudentController
+
+Service:
+
+- SubjectService
+- SubjectServiceImpl
+
+Repository:
+
+- SubjectRepository
+- SubjectRepositoryImpl
+
+DTO:
+
+- SubjectDto
+
+Entity:
+
+- Subject
+
+JSP:
+
+- subjectList.jsp
+- subjectForm.jsp
+
+---
+
+# CRUD Method Convention
+
+Service:
+
+createSubject()
+updateSubject()
+deleteSubject()
+getSubjectById()
+
+Repository:
+
+save()
+update()
+delete()
+findById()
+findAll()
 
 ---
 
 # Performance Rules
 
-- Never load all .md files unless required
-- Prefer targeted context loading
-- Read business rules only for business logic
-- Read frontend rules only for UI tasks
-- Read auth rules only for authentication tasks
-- Avoid wildcard loading
-- Prefer exact file references
+- Never wildcard-load contexts
+- Load business rules only when needed
+- Load frontend rules only for JSP tasks
+- Load auth rules only for login/security
+- Load exam rules only for exam logic
 
 ---
 
-# Architecture Rules
+# Bug Fixing Rules
 
-Always preserve:
+Read only:
 
-Controller -> Service -> Repository -> Database
+- Related module
+- Related entity
+- Related business rule
 
-Forbidden:
+Always read:
 
-- SQL in controller
-- Business logic in JSP
-- Repository access from controller
+- architecture.md
+
+Avoid:
+
+- Reloading entire project rules
+
+---
+
+# Security Rules
+
+Always:
+
+- Validate all inputs
+- Prevent SQL injection
+- Use session authentication
+- Encrypt passwords
+
+Never:
+
+- Store plain passwords
+- Trust frontend validation
 
 ---
 
@@ -253,7 +519,11 @@ Generated code must be:
 - Maven compatible
 - Eclipse compatible
 - Layered
-- Maintainable
-- Readable
 - Modular
 - Reusable
+- Readable
+- Maintainable
+
+Always follow:
+
+Spring MVC + Hibernate + JSP architecture.
