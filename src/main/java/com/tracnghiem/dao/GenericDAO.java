@@ -1,15 +1,13 @@
 package com.tracnghiem.dao;
 
+import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.io.Serializable;
 
 @Transactional
 public abstract class GenericDAO<T> {
