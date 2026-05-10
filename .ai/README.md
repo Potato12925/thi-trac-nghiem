@@ -66,34 +66,26 @@ Project uses:
 
 Always generate:
 
-src/main/java/
-├── controller/
-├── service/
-│ └── impl/
-├── repository/
-│ └── impl/
-├── entity/
-├── dto/
-├── config/
-├── utils/
-├── validator/
-├── exception/
-├── interceptor/
-└── constants/
-
-src/main/resources/
-├── application.properties
-
-src/main/webapp/
-├── WEB-INF/
-│ ├── views/
-│ └── web.xml
-│
-├── assets/
-│ ├── css/
-│ ├── js/
-│ └── images/
-
+src/main/
+├───java
+│   ├───com
+│   │   └───tracnghiem
+│   │       ├───config
+│   │       ├───controller
+│   │       ├───dao
+│   │       ├───entity
+│   │       │   └───id
+│   │       ├───repository
+│   │       ├───service
+│   │       └───utils
+│   ├───config
+│   └───utils
+├───resources
+└──webapp
+    ├───META-INF
+    └───WEB-INF
+        ├───configs
+        └───views
 ---
 
 # Context Routing Rules
