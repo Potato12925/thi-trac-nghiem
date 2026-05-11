@@ -1,0 +1,59 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+pageEncoding="UTF-8"%> <%@ taglib prefix="c"
+uri="http://java.sun.com/jsp/jstl/core" %> <% request.setAttribute("pageTitle",
+"Quản lý Môn học"); %> <%@ include file="../Shared/_LayoutStart.jsp" %>
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">Danh mục Môn học</h1>
+    <button class="btn btn-primary">
+      <i class="bi bi-journal-plus me-2"></i> Thêm Môn học
+    </button>
+  </div>
+
+  <div class="card border-0 shadow-sm">
+    <div class="table-responsive p-3">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th scope="col">Mã MH</th>
+            <th scope="col">Tên Môn học</th>
+            <th scope="col">Số Tín chỉ Lý thuyết</th>
+            <th scope="col">Số Tín chỉ Thực hành</th>
+            <th scope="col" class="text-end">Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="fw-medium text-primary">CTDL</td>
+            <td>Cấu trúc dữ liệu và giải thuật</td>
+            <td>2</td>
+            <td>1</td>
+            <td class="text-end">
+              <button class="btn btn-sm btn-outline-primary me-1">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button class="btn btn-sm btn-outline-danger">
+                <i class="bi bi-trash"></i>
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td class="fw-medium text-primary">CSDL</td>
+            <td>Cơ sở dữ liệu</td>
+            <td>3</td>
+            <td>1</td>
+            <td class="text-end">
+              <button class="btn btn-sm btn-outline-primary me-1">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button class="btn btn-sm btn-outline-danger">
+                <i class="bi bi-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<%@ include file="../Shared/_LayoutEnd.jsp" %>
