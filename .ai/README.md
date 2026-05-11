@@ -68,24 +68,25 @@ Always generate:
 
 src/main/
 ├───java
-│   ├───com
-│   │   └───tracnghiem
-│   │       ├───config
-│   │       ├───controller
-│   │       ├───dao
-│   │       ├───entity
-│   │       │   └───id
-│   │       ├───repository
-│   │       ├───service
-│   │       └───utils
-│   ├───config
-│   └───utils
+│ ├───com
+│ │ └───tracnghiem
+│ │ ├───config
+│ │ ├───controller
+│ │ ├───dao
+│ │ ├───entity
+│ │ │ └───id
+│ │ ├───repository
+│ │ ├───service
+│ │ └───utils
+│ ├───config
+│ └───utils
 ├───resources
 └──webapp
-    ├───META-INF
-    └───WEB-INF
-        ├───configs
-        └───views
+├───META-INF
+└───WEB-INF
+├───configs
+└───views
+
 ---
 
 # Context Routing Rules
@@ -140,19 +141,6 @@ Use for:
 - Entity relationships
 - Mapping annotations
 
-Rules:
-
-- Use @Entity
-- Use @Table(name="...")
-- Use manual business keys
-- Use LAZY fetch by default
-
-Avoid:
-
-- JSP rules
-- Authentication rules
-- Exam rules
-
 ---
 
 # Controller Context
@@ -163,19 +151,6 @@ Read:
 - .ai/backend/controller-rules.md
 - .ai/backend/validation-rules.md
 
-Rules:
-
-- Use @Controller
-- Use @ModelAttribute
-- Use @Valid
-- Use DTO for form binding
-
-Avoid:
-
-- HttpServletRequest parameter extraction
-- Business logic
-- Repository access
-
 ---
 
 # Service Context
@@ -185,12 +160,6 @@ Read:
 - .ai/core/architecture.md
 - .ai/backend/service-rules.md
 - .ai/backend/transaction-rules.md
-
-Rules:
-
-- Use @Service
-- Use @Transactional only here
-- Handle business validation here
 
 Use for:
 
@@ -209,13 +178,6 @@ Read:
 - .ai/backend/repository-rules.md
 - .ai/database/database-rules.md
 
-Rules:
-
-- Use Hibernate SessionFactory
-- Use HQL
-- No raw JDBC
-- No Spring Data JPA
-
 Use for:
 
 - HQL queries
@@ -228,17 +190,6 @@ Use for:
 Read:
 
 - .ai/frontend/jsp-rules.md
-
-Rules:
-
-- JSP + JSTL only
-- Bootstrap UI
-- Spring Form Tag Library
-- No Java scriptlets
-
-Views location:
-
-/WEB-INF/views/
 
 ---
 
@@ -258,17 +209,6 @@ Use for:
 - Session
 - Authorization
 - Interceptors
-
-Session convention:
-
-session.setAttribute("LOGIN_USER", user);
-session.setAttribute("ROLE", role);
-
-Roles:
-
-- PGV
-- GIANGVIEN
-- SINHVIEN
 
 ---
 
