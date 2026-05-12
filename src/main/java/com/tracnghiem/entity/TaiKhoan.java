@@ -2,39 +2,32 @@ package com.tracnghiem.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "TaiKhoan")
+@Table(name = "TAIKHOAN")
 public class TaiKhoan {
 
     @Id
-    @Column(name = "USERNAME")
-    private String username;
+    @Column(name = "MA")
+    private String ma;
 
-    @Column(name = "PASSWORD_HASH")
+    @Column(name = "PASSWORD_HASH", nullable = false)
     private String passwordHash;
 
-    @Column(name = "ROLE")
+    @Column(name = "ROLE", nullable = false)
     private String role;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "MAGV")
-    private GiaoVien giaoVien;
 
     public TaiKhoan() {
     }
 
-    public String getUsername() {
-        return username;
+    public String getMa() {
+        return ma;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setMa(String ma) {
+        this.ma = ma;
     }
 
     public String getPasswordHash() {
@@ -51,13 +44,5 @@ public class TaiKhoan {
 
     public void setRole(String role) {
         this.role = role;
-    }
-
-    public GiaoVien getGiaoVien() {
-        return giaoVien;
-    }
-
-    public void setGiaoVien(GiaoVien giaoVien) {
-        this.giaoVien = giaoVien;
     }
 }

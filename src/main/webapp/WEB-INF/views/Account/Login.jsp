@@ -19,25 +19,19 @@
         .input-group-premium { display: flex; align-items: center; position: relative; margin-bottom: 1rem; }
         .input-icon { position: absolute; left: 12px; color: #999; }
         .form-control-premium { border: 1px solid #ddd; border-radius: .5rem; padding: .75rem 1rem .75rem 2.5rem; }
-        .role-switch-group { display: flex; gap: 1rem; margin-bottom: 2rem; }
-        .role-switch-btn { padding: .75rem 1.5rem; border: 2px solid #ddd; border-radius: .5rem; cursor: pointer; transition: all .3s; }
+        .role-switch-group { display: flex; gap: .5rem; margin-bottom: 2rem; }
+        .role-switch-btn { padding: .75rem .75rem; border: 2px solid #ddd; border-radius: .5rem; cursor: pointer; transition: all .3s; text-align: center; }
         .btn-check:checked + .role-switch-btn { background: #667eea; color: #fff; border-color: #667eea; }
         .btn-action { padding: .75rem 1.5rem; border-radius: .5rem; font-weight: 600; transition: all .3s; }
         .btn-action-primary { background: #667eea; color: #fff; border: none; }
         .btn-action-primary:hover { background: #5568d3; transform: translateY(-2px); }
         .max-w-md { max-width: 400px; }
-        .d-flex { display: flex; }
-        .align-items-center { align-items: center; }
-        .gap-1 { gap: 0.25rem; }
-        .gap-2 { gap: 0.5rem; }
-        .gap-3 { gap: 0.75rem; }
     </style>
 </head>
 <body>
     <div class="login-page">
         <div class="container">
             <div class="row align-items-center g-0">
-                <!-- Left Side -->
                 <div class="col-lg-7 d-none d-lg-block">
                     <div class="login-illustration pe-lg-5">
                         <div class="icon-circle mb-4">
@@ -49,8 +43,7 @@
                         </p>
                     </div>
                 </div>
-                
-                <!-- Right Side -->
+
                 <div class="col-lg-5">
                     <div class="login-card">
                         <div class="card-body p-4">
@@ -58,35 +51,38 @@
                                 <h1 class="h4 fw-bold text-gradient mb-2">Xin chào trở lại!</h1>
                                 <p class="text-muted small">Vui lòng đăng nhập để tiếp tục</p>
                             </div>
-                            
+
                             <c:if test="${not empty error}">
                                 <div class="alert alert-danger border-0 mb-4 py-3 d-flex align-items-center gap-2" role="alert">
                                     <i class="bi bi-exclamation-triangle-fill"></i>
                                     <span class="small fw-medium">${error}</span>
                                 </div>
                             </c:if>
-                            
-                            <form method="post" action="${pageContext.request.contextPath}/account/login">
-                                <!-- Role Selection -->
+
+                            <form method="post" action="${pageContext.request.contextPath}/login">
                                 <div class="role-switch-group mb-4">
                                     <div class="flex-grow-1">
-                                        <input type="radio" class="btn-check" name="role" id="roleGV" value="GIANGVIEN" checked>
-                                        <label class="role-switch-btn d-block" for="roleGV">Giảng viên / Quản trị</label>
+                                        <input type="radio" class="btn-check" name="role" id="rolePGV" value="PGV" checked>
+                                        <label class="role-switch-btn d-block" for="rolePGV">PGV</label>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <input type="radio" class="btn-check" name="role" id="roleGV" value="GIANGVIEN">
+                                        <label class="role-switch-btn d-block" for="roleGV">Giáo viên</label>
                                     </div>
                                     <div class="flex-grow-1">
                                         <input type="radio" class="btn-check" name="role" id="roleSV" value="SINHVIEN">
                                         <label class="role-switch-btn d-block" for="roleSV">Sinh viên</label>
                                     </div>
                                 </div>
-                                
+
                                 <div class="mb-3">
-                                    <label for="username" class="form-label small fw-bold text-muted">Tên đăng nhập</label>
+                                    <label for="ma" class="form-label small fw-bold text-muted">Mã đăng nhập</label>
                                     <div class="input-group-premium">
                                         <i class="bi bi-person input-icon"></i>
-                                        <input type="text" name="username" id="username" class="form-control-premium" placeholder="Nhập tên đăng nhập..." required />
+                                        <input type="text" name="ma" id="ma" class="form-control-premium" placeholder="Nhập mã đăng nhập..." required />
                                     </div>
                                 </div>
-                                
+
                                 <div class="mb-4">
                                     <label for="password" class="form-label small fw-bold text-muted">Mật khẩu</label>
                                     <div class="input-group-premium">
@@ -97,29 +93,18 @@
                                         </button>
                                     </div>
                                 </div>
-                                
-                                <div class="d-flex justify-content-between align-items-center mb-4">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="rememberMe">
-                                        <label class="form-check-label small text-muted" for="rememberMe">Ghi nhớ đăng nhập</label>
-                                    </div>
-                                </div>
-                                
+
                                 <button type="submit" class="btn btn-action btn-action-primary w-100 py-3">
                                     Đăng nhập ngay <i class="bi bi-box-arrow-in-right ms-2"></i>
                                 </button>
                             </form>
-                            
-                            <div class="mt-4 pt-3 border-top text-center">
-                                <p class="text-muted small mb-0">Chưa có tài khoản? <a href="#" class="text-gradient fw-bold text-decoration-none">Yêu cầu cấp tài khoản</a></p>
-                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.getElementById('togglePassword').addEventListener('click', function() {

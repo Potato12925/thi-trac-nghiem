@@ -15,18 +15,23 @@
                     </c:if>
                     <form method="post" action="${pageContext.request.contextPath}/login">
                         <div class="mb-3">
-                            <label for="username" class="form-label">Tài khoản</label>
-                            <input id="username" name="username" class="form-control" value="${username}" required />
+                            <label for="ma" class="form-label">Mã đăng nhập</label>
+                            <input id="ma" name="ma" class="form-control" value="${ma}" required />
                         </div>
                         <div class="mb-3">
                             <label for="password" class="form-label">Mật khẩu</label>
                             <input id="password" type="password" name="password" class="form-control" required />
                         </div>
+                        <div class="mb-3">
+                            <label class="form-label">Vai trò</label>
+                            <select name="role" class="form-select" required>
+                                <option value="PGV" <c:if test="${role == 'PGV'}">selected</c:if>>PGV</option>
+                                <option value="GIANGVIEN" <c:if test="${role == 'GIANGVIEN' || empty role}">selected</c:if>>Giáo viên</option>
+                                <option value="SINHVIEN" <c:if test="${role == 'SINHVIEN'}">selected</c:if>>Sinh viên</option>
+                            </select>
+                        </div>
                         <button type="submit" class="btn btn-primary w-100">Đăng nhập</button>
                     </form>
-                    <div class="text-center mt-3">
-                        <a href="${pageContext.request.contextPath}/register">Chưa có tài khoản? Đăng ký</a>
-                    </div>
                 </div>
             </div>
         </div>
