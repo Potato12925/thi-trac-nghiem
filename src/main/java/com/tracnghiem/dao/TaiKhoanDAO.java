@@ -7,13 +7,13 @@ import com.tracnghiem.entity.TaiKhoan;
 @Repository
 public class TaiKhoanDAO extends GenericDAO<TaiKhoan> {
 
-    public TaiKhoan findByUsername(String username) {
+    public TaiKhoan findByMa(String ma) {
 
-        String hql = "FROM TaiKhoan t WHERE t.username = :username";
+        String hql = "FROM TaiKhoan t WHERE t.ma = :ma";
 
         return getSession()
                 .createQuery(hql, TaiKhoan.class)
-                .setParameter("username", username)
+                .setParameter("ma", ma)
                 .uniqueResult();
     }
 }

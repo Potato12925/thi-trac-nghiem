@@ -24,54 +24,29 @@ public class AuthController {
         return "login";
     }
 
-    @GetMapping("/register")
-    public String showRegister() {
-        return "register";
-    }
-
     @PostMapping("/login")
     public String login(
-            @RequestParam("username") String username,
+            @RequestParam("ma") String ma,
             @RequestParam("password") String password,
+            @RequestParam("role") String role,
             HttpSession session,
             Model model) {
 
-        boolean ok = authService.login(username, password, session);
+        String error = authService.login(ma, password, role, session);
 
-        if (!ok) {
-            model.addAttribute("error", "Sai tài khoản hoặc mật khẩu");
-            model.addAttribute("username", username);
+        if (error != null) {
+            model.addAttribute("error", error);
+            model.addAttribute("ma", ma);
+            model.addAttribute("role", role);
             return "login";
         }
 
         return "redirect:/hello";
     }
 
-    @GetMapping("/logout")
+    @PostMapping("/logout")
     public String logout(HttpSession session) {
         authService.logout(session);
-        return "redirect:/login";
-    }
-
-    @PostMapping("/register")
-    public String register(
-            @RequestParam("username") String username,
-            @RequestParam("password") String password,
-            @RequestParam("confirmPassword") String confirmPassword,
-            @RequestParam("role") String role,
-            @RequestParam(value = "maGV", required = false) String maGV,
-            Model model) {
-
-        String error = authService.register(username, password, confirmPassword, role, maGV);
-
-        if (error != null) {
-            model.addAttribute("error", error);
-            model.addAttribute("username", username);
-            model.addAttribute("role", role);
-            model.addAttribute("maGV", maGV);
-            return "register";
-        }
-
         return "redirect:/login";
     }
 }

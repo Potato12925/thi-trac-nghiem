@@ -82,10 +82,10 @@ src/main/
 │ └───utils
 ├───resources
 └──webapp
-├───META-INF
-└───WEB-INF
-├───configs
-└───views
+    ├───META-INF
+    └───WEB-INF
+        ├───configs
+        └───views
 
 ---
 

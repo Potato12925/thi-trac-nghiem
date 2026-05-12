@@ -10,9 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.tracnghiem.dao.GiaoVienDAO;
 import com.tracnghiem.dao.TaiKhoanDAO;
-import com.tracnghiem.entity.GiaoVien;
 import com.tracnghiem.entity.TaiKhoan;
 
 @Service
@@ -21,76 +19,52 @@ public class AuthService {
     @Autowired
     private TaiKhoanDAO taiKhoanDAO;
 
-    @Autowired
-    private GiaoVienDAO giaoVienDAO;
-
     @Transactional
-    public boolean login(String username, String rawPassword, HttpSession session) {
+    public String login(String ma, String rawPassword, String role, HttpSession session) {
 
-        if (isBlank(username) || isBlank(rawPassword)) {
-            return false;
+        if (isBlank(ma)) {
+            return "Vui lòng nhập mã đăng nhập";
         }
 
-        TaiKhoan user = taiKhoanDAO.findByUsername(username.trim());
+        if (isBlank(rawPassword)) {
+            return "Vui lòng nhập mật khẩu";
+        }
+
+        if (isBlank(role)) {
+            return "Vui lòng chọn vai trò đăng nhập";
+        }
+
+        String normalizedMa = ma.trim();
+        String normalizedRole = role.trim().toUpperCase();
+
+        if (!isSupportedRole(normalizedRole)) {
+            return "Vai trò đăng nhập không hợp lệ";
+        }
+
+        TaiKhoan user = taiKhoanDAO.findByMa(normalizedMa);
 
         if (user == null) {
-            return false;
+            return "Mã đăng nhập không tồn tại";
         }
 
         String inputHash = sha256(rawPassword);
 
         if (!inputHash.equalsIgnoreCase(user.getPasswordHash())) {
-            return false;
+            return "Mật khẩu không chính xác";
         }
 
-        session.setAttribute("LOGIN_USER", user.getUsername());
+        if (!normalizedRole.equalsIgnoreCase(user.getRole())) {
+            return "Vai trò không khớp với tài khoản này";
+        }
+
+        session.setAttribute("LOGIN_USER", user.getMa());
         session.setAttribute("ROLE", user.getRole());
 
-        return true;
+        return null;
     }
 
     public void logout(HttpSession session) {
         session.invalidate();
-    }
-
-    @Transactional
-    public String register(String username, String rawPassword, String confirmPassword, String role, String maGV) {
-
-        if (isBlank(username) || isBlank(rawPassword) || isBlank(confirmPassword) || isBlank(role)) {
-            return "Vui lòng nhập đầy đủ thông tin bắt buộc";
-        }
-
-        if (!rawPassword.equals(confirmPassword)) {
-            return "Mật khẩu xác nhận không khớp";
-        }
-
-        String normalizedUsername = username.trim();
-        String normalizedRole = role.trim().toUpperCase();
-
-        if (!isSupportedRole(normalizedRole)) {
-            return "Vai trò không hợp lệ";
-        }
-
-        TaiKhoan existed = taiKhoanDAO.findByUsername(normalizedUsername);
-        if (existed != null) {
-            return "Tên đăng nhập đã tồn tại";
-        }
-
-        TaiKhoan account = new TaiKhoan();
-        account.setUsername(normalizedUsername);
-        account.setPasswordHash(sha256(rawPassword));
-        account.setRole(normalizedRole);
-
-        if (!isBlank(maGV)) {
-            GiaoVien giaoVien = giaoVienDAO.findById(maGV.trim());
-            if (giaoVien == null) {
-                return "Mã giáo viên không tồn tại";
-            }
-            account.setGiaoVien(giaoVien);
-        }
-
-        taiKhoanDAO.create(account);
-        return null;
     }
 
     private boolean isBlank(String value) {
