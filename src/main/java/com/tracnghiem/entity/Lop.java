@@ -22,5 +22,30 @@ public class Lop {
     @OneToMany(mappedBy = "lop")
     private List<SinhVien> sinhViens;
 
-    // getter setter
-}
+    public Lop() {
+    }
+
+    public String getMaLop() {
+        return maLop;
+    }
+
+    public void setMaLop(String maLop) {
+        this.maLop = maLop;
+    }
+
+    public String getTenLop() {
+        return tenLop;
+    }
+
+    public void setTenLop(String tenLop) {
+        this.tenLop = tenLop;
+    }
+
+    public List<SinhVien> getSinhViens() {
+        return sinhViens;
+    }
+
+    public void setSinhViens(List<SinhVien> sinhViens) {
+        this.sinhViens = sinhViens;
+    }
+} 
