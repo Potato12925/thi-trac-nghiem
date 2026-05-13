@@ -16,37 +16,32 @@ import com.tracnghiem.service.AuthService;
 @RequestMapping
 public class AuthController {
 
-    @Autowired
-    private AuthService authService;
+	@Autowired
+	private AuthService authService;
 
-    @GetMapping("/login")
-    public String showLogin() {
-        return "login";
-    }
+	@GetMapping("/login")
+	public String showLogin() {
+		return "login";
+	}
 
-    @PostMapping("/login")
-    public String login(
-            @RequestParam("ma") String ma,
-            @RequestParam("password") String password,
-            @RequestParam("role") String role,
-            HttpSession session,
-            Model model) {
+	@PostMapping("/login")
+	public String login(@RequestParam("ma") String ma, @RequestParam("password") String password, HttpSession session,
+			Model model) {
 
-        String error = authService.login(ma, password, role, session);
+		String error = authService.login(ma, password, session);
 
-        if (error != null) {
-            model.addAttribute("error", error);
-            model.addAttribute("ma", ma);
-            model.addAttribute("role", role);
-            return "login";
-        }
+		if (error != null) {
+			model.addAttribute("error", error);
+			model.addAttribute("ma", ma);
+			return "login";
+		}
 
-        return "redirect:/hello";
-    }
+		return "redirect:/hello";
+	}
 
-    @PostMapping("/logout")
-    public String logout(HttpSession session) {
-        authService.logout(session);
-        return "redirect:/login";
-    }
+	@PostMapping("/logout")
+	public String logout(HttpSession session) {
+		authService.logout(session);
+		return "redirect:/login";
+	}
 }
