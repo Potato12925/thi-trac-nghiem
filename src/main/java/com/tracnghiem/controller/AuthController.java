@@ -1,4 +1,4 @@
-package com.tracnghiem.controller;
+﻿package com.tracnghiem.controller;
 
 import javax.servlet.http.HttpSession;
 
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.tracnghiem.service.AuthService;
 
 @Controller
-@RequestMapping
+@RequestMapping("/auth")
 public class AuthController {
 
 	@Autowired
@@ -21,7 +21,7 @@ public class AuthController {
 
 	@GetMapping("/login")
 	public String showLogin() {
-		return "login";
+		return "Account/Login";
 	}
 
 	@PostMapping("/login")
@@ -33,7 +33,7 @@ public class AuthController {
 		if (error != null) {
 			model.addAttribute("error", error);
 			model.addAttribute("ma", ma);
-			return "login";
+			return "Home/Index";
 		}
 
 		return "redirect:/hello";
@@ -42,6 +42,6 @@ public class AuthController {
 	@PostMapping("/logout")
 	public String logout(HttpSession session) {
 		authService.logout(session);
-		return "redirect:/login";
+		return "Home/Index";
 	}
 }

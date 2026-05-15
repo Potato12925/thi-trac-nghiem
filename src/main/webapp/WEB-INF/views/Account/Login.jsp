@@ -59,7 +59,7 @@
                                 </div>
                             </c:if>
 
-                            <form method="post" action="${pageContext.request.contextPath}/login">
+                            <form method="post" action="${pageContext.request.contextPath}/auth/login">
                                 <div class="role-switch-group mb-4">
                                     <div class="flex-grow-1">
                                         <input type="radio" class="btn-check" name="role" id="rolePGV" value="PGV" checked>

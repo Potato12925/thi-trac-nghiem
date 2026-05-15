@@ -1,4 +1,4 @@
-package com.tracnghiem.controller;
+﻿package com.tracnghiem.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -17,10 +17,6 @@ public class HelloController {
 
     @GetMapping
     public String sayHello(Model model) {
-
-        model.addAttribute(
-                "message",
-                "Hello, Spring MVC Developer!");
 
         boolean connected = testService.testConnection();
 
@@ -41,6 +37,6 @@ public class HelloController {
                 "dbConnected",
                 connected);
 
-        return "hello";
+        return "Home/Index";
     }
 }
