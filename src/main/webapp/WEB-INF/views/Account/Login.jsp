@@ -44,9 +44,9 @@
                         <div class="icon-circle mb-4">
                             <i class="bi bi-mortarboard-fill"></i>
                         </div>
-                        <h2 class="display-4 fw-bold text-white mb-3">Hệ Thống Quản Lý Đào Tạo</h2>
+                        <h2 class="display-4 fw-bold text-white mb-3">Hệ Thống Thi Trắc Nghiệm Online</h2>
                         <p class="fs-5 text-white text-opacity-75 max-w-md">
-                            Cổng thông tin tích hợp dành cho sinh viên và giảng viên. Quản lý điểm, thời khóa biểu và đăng ký tín chỉ một cách thông minh.
+                            Tích hợp dành cho sinh viên và giảng viên. Thi trắc nhiệm, quản lý điểm.
                         </p>
                     </div>
                 </div>
@@ -67,20 +67,6 @@
                             </c:if>
 
                             <form method="post" action="${pageContext.request.contextPath}/auth/login">
-                                <div class="role-switch-group mb-4">
-                                    <div class="flex-grow-1">
-                                        <input type="radio" class="btn-check" name="role" id="rolePGV" value="PGV" checked>
-                                        <label class="role-switch-btn d-block" for="rolePGV">PGV</label>
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <input type="radio" class="btn-check" name="role" id="roleGV" value="GIANGVIEN">
-                                        <label class="role-switch-btn d-block" for="roleGV">Giáo viên</label>
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <input type="radio" class="btn-check" name="role" id="roleSV" value="SINHVIEN">
-                                        <label class="role-switch-btn d-block" for="roleSV">Sinh viên</label>
-                                    </div>
-                                </div>
 
                                 <div class="mb-3">
                                     <label for="ma" class="form-label small fw-bold field-label">Mã đăng nhập</label>
