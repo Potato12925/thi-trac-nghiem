@@ -27,6 +27,9 @@
     <!-- MVC -->
     <mvc:annotation-driven/>
 
+    <!-- STATIC RESOURCES -->
+    <mvc:resources mapping="/assets/**" location="/assets/" />
+
     <!-- Transaction -->
     <tx:annotation-driven/>
 

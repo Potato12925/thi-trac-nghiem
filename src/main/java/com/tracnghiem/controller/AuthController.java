@@ -33,15 +33,15 @@ public class AuthController {
 		if (error != null) {
 			model.addAttribute("error", error);
 			model.addAttribute("ma", ma);
-			return "Home/Index";
+			return "Account/Login";
 		}
 
-		return "redirect:/hello";
+		return "Home/Index";
 	}
 
 	@PostMapping("/logout")
 	public String logout(HttpSession session) {
 		authService.logout(session);
-		return "Home/Index";
+		return "Hello/Index";
 	}
 }

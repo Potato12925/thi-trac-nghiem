@@ -13,7 +13,7 @@ String username = session.getAttribute("LOGIN_USER") != null ? session.getAttrib
 	<nav class="sidebar-nav" aria-label="Main Navigation">
 		<ul>
 			<li><a class="nav-link active"
-				href="${pageContext.request.contextPath}/"><i
+				href="${pageContext.request.contextPath}/home"><i
 					class="bi bi-house"></i> Trang chủ</a></li>
 			<li><a class="nav-link"
 				href="${pageContext.request.contextPath}/class"><i
