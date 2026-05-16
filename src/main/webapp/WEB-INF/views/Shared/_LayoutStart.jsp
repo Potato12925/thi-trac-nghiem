@@ -12,6 +12,7 @@
     <title><%= pageTitle %></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/theme.css" />
     <style>
         body { min-height: 100vh; background: #f4f6fb; }
         .app-layout { display: flex; min-height: 100vh; }

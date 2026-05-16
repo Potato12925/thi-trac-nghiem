@@ -37,6 +37,6 @@ public class HelloController {
                 "dbConnected",
                 connected);
 
-        return "Home/Index";
+        return "Hello/Index";
     }
 }

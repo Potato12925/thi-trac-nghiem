@@ -4,8 +4,8 @@
 - Use EL: ${}
 - Use Bootstrap
 - Use Spring Form Tag Library
-
-Avoid:
+- Use root theme.css for color
+  Avoid:
 
 - Java scriptlets <% %>
 - Business logic in JSP
@@ -16,4 +16,8 @@ Location:
 
 Reusable layouts:
 
-- /WEB-INF/views/layout/
+- /WEB-INF/views/Shared/
+
+them.css:
+
+- src/main/webapp/assets/css/theme.css
