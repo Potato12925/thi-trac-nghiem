@@ -1,110 +1,78 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
-
 <%
 request.setAttribute("pageTitle", "Quản lý Môn học");
 %>
-
 <%@ include file="../Shared/_LayoutStart.jsp"%>
-
-<div class="container py-4">
-
+<div class="container-fluid">
 	<div class="d-flex justify-content-between align-items-center mb-4">
-		<div>
-			<h3 class="fw-semibold mb-1">Quản lý môn học</h3>
-			<p class="text-muted mb-0 small">Quản lý danh sách môn học trong
-				hệ thống</p>
-		</div>
+		<h1 class="h3 mb-0">Danh mục Môn học</h1>
 	</div>
 
-	<div class="border rounded-3 bg-white p-4 mb-4">
-
-		<form:form id="subjectForm"
-			action="${pageContext.request.contextPath}/subject/add" method="post"
-			modelAttribute="monHoc">
-
-			<input type="hidden" id="_method" name="_method" value="POST" />
-
-			<div class="row g-3">
-
-				<div class="col-md-3">
-
-					<label class="form-label small text-secondary"> Mã môn học
-					</label>
-
-					<form:input path="maMH" cssClass="form-control" />
-					<form:errors path="maMH" cssClass="text-danger small mt-1 d-block"/>
-				</div>
-
-				<div class="col-md-5">
-
-					<label class="form-label small text-secondary"> Tên môn học
-					</label>
-
-					<form:input path="tenMH" cssClass="form-control" />
-					<form:errors path="tenMH" cssClass="text-danger small mt-1 d-block"/>
-				</div>
-
-				<div class="col-md-2">
-
-					<label class="form-label small text-secondary"> Số tiết LT
-					</label>
-
-					<form:input path="soTiet_LT" cssClass="form-control" />
-					<form:errors path="soTiet_LT" cssClass="text-danger small mt-1 d-block"/>
-				</div>
-
-				<div class="col-md-2">
-
-					<label class="form-label small text-secondary"> Số tiết TH
-					</label>
-
-					<form:input path="soTiet_TH" cssClass="form-control" />
-					<form:errors path="soTiet_TH" cssClass="text-danger small mt-1 d-block"/>
-				</div>
-
+	<div class="card border-0 shadow-sm mb-4 p-3">
+		<c:if test="${not empty successMessage}">
+			<div class="alert alert-success alert-dismissible fade show"
+				role="alert">
+				${successMessage}
+				<button type="button" class="btn-close" data-bs-dismiss="alert"
+					aria-label="Close"></button>
 			</div>
-
-			<div class="d-flex gap-2 mt-4">
-
-				<button type="submit" class="btn btn-dark px-4"
-					onclick="submitForm(
-                        'add',
-                        'POST'
-                    )">
-
-					Thêm</button>
-
-				<button type="submit" class="btn btn-outline-secondary px-4"
-					onclick="submitForm(
-                        'update',
-                        'PUT'
-                    )">
-
-					Chỉnh sửa</button>
-
-				<button type="submit" class="btn btn-outline-danger px-4"
-					onclick="submitForm(
-                        'delete',
-                        'DELETE'
-                    )">
-
-					Xóa</button>
-
-				<button type="button" class="btn btn-outline-dark"
-					onclick="resetForm()">Reset</button>
+		</c:if>
+		<c:if test="${not empty errorMessage}">
+			<div class="alert alert-danger alert-dismissible fade show"
+				role="alert">
+				${errorMessage}
+				<button type="button" class="btn-close" data-bs-dismiss="alert"
+					aria-label="Close"></button>
 			</div>
+		</c:if>
+		<c:if test="${not empty infoMessage}">
+			<div class="alert alert-info alert-dismissible fade show"
+				role="alert">
+				${infoMessage}
+				<button type="button" class="btn-close" data-bs-dismiss="alert"
+					aria-label="Close"></button>
+			</div>
+		</c:if>
 
-		</form:form>
+		<form id="subjectForm"
+			action="${pageContext.request.contextPath}/subject/save"
+			method="post" class="row g-3 align-items-end">
+			<div class="col-md-2">
+				<label class="form-label text-sm fw-medium">Mã MH</label> <input
+					type="text" name="maMH" class="form-control form-control-sm"
+					placeholder="MAMH" value="${subject.maMH}" />
+			</div>
+			<div class="col-md-4">
+				<label class="form-label text-sm fw-medium">Tên Môn học</label> <input
+					type="text" name="tenMH" class="form-control form-control-sm"
+					placeholder="Nhập tên môn học" value="${subject.tenMH}" />
+			</div>
+			<div class="col-md-6">
+				<div class="d-flex flex-wrap gap-2 justify-content-md-end">
+					<button class="btn btn-primary" type="button"
+						onclick="addPendingSubject()">Thêm</button>
+					<button class="btn btn-outline-primary" type="button"
+						onclick="document.getElementById('subjectForm').submit()">Hiệu
+						chỉnh</button>
+					<button class="btn btn-outline-secondary" type="reset">Phục
+						hồi</button>
+					<button class="btn btn-outline-danger" type="button"
+						onclick="submitDelete()">Xóa</button>
+					<c:if test="${canUndo}">
+						<button class="btn btn-warning" type="submit" form="undoForm">Phục
+							hồi thao tác</button>
+						<button class="btn btn-success" type="button"
+							onclick="submitSave()">Ghi</button>
+					</c:if>
+				</div>
+			</div>
+		</form>
 
-	</div>
-	<div class="border rounded-3 bg-white overflow-hidden">
-
-		<div class="px-4 py-3 border-bottom">
-			<h6 class="mb-0 fw-semibold">Danh sách môn học</h6>
-		</div>
+		<form id="batchSaveForm"
+			action="${pageContext.request.contextPath}/subject/save-batch"
+			method="post"></form>
 
 		<form id="searchForm"
 			action="${pageContext.request.contextPath}/subject" method="get"
@@ -121,145 +89,170 @@ request.setAttribute("pageTitle", "Quản lý Môn học");
 			</div>
 		</form>
 
-		<div class="table-responsive">
+		<form id="undoForm"
+			action="${pageContext.request.contextPath}/subject/undo"
+			method="post" class="d-none"></form>
+	</div>
 
-			<table class="table align-middle mb-0">
-
-				<thead class="bg-light">
+	<div class="card border-0 shadow-sm">
+		<div class="table-responsive p-3">
+			<table class="table table-hover align-middle mb-0">
+				<thead class="table-light">
 					<tr>
-						<th class="px-4 py-3 text-secondary fw-semibold">Mã MH</th>
-
-						<th class="py-3 text-secondary fw-semibold">Tên môn học</th>
-
-						<th class="py-3 text-secondary fw-semibold">Số tiết LT</th>
-
-						<th class="py-3 text-secondary fw-semibold">Số tiết TH</th>
-
-						<th class="py-3 text-end text-secondary fw-semibold pe-4">
-							Hành động</th>
+						<th scope="col">Mã MH</th>
+						<th scope="col">Tên Môn học</th>
+						<th scope="col" class="text-end">Hành động</th>
 					</tr>
 				</thead>
-
-				<tbody>
-
-					<c:forEach var="mh" items="${danhSachMonHoc}">
-
+				<tbody id="subjectTableBody">
+					<c:forEach items="${subjects}" var="item">
 						<tr>
-
-							<td class="px-4 fw-medium">${mh.maMH}</td>
-
-							<td>${mh.tenMH}</td>
-
-							<td>${mh.soTiet_LT}</td>
-
-							<td>${mh.soTiet_TH}</td>
-
-							<td class="text-end pe-4">
-
-								<button class="btn btn-sm btn-outline-secondary me-2 btn-edit">
+							<td class="fw-medium text-primary">${item.maMH}</td>
+							<td>${item.tenMH}</td>
+							<td class="text-end"><a
+								class="btn btn-sm btn-outline-primary me-1"
+								href="${pageContext.request.contextPath}/subject?maMH=${item.maMH}&search=${search}">
 									<i class="bi bi-pencil"></i>
-								</button>
-
-								<button class="btn btn-sm btn-outline-danger">
-									<i class="bi bi-trash"></i>
-								</button>
-							</td>
+							</a>
+								<form action="${pageContext.request.contextPath}/subject/delete"
+									method="post" class="d-inline">
+									<input type="hidden" name="maMH" value="${item.maMH}" />
+									<button class="btn btn-sm btn-outline-danger" type="submit">
+										<i class="bi bi-trash"></i>
+									</button>
+								</form></td>
 						</tr>
 					</c:forEach>
+					<c:if test="${empty subjects}">
+						<tr id="emptyRow">
+							<td colspan="3" class="text-center text-muted">Không có môn
+								học nào.</td>
+						</tr>
+					</c:if>
 				</tbody>
 			</table>
 		</div>
 	</div>
 </div>
 
-<style>
-body {
-	background-color: #f8f9fa;
-}
-
-.form-control {
-	height: 42px;
-	border-radius: 10px;
-	border: 1px solid #dee2e6;
-	font-size: 14px;
-}
-
-.form-control:focus {
-	box-shadow: none;
-	border-color: #212529;
-}
-
-.btn {
-	height: 40px;
-	border-radius: 10px;
-	font-size: 14px;
-	font-weight: 500;
-	box-shadow: none !important;
-}
-
-.table th {
-	font-size: 13px;
-	letter-spacing: 0.3px;
-	border-bottom: 1px solid #e9ecef;
-}
-
-.table td {
-	padding-top: 16px;
-	padding-bottom: 16px;
-	border-color: #f1f3f5;
-	font-size: 14px;
-}
-
-.table tbody tr:hover {
-	background-color: #fafafa;
-}
-</style>
+<form id="deleteForm"
+	action="${pageContext.request.contextPath}/subject/delete"
+	method="post">
+	<input type="hidden" name="maMH" id="deleteMaMH" />
+</form>
 
 <script>
-	function fillFormFromRow(row) {
-		const cells = row.querySelectorAll("td");
-		
-		const maMH = cells[0].innerText;
-		const tenMH = cells[1].innerText;
-		const soTietLT = cells[2].innerText;
-		const soTietTH = cells[3].innerText;
-		        
-		document.getElementById("maMH").value = maMH;
-        document.getElementById("tenMH").value = tenMH;
-        document.getElementById("soTiet_LT").value = soTietLT;
-        document.getElementById("soTiet_TH").value = soTietTH;
-        
-        document.getElementById("maMH").readOnly = true;
+	var pendingSubjects = [];
+
+	function addPendingSubject() {
+		var form = document.getElementById('subjectForm');
+		var maMH = form.elements['maMH'].value.trim();
+		var tenMH = form.elements['tenMH'].value.trim();
+
+		if (!maMH || !tenMH) {
+			alert('Cần nhập đầy đủ Mã MH và Tên Môn học trước khi thêm.');
+			return;
+		}
+
+		if (pendingSubjects.some(function(item) {
+			return item.maMH === maMH;
+		})) {
+			alert('Mã môn học này đã được thêm tạm.');
+			return;
+		}
+
+		pendingSubjects.push({
+			maMH : maMH,
+			tenMH : tenMH
+		});
+		renderPendingSubjects();
+		                clearSubjectForm();
 	}
 
-	const editButtons = document.querySelectorAll(".btn-edit");
-	
-	editButtons.forEach(button => {
-		button.addEventListener("click", function () {
-			const row = this.closest("tr");
-			
-			fillFormFromRow(row);
+	function renderPendingSubjects() {
+		var tbody = document.getElementById('subjectTableBody');
+		var emptyRow = document.getElementById('emptyRow');
+
+		// Remove existing pending rows
+		var existingPending = tbody.querySelectorAll('.pending-row');
+		existingPending.forEach(function(row) {
+			row.remove();
 		});
-	});
 
-	function submitForm(action, method) {
+		// Hide empty message when there are pending rows
+		if (emptyRow) {
+			emptyRow.style.display = pendingSubjects.length > 0 ? 'none' : '';
+		}
 
-        const form = document.getElementById("subjectForm");
+		// Append pending rows after server rows
+		pendingSubjects
+				.forEach(function(item, index) {
+					var row = document.createElement('tr');
+					row.className = 'table-warning pending-row';
+					row.innerHTML = ''
+							+ '<td class="fw-medium text-primary">'
+							+ item.maMH
+							+ '</td>'
+							+ '<td>'
+							+ item.tenMH
+							+ '</td>'
+							+ '<td class="text-end">'
+							+ '<span class="badge bg-warning text-dark me-2">Chưa lưu</span>'
+							+ '<button type="button" class="btn btn-sm btn-outline-danger" onclick="removePendingSubject('
+							+ index + ')">' + '<i class="bi bi-x-lg"></i>'
+							+ '</button>' + '</td>';
+					tbody.appendChild(row);
+				});
 
-        form.action =
-            "${pageContext.request.contextPath}/subject/"
-            + action;
+		updateBatchFormInputs();
+	}
 
-        document.getElementById("_method").value =
-            method;
-    }
-	
-	function resetForm() {
-	    document.getElementById("subjectForm").reset();
+	function updateBatchFormInputs() {
+		var batchForm = document.getElementById('batchSaveForm');
+		batchForm.innerHTML = '';
 
-	    document.getElementById("maMH").readOnly = false;
+		pendingSubjects.forEach(function(item) {
+			var inputCode = document.createElement('input');
+			inputCode.type = 'hidden';
+			inputCode.name = 'pendingMaMH';
+			inputCode.value = item.maMH;
+			batchForm.appendChild(inputCode);
+
+			var inputName = document.createElement('input');
+			inputName.type = 'hidden';
+			inputName.name = 'pendingTenMH';
+			inputName.value = item.tenMH;
+			batchForm.appendChild(inputName);
+		});
+	}
+
+	function removePendingSubject(index) {
+		pendingSubjects.splice(index, 1);
+		renderPendingSubjects();
+	}
+
+	function clearSubjectForm() {
+		var form = document.getElementById('subjectForm');
+		form.reset();
+		form.elements['maMH'].value = '';
+		form.elements['tenMH'].value = '';
+	}
+
+	function submitSave() {
+		if (pendingSubjects.length > 0) {
+			document.getElementById('batchSaveForm').submit();
+			return;
+		}
+		document.getElementById('subjectForm').submit();
+	}
+
+	function submitDelete() {
+		var value = document.getElementById('subjectForm').elements['maMH'].value;
+		if (!value) {
+			return;
+		}
+		document.getElementById('deleteMaMH').value = value;
+		document.getElementById('deleteForm').submit();
 	}
 </script>
-
-
 <%@ include file="../Shared/_LayoutEnd.jsp"%>
