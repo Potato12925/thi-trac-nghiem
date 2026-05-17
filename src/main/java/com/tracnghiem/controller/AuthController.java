@@ -1,4 +1,4 @@
-package com.tracnghiem.controller;
+﻿package com.tracnghiem.controller;
 
 import javax.servlet.http.HttpSession;
 
@@ -13,40 +13,35 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.tracnghiem.service.AuthService;
 
 @Controller
-@RequestMapping
+@RequestMapping("/auth")
 public class AuthController {
 
-    @Autowired
-    private AuthService authService;
+	@Autowired
+	private AuthService authService;
 
-    @GetMapping("/login")
-    public String showLogin() {
-        return "login";
-    }
+	@GetMapping("/login")
+	public String showLogin() {
+		return "Account/Login";
+	}
 
-    @PostMapping("/login")
-    public String login(
-            @RequestParam("ma") String ma,
-            @RequestParam("password") String password,
-            @RequestParam("role") String role,
-            HttpSession session,
-            Model model) {
+	@PostMapping("/login")
+	public String login(@RequestParam("ma") String ma, @RequestParam("password") String password, HttpSession session,
+			Model model) {
 
-        String error = authService.login(ma, password, role, session);
+		String error = authService.login(ma, password, session);
 
-        if (error != null) {
-            model.addAttribute("error", error);
-            model.addAttribute("ma", ma);
-            model.addAttribute("role", role);
-            return "login";
-        }
+		if (error != null) {
+			model.addAttribute("error", error);
+			model.addAttribute("ma", ma);
+			return "Account/Login";
+		}
 
-        return "redirect:/hello";
-    }
+		return "Home/Index";
+	}
 
-    @PostMapping("/logout")
-    public String logout(HttpSession session) {
-        authService.logout(session);
-        return "redirect:/login";
-    }
+	@PostMapping("/logout")
+	public String logout(HttpSession session) {
+		authService.logout(session);
+		return "Hello/Index";
+	}
 }

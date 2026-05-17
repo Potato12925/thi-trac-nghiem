@@ -16,80 +16,67 @@ import com.tracnghiem.entity.TaiKhoan;
 @Service
 public class AuthService {
 
-    @Autowired
-    private TaiKhoanDAO taiKhoanDAO;
+	@Autowired
+	private TaiKhoanDAO taiKhoanDAO;
 
-    @Transactional
-    public String login(String ma, String rawPassword, String role, HttpSession session) {
+	@Transactional
+	public String login(String ma, String rawPassword, HttpSession session) {
 
-        if (isBlank(ma)) {
-            return "Vui lòng nhập mã đăng nhập";
-        }
+		if (isBlank(ma)) {
+			return "Vui lòng nhập mã đăng nhập";
+		}
 
-        if (isBlank(rawPassword)) {
-            return "Vui lòng nhập mật khẩu";
-        }
+		if (isBlank(rawPassword)) {
+			return "Vui lòng nhập mật khẩu";
+		}
 
-        if (isBlank(role)) {
-            return "Vui lòng chọn vai trò đăng nhập";
-        }
+		String normalizedMa = ma.trim();
 
-        String normalizedMa = ma.trim();
-        String normalizedRole = role.trim().toUpperCase();
+		TaiKhoan user = taiKhoanDAO.findByMa(normalizedMa);
 
-        if (!isSupportedRole(normalizedRole)) {
-            return "Vai trò đăng nhập không hợp lệ";
-        }
+		if (user == null) {
+			return "Mã đăng nhập không tồn tại";
+		}
 
-        TaiKhoan user = taiKhoanDAO.findByMa(normalizedMa);
+		String inputHash = sha256(rawPassword);
 
-        if (user == null) {
-            return "Mã đăng nhập không tồn tại";
-        }
+		if (!inputHash.equalsIgnoreCase(user.getPasswordHash())) {
+			return "Mật khẩu không chính xác";
+		}
 
-        String inputHash = sha256(rawPassword);
+		session.setAttribute("LOGIN_USER", user.getMa());
+		session.setAttribute("ROLE", user.getRole());
 
-        if (!inputHash.equalsIgnoreCase(user.getPasswordHash())) {
-            return "Mật khẩu không chính xác";
-        }
+		return null;
+	}
 
-        if (!normalizedRole.equalsIgnoreCase(user.getRole())) {
-            return "Vai trò không khớp với tài khoản này";
-        }
+	public void logout(HttpSession session) {
+		session.invalidate();
+	}
 
-        session.setAttribute("LOGIN_USER", user.getMa());
-        session.setAttribute("ROLE", user.getRole());
+	private boolean isBlank(String value) {
+		return value == null || value.trim().isEmpty();
+	}
 
-        return null;
-    }
+	private boolean isSupportedRole(String role) {
+		return "PGV".equals(role) || "GIAOVIEN".equals(role) || "SINHVIEN".equals(role);
+	}
 
-    public void logout(HttpSession session) {
-        session.invalidate();
-    }
+	private String sha256(String raw) {
 
-    private boolean isBlank(String value) {
-        return value == null || value.trim().isEmpty();
-    }
+		try {
+			MessageDigest digest = MessageDigest.getInstance("SHA-256");
+			byte[] hash = digest.digest(raw.getBytes(StandardCharsets.UTF_8));
+			StringBuilder sb = new StringBuilder(hash.length * 2);
 
-    private boolean isSupportedRole(String role) {
-        return "PGV".equals(role) || "GIANGVIEN".equals(role) || "SINHVIEN".equals(role);
-    }
+			for (byte b : hash) {
+				sb.append(String.format("%02x", b));
+			}
 
-    private String sha256(String raw) {
+			return sb.toString();
 
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest(raw.getBytes(StandardCharsets.UTF_8));
-            StringBuilder sb = new StringBuilder(hash.length * 2);
-
-            for (byte b : hash) {
-                sb.append(String.format("%02x", b));
-            }
-
-            return sb.toString();
-
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("SHA-256 algorithm not available", e);
-        }
-    }
+		} catch (NoSuchAlgorithmException e) {
+			throw new IllegalStateException("SHA-256 algorithm not available", e);
+		}
+	}
 }

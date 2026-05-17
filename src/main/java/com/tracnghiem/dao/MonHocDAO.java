@@ -12,6 +12,9 @@ import com.tracnghiem.entity.MonHoc;
  */
 @Repository
 public class MonHocDAO extends GenericDAO<MonHoc> {
+	public void themMonHoc(MonHoc monHoc) {
+		create(monHoc);
+	}
 
     /**
      * Searches subjects by keyword.

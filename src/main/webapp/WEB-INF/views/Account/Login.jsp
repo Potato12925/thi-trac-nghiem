@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<% request.setAttribute("pageTitle", "Đăng nhập"); %>
+<c:set var="pageTitle" value="Đăng nhập" scope="request" />
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -9,22 +9,29 @@
     <title>Đăng nhập</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
+    <link href="${pageContext.request.contextPath}/assets/css/theme.css" rel="stylesheet" />
     <style>
-        body { min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; }
+        body { min-height: 100vh; background: linear-gradient(135deg, var(--oqs-primary) 0%, var(--oqs-secondary) 100%); display: flex; align-items: center; }
         .login-page { display: flex; align-items: center; min-height: 100vh; }
         .login-illustration { padding: 2rem; }
-        .icon-circle { width: 80px; height: 80px; border-radius: 50%; background: #667eea; color: #fff; display: grid; place-items: center; font-size: 2rem; }
-        .login-card { border-radius: 1rem; box-shadow: 0 10px 40px rgba(0, 0, 0, .2); }
-        .text-gradient { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .icon-circle { width: 80px; height: 80px; border-radius: 50%; background: var(--oqs-white); color: var(--oqs-primary); display: grid; place-items: center; font-size: 2rem; }
+        .login-card { border-radius: 1rem; box-shadow: 0 10px 40px rgba(13, 110, 253, .2); border: 1px solid var(--oqs-light); background: var(--oqs-white); }
+        .text-gradient { background: linear-gradient(135deg, var(--oqs-primary) 0%, var(--oqs-secondary) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .input-group-premium { display: flex; align-items: center; position: relative; margin-bottom: 1rem; }
-        .input-icon { position: absolute; left: 12px; color: #999; }
-        .form-control-premium { border: 1px solid #ddd; border-radius: .5rem; padding: .75rem 1rem .75rem 2.5rem; }
+        .input-icon { position: absolute; left: 12px; color: var(--oqs-muted); }
+        .form-control-premium { border: 1px solid #d9e4ff; border-radius: .5rem; padding: .75rem 1rem .75rem 2.5rem; width: 100%; color: var(--oqs-text); background: var(--oqs-white); }
+        .form-control-premium::placeholder { color: var(--oqs-muted); opacity: .8; }
+        .form-control-premium:focus { border-color: var(--oqs-secondary); outline: none; box-shadow: 0 0 0 .2rem rgba(43, 140, 255, .15); }
         .role-switch-group { display: flex; gap: .5rem; margin-bottom: 2rem; }
-        .role-switch-btn { padding: .75rem .75rem; border: 2px solid #ddd; border-radius: .5rem; cursor: pointer; transition: all .3s; text-align: center; }
-        .btn-check:checked + .role-switch-btn { background: #667eea; color: #fff; border-color: #667eea; }
+        .role-switch-btn { padding: .75rem .75rem; border: 2px solid #d9e4ff; border-radius: .5rem; cursor: pointer; transition: all .3s; text-align: center; color: var(--oqs-muted); }
+        .btn-check:checked + .role-switch-btn { background: var(--oqs-primary); color: var(--oqs-white); border-color: var(--oqs-primary); }
         .btn-action { padding: .75rem 1.5rem; border-radius: .5rem; font-weight: 600; transition: all .3s; }
-        .btn-action-primary { background: #667eea; color: #fff; border: none; }
-        .btn-action-primary:hover { background: #5568d3; transform: translateY(-2px); }
+        .btn-action-primary { background: var(--oqs-primary); color: var(--oqs-white); border: none; }
+        .btn-action-primary:hover { background: var(--oqs-secondary); color: var(--oqs-white); transform: translateY(-2px); }
+        .login-subtitle { color: var(--oqs-muted); }
+        .field-label { color: var(--oqs-text); }
+        .password-toggle { color: var(--oqs-muted); }
+        .password-toggle:hover { color: var(--oqs-primary); }
         .max-w-md { max-width: 400px; }
     </style>
 </head>
@@ -37,9 +44,9 @@
                         <div class="icon-circle mb-4">
                             <i class="bi bi-mortarboard-fill"></i>
                         </div>
-                        <h2 class="display-4 fw-bold text-white mb-3">Hệ Thống Quản Lý Đào Tạo</h2>
+                        <h2 class="display-4 fw-bold text-white mb-3">Hệ Thống Thi Trắc Nghiệm Online</h2>
                         <p class="fs-5 text-white text-opacity-75 max-w-md">
-                            Cổng thông tin tích hợp dành cho sinh viên và giảng viên. Quản lý điểm, thời khóa biểu và đăng ký tín chỉ một cách thông minh.
+                            Tích hợp dành cho sinh viên và giảng viên. Thi trắc nhiệm, quản lý điểm.
                         </p>
                     </div>
                 </div>
@@ -49,7 +56,7 @@
                         <div class="card-body p-4">
                             <div class="text-center mb-4">
                                 <h1 class="h4 fw-bold text-gradient mb-2">Xin chào trở lại!</h1>
-                                <p class="text-muted small">Vui lòng đăng nhập để tiếp tục</p>
+                                <p class="small login-subtitle">Vui lòng đăng nhập để tiếp tục</p>
                             </div>
 
                             <c:if test="${not empty error}">
@@ -59,24 +66,10 @@
                                 </div>
                             </c:if>
 
-                            <form method="post" action="${pageContext.request.contextPath}/login">
-                                <div class="role-switch-group mb-4">
-                                    <div class="flex-grow-1">
-                                        <input type="radio" class="btn-check" name="role" id="rolePGV" value="PGV" checked>
-                                        <label class="role-switch-btn d-block" for="rolePGV">PGV</label>
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <input type="radio" class="btn-check" name="role" id="roleGV" value="GIANGVIEN">
-                                        <label class="role-switch-btn d-block" for="roleGV">Giáo viên</label>
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <input type="radio" class="btn-check" name="role" id="roleSV" value="SINHVIEN">
-                                        <label class="role-switch-btn d-block" for="roleSV">Sinh viên</label>
-                                    </div>
-                                </div>
+                            <form method="post" action="${pageContext.request.contextPath}/auth/login">
 
                                 <div class="mb-3">
-                                    <label for="ma" class="form-label small fw-bold text-muted">Mã đăng nhập</label>
+                                    <label for="ma" class="form-label small fw-bold field-label">Mã đăng nhập</label>
                                     <div class="input-group-premium">
                                         <i class="bi bi-person input-icon"></i>
                                         <input type="text" name="ma" id="ma" class="form-control-premium" placeholder="Nhập mã đăng nhập..." required />
@@ -84,11 +77,11 @@
                                 </div>
 
                                 <div class="mb-4">
-                                    <label for="password" class="form-label small fw-bold text-muted">Mật khẩu</label>
+                                    <label for="password" class="form-label small fw-bold field-label">Mật khẩu</label>
                                     <div class="input-group-premium">
                                         <i class="bi bi-lock input-icon"></i>
                                         <input type="password" name="password" id="password" class="form-control-premium pe-5" placeholder="••••••••" required />
-                                        <button class="btn btn-link position-absolute end-0 top-50 translate-middle-y text-muted p-2 text-decoration-none" type="button" id="togglePassword">
+                                        <button class="btn btn-link position-absolute end-0 top-50 translate-middle-y p-2 text-decoration-none password-toggle" type="button" id="togglePassword">
                                             <i class="bi bi-eye"></i>
                                         </button>
                                     </div>
