@@ -59,7 +59,7 @@ public class AuthService {
 	}
 
 	private boolean isSupportedRole(String role) {
-		return "PGV".equals(role) || "GIANGVIEN".equals(role) || "SINHVIEN".equals(role);
+		return "PGV".equals(role) || "GIAOVIEN".equals(role) || "SINHVIEN".equals(role);
 	}
 
 	private String sha256(String raw) {
