@@ -78,7 +78,7 @@ String username = session.getAttribute("LOGIN_USER") != null ? session.getAttrib
 
 			<!-- ================= GIANG VIEN ================= -->
 			<%
-			if (role.equals("GIANGVIEN")) {
+			if (role.equals("GIAOVIEN")) {
 			%>
 
 			<li><a class="nav-link"
