@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/class")
 public class ClassController {
 
-	@GetMapping
+	@GetMapping("/")
 	public String index() {
 		return "Class/Index";
 	}

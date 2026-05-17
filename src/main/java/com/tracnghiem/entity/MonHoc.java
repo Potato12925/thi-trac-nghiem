@@ -78,23 +78,4 @@ public class MonHoc {
 	public void setSoTiet_TH(int soTiet_TH) {
 		this.soTiet_TH = soTiet_TH;
 	}
-
-    public MonHoc() {
-    }
-
-    public String getMaMH() {
-        return maMH;
-    }
-
-    public void setMaMH(String maMH) {
-        this.maMH = maMH;
-    }
-
-    public String getTenMH() {
-        return tenMH;
-    }
-
-    public void setTenMH(String tenMH) {
-        this.tenMH = tenMH;
-    }
 } 

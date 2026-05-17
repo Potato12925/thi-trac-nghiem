@@ -29,9 +29,9 @@ public class MonHocController {
 
 		List<MonHoc> danhSachMonHoc;
 		if (search != null && !search.trim().isEmpty()) {
-			danhSachMonHoc = monHocService.timKiemTheoMaMonHoc(search.trim());
+			danhSachMonHoc = monHocService.searchSubjects(search.trim());
 		} else {
-			danhSachMonHoc = monHocService.layTatCaMonHoc();
+			danhSachMonHoc = monHocService.searchSubjects(null);
 		}
 
 		model.addAttribute("danhSachMonHoc", danhSachMonHoc);
@@ -44,27 +44,27 @@ public class MonHocController {
 	public String add(@Validated @ModelAttribute("monHoc") MonHoc monHoc, BindingResult errors, ModelMap model) {
 		if (errors.hasErrors()) {
 
-			List<MonHoc> danhSachMonHoc = monHocService.layTatCaMonHoc();
+			List<MonHoc> danhSachMonHoc = monHocService.searchSubjects(null);
 			model.addAttribute("danhSachMonHoc", danhSachMonHoc);
 
 			return "Subject/Index";
 		}
 
-		monHocService.themMonHoc(monHoc);
+		monHocService.createSubject(monHoc.getMaMH(),monHoc.getTenMH());
 
 		return "redirect:/subject";
 	}
 
 	@PutMapping("/update")
 	public String update(@Validated @ModelAttribute("monHoc") MonHoc monHoc) {
-		monHocService.chinhSuaMonHoc(monHoc);
+		monHocService.updateSubject(monHoc.getMaMH(), monHoc.getTenMH());
 
 		return "redirect:/subject";
 	}
 
 	@DeleteMapping("/delete")
 	public String delete(@ModelAttribute("monHoc") MonHoc monHoc) {
-		monHocService.xoaMonHoc(monHoc);
+		monHocService.deleteSubject(monHoc.getMaMH());
 
 		return "redirect:/subject";
 	}
