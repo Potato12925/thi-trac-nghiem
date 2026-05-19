@@ -17,87 +17,87 @@ import javax.persistence.TemporalType;
 @Table(name = "SINHVIEN")
 public class SinhVien {
 
-    @Id
-    @Column(name = "MASV", length = 8)
-    private String maSV;
+	@Id
+	@Column(name = "MASV", length = 8)
+	private String maSV;
 
-    @Column(name = "HO", length = 40)
-    private String ho;
+	@Column(name = "HO", length = 40)
+	private String ho;
 
-    @Column(name = "TEN", length = 10)
-    private String ten;
+	@Column(name = "TEN", length = 10)
+	private String ten;
 
-    @Temporal(TemporalType.DATE)
-    @Column(name = "NGAYSINH")
-    private Date ngaySinh;
+	@Temporal(TemporalType.DATE)
+	@Column(name = "NGAYSINH")
+	private Date ngaySinh;
 
-    @Column(name = "DIACHI", length = 100)
-    private String diaChi;
+	@Column(name = "DIACHI", length = 100)
+	private String diaChi;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "MALOP", nullable = false)
-    private Lop lop;
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "MALOP", nullable = false)
+	private Lop lop;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "MASV", referencedColumnName = "MA", insertable = false, updatable = false)
-    private TaiKhoan taiKhoan;
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "MASV", referencedColumnName = "MA", insertable = false, updatable = false)
+	private TaiKhoan taiKhoan;
 
-    public SinhVien() {
-    }
+	public SinhVien() {
+	}
 
-    public String getMaSV() {
-        return maSV;
-    }
+	public String getMaSV() {
+		return maSV;
+	}
 
-    public void setMaSV(String maSV) {
-        this.maSV = maSV;
-    }
+	public void setMaSV(String maSV) {
+		this.maSV = maSV;
+	}
 
-    public String getHo() {
-        return ho;
-    }
+	public String getHo() {
+		return ho;
+	}
 
-    public void setHo(String ho) {
-        this.ho = ho;
-    }
+	public void setHo(String ho) {
+		this.ho = ho;
+	}
 
-    public String getTen() {
-        return ten;
-    }
+	public String getTen() {
+		return ten;
+	}
 
-    public void setTen(String ten) {
-        this.ten = ten;
-    }
+	public void setTen(String ten) {
+		this.ten = ten;
+	}
 
-    public Date getNgaySinh() {
-        return ngaySinh;
-    }
+	public Date getNgaySinh() {
+		return ngaySinh;
+	}
 
-    public void setNgaySinh(Date ngaySinh) {
-        this.ngaySinh = ngaySinh;
-    }
+	public void setNgaySinh(Date ngaySinh) {
+		this.ngaySinh = ngaySinh;
+	}
 
-    public String getDiaChi() {
-        return diaChi;
-    }
+	public String getDiaChi() {
+		return diaChi;
+	}
 
-    public void setDiaChi(String diaChi) {
-        this.diaChi = diaChi;
-    }
+	public void setDiaChi(String diaChi) {
+		this.diaChi = diaChi;
+	}
 
-    public Lop getLop() {
-        return lop;
-    }
+	public Lop getLop() {
+		return lop;
+	}
 
-    public void setLop(Lop lop) {
-        this.lop = lop;
-    }
+	public void setLop(Lop lop) {
+		this.lop = lop;
+	}
 
-    public TaiKhoan getTaiKhoan() {
-        return taiKhoan;
-    }
+	public TaiKhoan getTaiKhoan() {
+		return taiKhoan;
+	}
 
-    public void setTaiKhoan(TaiKhoan taiKhoan) {
-        this.taiKhoan = taiKhoan;
-    }
+	public void setTaiKhoan(TaiKhoan taiKhoan) {
+		this.taiKhoan = taiKhoan;
+	}
 }

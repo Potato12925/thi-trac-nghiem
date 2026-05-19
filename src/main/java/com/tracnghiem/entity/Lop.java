@@ -12,40 +12,49 @@ import javax.persistence.Table;
 @Table(name = "Lop")
 public class Lop {
 
-    @Id
-    @Column(name = "MALOP", length = 15)
-    private String maLop;
+	@Id
+	@Column(name = "MALOP", length = 15)
+	private String maLop;
 
-    @Column(name = "TENLOP", nullable = false, unique = true)
-    private String tenLop;
+	@Column(name = "TENLOP", nullable = false, unique = true)
+	private String tenLop;
 
-    @OneToMany(mappedBy = "lop")
-    private List<SinhVien> sinhViens;
+	@OneToMany(mappedBy = "lop")
+	private List<SinhVien> sinhViens;
 
-    public Lop() {
-    }
+	public Lop() {
+		super();
+	}
 
-    public String getMaLop() {
-        return maLop;
-    }
+	public Lop(String maLop, String tenLop, List<SinhVien> sinhViens) {
+		super();
+		this.maLop = maLop;
+		this.tenLop = tenLop;
+		this.sinhViens = sinhViens;
+	}
 
-    public void setMaLop(String maLop) {
-        this.maLop = maLop;
-    }
+	public String getMaLop() {
+		return maLop;
+	}
 
-    public String getTenLop() {
-        return tenLop;
-    }
+	public void setMaLop(String maLop) {
+		this.maLop = maLop;
+	}
 
-    public void setTenLop(String tenLop) {
-        this.tenLop = tenLop;
-    }
+	public String getTenLop() {
+		return tenLop;
+	}
 
-    public List<SinhVien> getSinhViens() {
-        return sinhViens;
-    }
+	public void setTenLop(String tenLop) {
+		this.tenLop = tenLop;
+	}
 
-    public void setSinhViens(List<SinhVien> sinhViens) {
-        this.sinhViens = sinhViens;
-    }
-} 
+	public List<SinhVien> getSinhViens() {
+		return sinhViens;
+	}
+
+	public void setSinhViens(List<SinhVien> sinhViens) {
+		this.sinhViens = sinhViens;
+	}
+
+}

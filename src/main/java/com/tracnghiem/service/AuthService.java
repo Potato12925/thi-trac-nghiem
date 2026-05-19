@@ -62,7 +62,7 @@ public class AuthService {
 		return "PGV".equals(role) || "GIAOVIEN".equals(role) || "SINHVIEN".equals(role);
 	}
 
-	private String sha256(String raw) {
+	public String sha256(String raw) {
 
 		try {
 			MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -78,5 +78,24 @@ public class AuthService {
 		} catch (NoSuchAlgorithmException e) {
 			throw new IllegalStateException("SHA-256 algorithm not available", e);
 		}
+	}
+
+	public TaiKhoan taoTaiKhoan(String maSV) {
+		TaiKhoan taiKhoan = new TaiKhoan();
+		taiKhoan.setMa(maSV);
+
+		String passwordHash = sha256(maSV);
+
+		taiKhoan.setPasswordHash(passwordHash);
+		taiKhoan.setRole("SINHVIEN");
+
+		taiKhoanDAO.create(taiKhoan);
+		return taiKhoan;
+	}
+
+	public TaiKhoan xoaTaiKhoan(String maSV) {
+		TaiKhoan taiKhoanCanXoa = taiKhoanDAO.findById(maSV);
+		taiKhoanDAO.delete(taiKhoanCanXoa);
+		return taiKhoanCanXoa;
 	}
 }

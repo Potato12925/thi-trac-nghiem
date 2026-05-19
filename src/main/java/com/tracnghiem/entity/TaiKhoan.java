@@ -9,40 +9,47 @@ import javax.persistence.Table;
 @Table(name = "TAIKHOAN")
 public class TaiKhoan {
 
-    @Id
-    @Column(name = "MA")
-    private String ma;
+	@Id
+	@Column(name = "MA")
+	private String ma;
 
-    @Column(name = "PASSWORD_HASH", nullable = false)
-    private String passwordHash;
+	@Column(name = "PASSWORD_HASH", nullable = false)
+	private String passwordHash;
 
-    @Column(name = "ROLE", nullable = false)
-    private String role;
+	@Column(name = "ROLE", nullable = false)
+	private String role;
 
-    public TaiKhoan() {
-    }
+	public TaiKhoan() {
+	}
 
-    public String getMa() {
-        return ma;
-    }
+	public TaiKhoan(String ma, String passwordHash, String role) {
+		super();
+		this.ma = ma;
+		this.passwordHash = passwordHash;
+		this.role = role;
+	}
 
-    public void setMa(String ma) {
-        this.ma = ma;
-    }
+	public String getMa() {
+		return ma;
+	}
 
-    public String getPasswordHash() {
-        return passwordHash;
-    }
+	public void setMa(String ma) {
+		this.ma = ma;
+	}
 
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
-    }
+	public String getPasswordHash() {
+		return passwordHash;
+	}
 
-    public String getRole() {
-        return role;
-    }
+	public void setPasswordHash(String passwordHash) {
+		this.passwordHash = passwordHash;
+	}
 
-    public void setRole(String role) {
-        this.role = role;
-    }
+	public String getRole() {
+		return role;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
+	}
 }
