@@ -3,7 +3,7 @@
 Roles:
 
 - PGV
-- GIANGVIEN
+- GIAOVIEN
 - SINHVIEN
 
 Session:
@@ -24,7 +24,7 @@ PGV:
 - full access
 - create accounts
 
-GIANGVIEN:
+GIAOVIEN:
 
 - manage own questions
 - view scores

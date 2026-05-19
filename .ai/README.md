@@ -73,6 +73,7 @@ src/main/
 │ │ ├───config
 │ │ ├───controller
 │ │ ├───dao
+│ │ ├───dto
 │ │ ├───entity
 │ │ │ └───id
 │ │ ├───repository
@@ -232,7 +233,7 @@ PGV:
 - Manage subjects
 - No exam participation
 
-GIANGVIEN:
+GIAOVIEN:
 
 - Manage own questions
 - Register exams

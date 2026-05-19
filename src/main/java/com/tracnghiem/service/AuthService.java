@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.tracnghiem.dao.TaiKhoanDAO;
+import com.tracnghiem.dto.DangNhapDTO;
 import com.tracnghiem.entity.TaiKhoan;
 
 @Service
@@ -20,17 +21,9 @@ public class AuthService {
 	private TaiKhoanDAO taiKhoanDAO;
 
 	@Transactional
-	public String login(String ma, String rawPassword, HttpSession session) {
+	public String login(DangNhapDTO dto, HttpSession session) {
 
-		if (isBlank(ma)) {
-			return "Vui lòng nhập mã đăng nhập";
-		}
-
-		if (isBlank(rawPassword)) {
-			return "Vui lòng nhập mật khẩu";
-		}
-
-		String normalizedMa = ma.trim();
+		String normalizedMa = dto.getMa().trim();
 
 		TaiKhoan user = taiKhoanDAO.findByMa(normalizedMa);
 
@@ -38,7 +31,7 @@ public class AuthService {
 			return "Mã đăng nhập không tồn tại";
 		}
 
-		String inputHash = sha256(rawPassword);
+		String inputHash = sha256(dto.getPassword());
 
 		if (!inputHash.equalsIgnoreCase(user.getPasswordHash())) {
 			return "Mật khẩu không chính xác";
@@ -52,14 +45,6 @@ public class AuthService {
 
 	public void logout(HttpSession session) {
 		session.invalidate();
-	}
-
-	private boolean isBlank(String value) {
-		return value == null || value.trim().isEmpty();
-	}
-
-	private boolean isSupportedRole(String role) {
-		return "PGV".equals(role) || "GIAOVIEN".equals(role) || "SINHVIEN".equals(role);
 	}
 
 	public String sha256(String raw) {

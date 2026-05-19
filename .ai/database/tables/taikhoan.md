@@ -10,7 +10,7 @@ Columns:
 Roles:
 
 - PGV
-- GIANGVIEN
+- GIAOVIEN
 - SINHVIEN
 
 Rules:

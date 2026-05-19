@@ -8,6 +8,7 @@ src/main/java/
 │ └── impl/
 ├── entity/
 ├── dto/
+├── dao/
 ├── config/
 ├── utils/
 ├── validator/
