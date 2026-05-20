@@ -36,7 +36,7 @@ public class SinhVien {
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "MALOP", nullable = false)
-	private Lop lop;
+	private ClassRoom lop;
 
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "MASV", referencedColumnName = "MA", insertable = false, updatable = false)
@@ -85,11 +85,11 @@ public class SinhVien {
 		this.diaChi = diaChi;
 	}
 
-	public Lop getLop() {
+	public ClassRoom getLop() {
 		return lop;
 	}
 
-	public void setLop(Lop lop) {
+	public void setLop(ClassRoom lop) {
 		this.lop = lop;
 	}
 

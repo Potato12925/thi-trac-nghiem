@@ -56,14 +56,15 @@
 	</filter>
 
 	<filter-mapping>
+		<filter-name>utf8</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
 		<filter-name>hiddenHttpMethodFilter</filter-name>
 
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
-	<filter-mapping>
-		<filter-name>utf8</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
 
 </web-app>

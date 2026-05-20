@@ -9,6 +9,7 @@ request.setAttribute("pageTitle", "Quản lý Sinh viên");
 %>
 
 <%@ include file="../Shared/_LayoutStart.jsp"%>
+
 <div class="container-fluid">
 	<div class="d-flex justify-content-between align-items-center mb-4">
 		<h1 class="h3 mb-0">Hồ sơ Sinh viên</h1>

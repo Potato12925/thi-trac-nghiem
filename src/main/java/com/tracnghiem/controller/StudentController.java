@@ -21,7 +21,7 @@ import com.tracnghiem.service.SinhVienService;
 
 @Controller
 @RequestMapping("/student")
-public class SinhVienController {
+public class StudentController {
 
 	@Autowired
 	SinhVienService sinhVienService;

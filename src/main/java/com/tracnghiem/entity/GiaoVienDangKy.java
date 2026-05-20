@@ -24,7 +24,7 @@ public class GiaoVienDangKy {
     @ManyToOne
     @MapsId("maLop")
     @JoinColumn(name = "MALOP")
-    private Lop lop;
+    private ClassRoom lop;
 
     @ManyToOne
     @MapsId("maMH")
@@ -59,11 +59,11 @@ public class GiaoVienDangKy {
         this.id = id;
     }
 
-    public Lop getLop() {
+    public ClassRoom getLop() {
         return lop;
     }
 
-    public void setLop(Lop lop) {
+    public void setLop(ClassRoom lop) {
         this.lop = lop;
     }
 

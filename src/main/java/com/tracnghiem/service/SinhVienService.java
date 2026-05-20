@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.tracnghiem.dao.SinhVienDAO;
 import com.tracnghiem.dto.SinhVienDTO;
-import com.tracnghiem.entity.Lop;
+import com.tracnghiem.entity.ClassRoom;
 import com.tracnghiem.entity.SinhVien;
 
 @Service
@@ -22,10 +22,10 @@ public class SinhVienService {
 	AuthService authService;
 
 	@Autowired
-	LopService lopService;
+	ClassRoomService lopService;
 
 	private SinhVien chuyenDoiSangEntity(SinhVienDTO dto) {
-		Lop lop = lopService.timLopTheoMa(dto.getMaLop());
+		ClassRoom lop = lopService.timLopTheoMa(dto.getMaLop());
 
 		SinhVien sinhVien = new SinhVien();
 		sinhVien.setMaSV(dto.getMaSV());

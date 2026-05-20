@@ -34,7 +34,7 @@ String activeHome =
         ? "active" : "";
 
 String activeClass =
-        path.equals("/class") || path.startsWith("/class/")
+        path.equals("/classRoom") || path.startsWith("/classRoom/")
         ? "active" : "";
 
 String activeStudent =
