@@ -10,22 +10,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.tracnghiem.dao.TaiKhoanDAO;
-import com.tracnghiem.dto.DangNhapDTO;
-import com.tracnghiem.entity.TaiKhoan;
+import com.tracnghiem.dao.AccountDAO;
+import com.tracnghiem.dto.LoginDTO;
+import com.tracnghiem.entity.Account;
 
 @Service
 public class AuthService {
 
 	@Autowired
-	private TaiKhoanDAO taiKhoanDAO;
+	private AccountDAO accountDAO;
 
 	@Transactional
-	public String login(DangNhapDTO dto, HttpSession session) {
+	public String login(LoginDTO dto, HttpSession session) {
 
 		String normalizedMa = dto.getMa().trim();
 
-		TaiKhoan user = taiKhoanDAO.findByMa(normalizedMa);
+		Account user = accountDAO.findByMa(normalizedMa);
 
 		if (user == null) {
 			return "Mã đăng nhập không tồn tại";
@@ -37,7 +37,7 @@ public class AuthService {
 			return "Mật khẩu không chính xác";
 		}
 
-		session.setAttribute("LOGIN_USER", user.getMa());
+		session.setAttribute("LOGIN_USER", user.getUsername());
 		session.setAttribute("ROLE", user.getRole());
 
 		return null;
@@ -50,10 +50,16 @@ public class AuthService {
 	public String sha256(String raw) {
 
 		try {
+			// chọn thuật toán băm
 			MessageDigest digest = MessageDigest.getInstance("SHA-256");
+			
+			// biến các kí tự raw thành list mã UTF_8 sau đó băm
 			byte[] hash = digest.digest(raw.getBytes(StandardCharsets.UTF_8));
+			
+			// hash tạo ra 32 byte, x2 tạo chỗ trống cho 64 kí tư
 			StringBuilder sb = new StringBuilder(hash.length * 2);
-
+			
+			// chuyển byte sang hex
 			for (byte b : hash) {
 				sb.append(String.format("%02x", b));
 			}
@@ -65,22 +71,22 @@ public class AuthService {
 		}
 	}
 
-	public TaiKhoan taoTaiKhoan(String maSV) {
-		TaiKhoan taiKhoan = new TaiKhoan();
-		taiKhoan.setMa(maSV);
+	public Account createAccount(String username) {
+		Account account = new Account();
+		account.setUsername(username);
 
-		String passwordHash = sha256(maSV);
+		String passwordHash = sha256(username);
 
-		taiKhoan.setPasswordHash(passwordHash);
-		taiKhoan.setRole("SINHVIEN");
+		account.setPasswordHash(passwordHash);
+		account.setRole("SINHVIEN");
 
-		taiKhoanDAO.create(taiKhoan);
-		return taiKhoan;
+		accountDAO.create(account);
+		return account;
 	}
 
-	public TaiKhoan xoaTaiKhoan(String maSV) {
-		TaiKhoan taiKhoanCanXoa = taiKhoanDAO.findById(maSV);
-		taiKhoanDAO.delete(taiKhoanCanXoa);
-		return taiKhoanCanXoa;
+	public Account deleteAccount(String studentId) {
+		Account accountToDelete = accountDAO.findById(studentId);
+		accountDAO.delete(accountToDelete);
+		return accountToDelete;
 	}
 }

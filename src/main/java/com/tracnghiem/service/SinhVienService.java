@@ -7,16 +7,16 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.tracnghiem.dao.SinhVienDAO;
-import com.tracnghiem.dto.SinhVienDTO;
+import com.tracnghiem.dao.StudentDAO;
+import com.tracnghiem.dto.StudentDTO;
 import com.tracnghiem.entity.ClassRoom;
-import com.tracnghiem.entity.SinhVien;
+import com.tracnghiem.entity.Student;
 
 @Service
 public class SinhVienService {
 
 	@Autowired
-	SinhVienDAO sinhVienDAO;
+	StudentDAO sinhVienDAO;
 
 	@Autowired
 	AuthService authService;
@@ -24,10 +24,10 @@ public class SinhVienService {
 	@Autowired
 	ClassRoomService lopService;
 
-	private SinhVien chuyenDoiSangEntity(SinhVienDTO dto) {
+	private Student chuyenDoiSangEntity(StudentDTO dto) {
 		ClassRoom lop = lopService.timLopTheoMa(dto.getMaLop());
 
-		SinhVien sinhVien = new SinhVien();
+		Student sinhVien = new Student();
 		sinhVien.setMaSV(dto.getMaSV());
 		sinhVien.setHo(dto.getHo());
 		sinhVien.setTen(dto.getTen());
@@ -38,22 +38,22 @@ public class SinhVienService {
 		return sinhVien;
 	}
 
-	public List<SinhVien> layDanhSachTatCaSinhVien() {
+	public List<Student> layDanhSachTatCaSinhVien() {
 		return sinhVienDAO.findAll();
 	}
 
-	public void themSinhVien(SinhVienDTO dto) {
-		SinhVien sinhVien = chuyenDoiSangEntity(dto);
+	public void themSinhVien(StudentDTO dto) {
+		Student sinhVien = chuyenDoiSangEntity(dto);
 		sinhVienDAO.create(sinhVien);
 	}
 
-	public void capNhatSinhVien(SinhVienDTO dto) {
-		SinhVien sinhVien = chuyenDoiSangEntity(dto);
+	public void capNhatSinhVien(StudentDTO dto) {
+		Student sinhVien = chuyenDoiSangEntity(dto);
 		sinhVienDAO.update(sinhVien);
 	}
 
-	public void xoaSinhVien(SinhVienDTO dto) {
-		SinhVien sinhVien = chuyenDoiSangEntity(dto);
+	public void xoaSinhVien(StudentDTO dto) {
+		Student sinhVien = chuyenDoiSangEntity(dto);
 
 		sinhVienDAO.delete(sinhVien);
 
@@ -70,7 +70,7 @@ public class SinhVienService {
 	}
 
 	@Transactional
-	public void themSinhVienVaTaiKhoan(SinhVienDTO dto) {
+	public void themSinhVienVaTaiKhoan(StudentDTO dto) {
 		validateSinhVienKhongTonTai(dto.getMaSV());
 
 		authService.taoTaiKhoan(dto.getMaSV());

@@ -9,12 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.tracnghiem.dao.BaiThiDAO;
-import com.tracnghiem.dao.BangDiemDAO;
-import com.tracnghiem.dao.BoDeDAO;
-import com.tracnghiem.dao.GiaoVienDangKyDAO;
-import com.tracnghiem.dao.MonHocDAO;
-import com.tracnghiem.entity.MonHoc;
+import com.tracnghiem.dao.ExamDAO;
+import com.tracnghiem.dao.ScoreDAO;
+import com.tracnghiem.dao.QuestionDAO;
+import com.tracnghiem.dao.TeacherRegistrationDAO;
+import com.tracnghiem.dao.SubjectDAO;
+import com.tracnghiem.entity.Subject;
 
 /**
  * Service layer for Subject (MonHoc) management.
@@ -26,19 +26,19 @@ import com.tracnghiem.entity.MonHoc;
 public class MonHocService {
 
     @Autowired
-    private MonHocDAO monHocDAO;
+    private SubjectDAO monHocDAO;
 
     @Autowired
-    private GiaoVienDangKyDAO giaoVienDangKyDAO;
+    private TeacherRegistrationDAO giaoVienDangKyDAO;
 
     @Autowired
-    private BoDeDAO boDeDAO;
+    private QuestionDAO boDeDAO;
 
     @Autowired
-    private BaiThiDAO baiThiDAO;
+    private ExamDAO baiThiDAO;
 
     @Autowired
-    private BangDiemDAO bangDiemDAO;
+    private ScoreDAO bangDiemDAO;
 
     // Stack for storing operation history for undo functionality
     private Stack<Operation> operationHistory = new Stack<>();
@@ -111,7 +111,7 @@ public class MonHocService {
         if (maMH == null || maMH.trim().isEmpty()) {
             return false;
         }
-        MonHoc subject = monHocDAO.findById(maMH.trim());
+        Subject subject = monHocDAO.findById(maMH.trim());
         return subject != null;
     }
 
@@ -127,8 +127,8 @@ public class MonHocService {
             return false;
         }
 
-        List<MonHoc> subjects = monHocDAO.findByKeyword(tenMH.trim());
-        for (MonHoc subject : subjects) {
+        List<Subject> subjects = monHocDAO.findByKeyword(tenMH.trim());
+        for (Subject subject : subjects) {
             if (subject.getTenMH().equalsIgnoreCase(tenMH.trim())) {
                 if (excludeMaMH == null || !subject.getMaMH().equals(excludeMaMH)) {
                     return true;
@@ -228,7 +228,7 @@ public class MonHocService {
         }
 
         // Create new subject
-        MonHoc subject = new MonHoc();
+        Subject subject = new Subject();
         subject.setMaMH(normalized_maMH);
         subject.setTenMH(normalized_tenMH);
 
@@ -265,7 +265,7 @@ public class MonHocService {
         String normalized_maMH = maMH.trim();
 
         // Find subject to update
-        MonHoc subject = monHocDAO.findById(normalized_maMH);
+        Subject subject = monHocDAO.findById(normalized_maMH);
         if (subject == null) {
             return "Môn học không tồn tại";
         }
@@ -284,7 +284,7 @@ public class MonHocService {
         }
 
         // Store old data for undo
-        Operation operation = new Operation(OP_UPDATE, new MonHoc());
+        Operation operation = new Operation(OP_UPDATE, new Subject());
         operation.getOldEntity().setMaMH(subject.getMaMH());
         operation.getOldEntity().setTenMH(subject.getTenMH());
 
@@ -319,7 +319,7 @@ public class MonHocService {
         String normalized_maMH = maMH.trim();
 
         // Find subject to delete
-        MonHoc subject = monHocDAO.findById(normalized_maMH);
+        Subject subject = monHocDAO.findById(normalized_maMH);
         if (subject == null) {
             return "Môn học không tồn tại";
         }
@@ -351,7 +351,7 @@ public class MonHocService {
      * @param keyword Search keyword
      * @return List of matching subjects
      */
-    public List<MonHoc> searchSubjects(String keyword) {
+    public List<Subject> searchSubjects(String keyword) {
         if (keyword == null || keyword.trim().isEmpty()) {
             return monHocDAO.findAll();
         }
@@ -364,7 +364,7 @@ public class MonHocService {
      * 
      * @return List of all subjects
      */
-    public List<MonHoc> getAllSubjects() {
+    public List<Subject> getAllSubjects() {
         return monHocDAO.findAll();
     }
 
@@ -374,7 +374,7 @@ public class MonHocService {
      * @param maMH Subject code
      * @return Subject entity or null if not found
      */
-    public MonHoc getSubjectById(String maMH) {
+    public Subject getSubjectById(String maMH) {
         if (maMH == null || maMH.trim().isEmpty()) {
             return null;
         }
@@ -414,7 +414,7 @@ public class MonHocService {
 
                 case OP_UPDATE:
                     // Undo UPDATE by restoring old values
-                    MonHoc currentSubject = monHocDAO.findById(operation.getOldEntity().getMaMH());
+                    Subject currentSubject = monHocDAO.findById(operation.getOldEntity().getMaMH());
                     if (currentSubject != null) {
                         currentSubject.setTenMH(operation.getOldEntity().getTenMH());
                         monHocDAO.update(currentSubject);
@@ -473,24 +473,24 @@ public class MonHocService {
         private static final long serialVersionUID = 1L;
 
         private String operationType;
-        private MonHoc entity;
-        private MonHoc oldEntity;
+        private Subject entity;
+        private Subject oldEntity;
 
-        Operation(String operationType, MonHoc entity) {
+        Operation(String operationType, Subject entity) {
             this.operationType = operationType;
             this.entity = entity;
-            this.oldEntity = new MonHoc();
+            this.oldEntity = new Subject();
         }
 
         String getOperationType() {
             return operationType;
         }
 
-        MonHoc getEntity() {
+        Subject getEntity() {
             return entity;
         }
 
-        MonHoc getOldEntity() {
+        Subject getOldEntity() {
             return oldEntity;
         }
     }

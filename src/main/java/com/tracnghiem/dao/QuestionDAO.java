@@ -4,14 +4,14 @@ import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
-import com.tracnghiem.entity.BoDe;
+import com.tracnghiem.entity.Question;
 
 @Repository
-public class BoDeDAO extends GenericDAO<BoDe> {
+public class QuestionDAO extends GenericDAO<Question> {
 
-    public List<BoDe> findByKeyword(String keyword) {
+    public List<Question> findByKeyword(String keyword) {
         String hql = "FROM BoDe b WHERE b.noiDung LIKE :keyword OR b.monHoc.maMH LIKE :keyword OR b.dapAn LIKE :keyword";
-        return getSession().createQuery(hql, BoDe.class)
+        return getSession().createQuery(hql, Question.class)
                 .setParameter("keyword", '%' + keyword + '%')
                 .list();
     }

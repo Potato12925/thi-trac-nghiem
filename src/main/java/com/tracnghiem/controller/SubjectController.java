@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.tracnghiem.entity.MonHoc;
+import com.tracnghiem.entity.Subject;
 import com.tracnghiem.service.MonHocService;
 
 /**
@@ -52,7 +52,7 @@ public class SubjectController {
             Model model) {
 
         // Search or get all subjects
-        List<MonHoc> subjects;
+        List<Subject> subjects;
         if (search != null && !search.trim().isEmpty()) {
             subjects = monHocService.searchSubjects(search.trim());
         } else {
@@ -60,12 +60,12 @@ public class SubjectController {
         }
 
         // Load subject for editing if maMH provided
-        MonHoc subject = null;
+        Subject subject = null;
         if (maMH != null && !maMH.trim().isEmpty()) {
             subject = monHocService.getSubjectById(maMH.trim());
         }
         if (subject == null) {
-            subject = new MonHoc(); // Empty for new entry
+            subject = new Subject(); // Empty for new entry
         }
 
         // Pass data to view
@@ -108,7 +108,7 @@ public class SubjectController {
         String normalized_maMH = maMH.trim();
 
         // Check if this is create or update
-        MonHoc existingSubject = monHocService.getSubjectById(normalized_maMH);
+        Subject existingSubject = monHocService.getSubjectById(normalized_maMH);
 
         String errorMessage;
         if (existingSubject == null) {

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.validation.BindingResult;
 
-import com.tracnghiem.dto.DangNhapDTO;
+import com.tracnghiem.dto.LoginDTO;
 import com.tracnghiem.service.AuthService;
 
 @Controller
@@ -26,14 +26,14 @@ public class AuthController {
 	@GetMapping("/login")
 	public String loginForm(Model model) {
 
-		model.addAttribute("taiKhoan", new DangNhapDTO());
+		model.addAttribute("taiKhoan", new LoginDTO());
 
 		return "Account/Login";
 	}
 
 	@PostMapping("/login")
 	public String login(
-			@Valid @ModelAttribute("taiKhoan") DangNhapDTO dto,
+			@Valid @ModelAttribute("taiKhoan") LoginDTO dto,
 			BindingResult result,
 			HttpSession session,
 			Model model) {

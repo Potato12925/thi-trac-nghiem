@@ -5,37 +5,36 @@ import javax.validation.constraints.NotBlank;
 public class ClassRoomDTO {
 
 	@NotBlank(message = "Mã lớp không được để trống")
-
-	private String maLop;
+	private String classId;
 
 	@NotBlank(message = "Tên lớp không được để trống")
-
-	private String tenLop;
+	private String className;
 
 	public ClassRoomDTO() {
 		super();
 	}
 
-	public ClassRoomDTO(@NotBlank(message = "Mã lớp không được để trống") String maLop,
-			@NotBlank(message = "Tên lớp không được để trống") String tenLop) {
+	public ClassRoomDTO(
+			@NotBlank(message = "Mã lớp không được để trống") String classId,
+			@NotBlank(message = "Tên lớp không được để trống") String className) {
 		super();
-		this.maLop = maLop;
-		this.tenLop = tenLop;
+		this.classId = classId;
+		this.className = className;
 	}
 
-	public String getMaLop() {
-		return maLop;
+	public String getClassId() {
+		return classId;
 	}
 
-	public void setMaLop(String maLop) {
-		this.maLop = maLop;
+	public void setClassId(String classId) {
+		this.classId = classId;
 	}
 
-	public String getTenLop() {
-		return tenLop;
+	public String getClassName() {
+		return className;
 	}
 
-	public void setTenLop(String tenLop) {
-		this.tenLop = tenLop;
+	public void setClassName(String className) {
+		this.className = className;
 	}
 }

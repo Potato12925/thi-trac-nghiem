@@ -2,17 +2,17 @@ package com.tracnghiem.dao;
 
 import org.springframework.stereotype.Repository;
 
-import com.tracnghiem.entity.TaiKhoan;
+import com.tracnghiem.entity.Account;
 
 @Repository
-public class TaiKhoanDAO extends GenericDAO<TaiKhoan> {
+public class AccountDAO extends GenericDAO<Account> {
 
-    public TaiKhoan findByMa(String ma) {
+    public Account findByMa(String ma) {
 
         String hql = "FROM TaiKhoan t WHERE t.ma = :ma";
 
         return getSession()
-                .createQuery(hql, TaiKhoan.class)
+                .createQuery(hql, Account.class)
                 .setParameter("ma", ma)
                 .uniqueResult();
     }

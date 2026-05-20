@@ -14,47 +14,47 @@ public class ClassRoom {
 
 	@Id
 	@Column(name = "MALOP", length = 15)
-	private String maLop;
+	private String classId;
 
 	@Column(name = "TENLOP", nullable = false, unique = true)
-	private String tenLop;
+	private String className;
 
-	@OneToMany(mappedBy = "lop")
-	private List<SinhVien> sinhViens;
+	@OneToMany(mappedBy = "classRoom")
+	private List<Student> students;
 
 	public ClassRoom() {
 		super();
 	}
 
-	public ClassRoom(String maLop, String tenLop, List<SinhVien> sinhViens) {
+	public ClassRoom(String classId, String className, List<Student> students) {
 		super();
-		this.maLop = maLop;
-		this.tenLop = tenLop;
-		this.sinhViens = sinhViens;
+		this.classId = classId;
+		this.className = className;
+		this.students = students;
 	}
 
-	public String getMaLop() {
-		return maLop;
+	public String getClassId() {
+		return classId;
 	}
 
-	public void setMaLop(String maLop) {
-		this.maLop = maLop;
+	public void setClassId(String classId) {
+		this.classId = classId;
 	}
 
-	public String getTenLop() {
-		return tenLop;
+	public String getClassName() {
+		return className;
 	}
 
-	public void setTenLop(String tenLop) {
-		this.tenLop = tenLop;
+	public void setClassName(String className) {
+		this.className = className;
 	}
 
-	public List<SinhVien> getSinhViens() {
-		return sinhViens;
+	public List<Student> getStudents() {
+		return students;
 	}
 
-	public void setSinhViens(List<SinhVien> sinhViens) {
-		this.sinhViens = sinhViens;
+	public void setStudents(List<Student> students) {
+		this.students = students;
 	}
 
 }

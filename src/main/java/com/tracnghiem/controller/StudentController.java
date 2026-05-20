@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.tracnghiem.dto.SinhVienDTO;
-import com.tracnghiem.entity.SinhVien;
+import com.tracnghiem.dto.StudentDTO;
+import com.tracnghiem.entity.Student;
 import com.tracnghiem.service.AuthService;
 import com.tracnghiem.service.SinhVienService;
 
@@ -31,9 +31,9 @@ public class StudentController {
 
 	@GetMapping()
 	public String Index(ModelMap model) {
-		SinhVien sinhVien = new SinhVien();
-		SinhVienDTO sinhVienDTO = new SinhVienDTO();
-		List<SinhVien> danhSachSinhVien = sinhVienService.layDanhSachTatCaSinhVien();
+		Student sinhVien = new Student();
+		StudentDTO sinhVienDTO = new StudentDTO();
+		List<Student> danhSachSinhVien = sinhVienService.layDanhSachTatCaSinhVien();
 
 		model.addAttribute("sinhVienDTO", sinhVienDTO);
 		model.addAttribute("sinhVien", sinhVien);
@@ -43,7 +43,7 @@ public class StudentController {
 	}
 
 	@PostMapping("/add")
-	public String add(@Validated @ModelAttribute("sinhVienDTO") SinhVienDTO sinhVien, BindingResult errors,
+	public String add(@Validated @ModelAttribute("sinhVienDTO") StudentDTO sinhVien, BindingResult errors,
 			ModelMap model) {
 
 		if (errors.hasErrors()) {
@@ -67,7 +67,7 @@ public class StudentController {
 	}
 
 	@PutMapping("/update")
-	public String update(@Validated @ModelAttribute("sinhVienDTO") SinhVienDTO sinhVienDTO, BindingResult errors,
+	public String update(@Validated @ModelAttribute("sinhVienDTO") StudentDTO sinhVienDTO, BindingResult errors,
 			ModelMap model) {
 		if (errors.hasErrors()) {
 			model.addAttribute("danhSachSinhVien", sinhVienService.layDanhSachTatCaSinhVien());
@@ -92,7 +92,7 @@ public class StudentController {
 	}
 
 	@DeleteMapping("/delete")
-	public String delete(@Validated @ModelAttribute("sinhVienDTO") SinhVienDTO sinhVienDTO, BindingResult errors,
+	public String delete(@Validated @ModelAttribute("sinhVienDTO") StudentDTO sinhVienDTO, BindingResult errors,
 			ModelMap model) {
 		if (errors.hasErrors()) {
 			model.addAttribute("danhSachSinhVien", sinhVienService.layDanhSachTatCaSinhVien());

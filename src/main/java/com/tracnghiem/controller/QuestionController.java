@@ -10,25 +10,25 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.tracnghiem.dao.BoDeDAO;
-import com.tracnghiem.dao.GiaoVienDAO;
-import com.tracnghiem.dao.MonHocDAO;
-import com.tracnghiem.entity.BoDe;
-import com.tracnghiem.entity.GiaoVien;
-import com.tracnghiem.entity.MonHoc;
+import com.tracnghiem.dao.QuestionDAO;
+import com.tracnghiem.dao.TeacherDAO;
+import com.tracnghiem.dao.SubjectDAO;
+import com.tracnghiem.entity.Question;
+import com.tracnghiem.entity.Teacher;
+import com.tracnghiem.entity.Subject;
 
 @Controller
 @RequestMapping("/question")
 public class QuestionController {
 
     @Autowired
-    private BoDeDAO boDeDAO;
+    private QuestionDAO boDeDAO;
 
     @Autowired
-    private MonHocDAO monHocDAO;
+    private SubjectDAO monHocDAO;
 
     @Autowired
-    private GiaoVienDAO giaoVienDAO;
+    private TeacherDAO giaoVienDAO;
 
     @GetMapping
     public String index(
@@ -36,23 +36,23 @@ public class QuestionController {
             @RequestParam(value = "cauHoi", required = false) Integer cauHoi,
             Model model) {
 
-        List<BoDe> questions;
+        List<Question> questions;
         if (search != null && !search.trim().isEmpty()) {
             questions = boDeDAO.findByKeyword(search.trim());
         } else {
             questions = boDeDAO.findAll();
         }
 
-        BoDe selected = null;
+        Question selected = null;
         if (cauHoi != null) {
             selected = boDeDAO.findById(cauHoi);
         }
         if (selected == null) {
-            selected = new BoDe();
+            selected = new Question();
         }
 
-        List<MonHoc> subjects = monHocDAO.findAll();
-        List<GiaoVien> teachers = giaoVienDAO.findAll();
+        List<Subject> subjects = monHocDAO.findAll();
+        List<Teacher> teachers = giaoVienDAO.findAll();
 
         model.addAttribute("questions", questions);
         model.addAttribute("question", selected);
@@ -76,19 +76,19 @@ public class QuestionController {
             @RequestParam(value = "dapAn", required = false) String dapAn,
             @RequestParam("maGV") String maGV) {
 
-        MonHoc subject = monHocDAO.findById(maMH.trim());
-        GiaoVien teacher = giaoVienDAO.findById(maGV.trim());
+        Subject subject = monHocDAO.findById(maMH.trim());
+        Teacher teacher = giaoVienDAO.findById(maGV.trim());
 
         if (subject == null || teacher == null) {
             return "redirect:/question";
         }
 
-        BoDe boDe = null;
+        Question boDe = null;
         if (cauHoi != null) {
             boDe = boDeDAO.findById(cauHoi);
         }
         if (boDe == null) {
-            boDe = new BoDe();
+            boDe = new Question();
         }
 
         boDe.setMonHoc(subject);
@@ -113,7 +113,7 @@ public class QuestionController {
     @PostMapping("/delete")
     public String delete(@RequestParam("cauHoi") Integer cauHoi) {
         if (cauHoi != null) {
-            BoDe boDe = boDeDAO.findById(cauHoi);
+            Question boDe = boDeDAO.findById(cauHoi);
             if (boDe != null) {
                 boDeDAO.delete(boDe);
             }

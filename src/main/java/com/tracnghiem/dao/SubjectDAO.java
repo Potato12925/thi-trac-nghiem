@@ -4,15 +4,15 @@ import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
-import com.tracnghiem.entity.MonHoc;
+import com.tracnghiem.entity.Subject;
 
 /**
  * DAO layer for Subject (MonHoc) entity.
  * Handles all database operations for MonHoc table.
  */
 @Repository
-public class MonHocDAO extends GenericDAO<MonHoc> {
-	public void themMonHoc(MonHoc monHoc) {
+public class SubjectDAO extends GenericDAO<Subject> {
+	public void themMonHoc(Subject monHoc) {
 		create(monHoc);
 	}
 
@@ -23,9 +23,9 @@ public class MonHocDAO extends GenericDAO<MonHoc> {
      * @param keyword Search keyword
      * @return List of matching subjects
      */
-    public List<MonHoc> findByKeyword(String keyword) {
+    public List<Subject> findByKeyword(String keyword) {
         String hql = "FROM MonHoc m WHERE m.maMH LIKE :keyword OR m.tenMH LIKE :keyword";
-        return getSession().createQuery(hql, MonHoc.class)
+        return getSession().createQuery(hql, Subject.class)
                 .setParameter("keyword", '%' + keyword + '%')
                 .list();
     }
@@ -99,7 +99,7 @@ public class MonHocDAO extends GenericDAO<MonHoc> {
      * @return true if exists, false otherwise
      */
     public boolean exists(String maMH) {
-        MonHoc subject = findById(maMH);
+        Subject subject = findById(maMH);
         return subject != null;
     }
 }

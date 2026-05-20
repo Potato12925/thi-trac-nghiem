@@ -10,15 +10,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.tracnghiem.dao.GiaoVienDAO;
-import com.tracnghiem.entity.GiaoVien;
+import com.tracnghiem.dao.TeacherDAO;
+import com.tracnghiem.entity.Teacher;
 
 @Controller
 @RequestMapping("/lecturer")
 public class LecturerController {
 
     @Autowired
-    private GiaoVienDAO giaoVienDAO;
+    private TeacherDAO giaoVienDAO;
 
     @GetMapping
     public String index(
@@ -26,19 +26,19 @@ public class LecturerController {
             @RequestParam(value = "maGV", required = false) String maGV,
             Model model) {
 
-        List<GiaoVien> teachers;
+        List<Teacher> teachers;
         if (search != null && !search.trim().isEmpty()) {
             teachers = giaoVienDAO.findByKeyword(search.trim());
         } else {
             teachers = giaoVienDAO.findAll();
         }
 
-        GiaoVien teacher = null;
+        Teacher teacher = null;
         if (maGV != null && !maGV.trim().isEmpty()) {
             teacher = giaoVienDAO.findById(maGV.trim());
         }
         if (teacher == null) {
-            teacher = new GiaoVien();
+            teacher = new Teacher();
         }
 
         model.addAttribute("teachers", teachers);
@@ -60,9 +60,9 @@ public class LecturerController {
             return "redirect:/lecturer";
         }
 
-        GiaoVien teacher = giaoVienDAO.findById(maGV.trim());
+        Teacher teacher = giaoVienDAO.findById(maGV.trim());
         if (teacher == null) {
-            teacher = new GiaoVien();
+            teacher = new Teacher();
             teacher.setMaGV(maGV.trim());
             teacher.setHo(ho != null ? ho.trim() : "");
             teacher.setTen(ten != null ? ten.trim() : "");
@@ -83,7 +83,7 @@ public class LecturerController {
     @PostMapping("/delete")
     public String delete(@RequestParam("maGV") String maGV) {
         if (maGV != null && !maGV.trim().isEmpty()) {
-            GiaoVien teacher = giaoVienDAO.findById(maGV.trim());
+            Teacher teacher = giaoVienDAO.findById(maGV.trim());
             if (teacher != null) {
                 giaoVienDAO.delete(teacher);
             }
