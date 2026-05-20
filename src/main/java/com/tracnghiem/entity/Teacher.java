@@ -7,7 +7,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "GiaoVien")
-public class GiaoVien {
+public class Teacher {
 
     @Id
     @Column(name = "MAGV", length = 8)
@@ -25,7 +25,7 @@ public class GiaoVien {
     @Column(name = "DIACHI")
     private String diaChi;
 
-    public GiaoVien() {
+    public Teacher() {
     }
 
 

@@ -23,8 +23,8 @@ public class ClassRoomService {
 	private ClassRoom chuyenDoiSangEntity(ClassRoomDTO dto) {
 		ClassRoom classRoom = new ClassRoom();
 
-		classRoom.setMaLop(dto.getMaLop());
-		classRoom.setTenLop(dto.getTenLop());
+		classRoom.setClassId(dto.getClassId());
+		classRoom.setClassName(dto.getClassName());
 
 		return classRoom;
 	}
@@ -42,7 +42,7 @@ public class ClassRoomService {
 	}
 
 	public void addClassRoom(ClassRoomDTO dto) {
-		validateExitsClassRoom(dto.getMaLop());
+		validateExitsClassRoom(dto.getClassId());
 
 		ClassRoom classRoom = chuyenDoiSangEntity(dto);
 

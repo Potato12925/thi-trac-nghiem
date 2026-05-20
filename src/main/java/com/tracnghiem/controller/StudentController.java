@@ -14,77 +14,77 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.tracnghiem.dto.SinhVienDTO;
-import com.tracnghiem.entity.SinhVien;
+import com.tracnghiem.dto.StudentDTO;
+import com.tracnghiem.entity.Student;
 import com.tracnghiem.service.AuthService;
-import com.tracnghiem.service.SinhVienService;
+import com.tracnghiem.service.StudentService;
 
 @Controller
 @RequestMapping("/student")
 public class StudentController {
 
 	@Autowired
-	SinhVienService sinhVienService;
+	StudentService studentService;
 
 	@Autowired
 	AuthService authService;
 
 	@GetMapping()
 	public String Index(ModelMap model) {
-		SinhVien sinhVien = new SinhVien();
-		SinhVienDTO sinhVienDTO = new SinhVienDTO();
-		List<SinhVien> danhSachSinhVien = sinhVienService.layDanhSachTatCaSinhVien();
+		Student student = new Student();
+		StudentDTO studentDTO = new StudentDTO();
+		List<Student> listOfStudents = studentService.getAllStudents();
 
-		model.addAttribute("sinhVienDTO", sinhVienDTO);
-		model.addAttribute("sinhVien", sinhVien);
-		model.addAttribute("danhSachSinhVien", danhSachSinhVien);
+		model.addAttribute("sinhVienDTO", studentDTO);
+		model.addAttribute("sinhVien", student);
+		model.addAttribute("danhSachSinhVien", listOfStudents);
 
 		return "Student/Index";
 	}
 
 	@PostMapping("/add")
-	public String add(@Validated @ModelAttribute("sinhVienDTO") SinhVienDTO sinhVien, BindingResult errors,
+	public String add(@Validated @ModelAttribute("sinhVienDTO") StudentDTO sinhVien, BindingResult errors,
 			ModelMap model) {
 
 		if (errors.hasErrors()) {
-			model.addAttribute("danhSachSinhVien", sinhVienService.layDanhSachTatCaSinhVien());
+			model.addAttribute("danhSachSinhVien", studentService.getAllStudents());
 
 			return "Student/Index";
 		}
 
 		try {
-			sinhVienService.themSinhVienVaTaiKhoan(sinhVien);
+			studentService.addStudentWithAccount(sinhVien);
 			return "redirect:/student";
 
 		} catch (IllegalArgumentException e) {
 
 			model.addAttribute("error", e.getMessage());
 
-			model.addAttribute("danhSachSinhVien", sinhVienService.layDanhSachTatCaSinhVien());
+			model.addAttribute("danhSachSinhVien", studentService.getAllStudents());
 
 			return "redirect:/student";
 		}
 	}
 
 	@PutMapping("/update")
-	public String update(@Validated @ModelAttribute("sinhVienDTO") SinhVienDTO sinhVienDTO, BindingResult errors,
+	public String update(@Validated @ModelAttribute("sinhVienDTO") StudentDTO studentDTO, BindingResult errors,
 			ModelMap model) {
 		if (errors.hasErrors()) {
-			model.addAttribute("danhSachSinhVien", sinhVienService.layDanhSachTatCaSinhVien());
+			model.addAttribute("danhSachSinhVien", studentService.getAllStudents());
 
 			return "Student/Index";
 
 		}
 
 		try {
-			sinhVienService.capNhatSinhVien(sinhVienDTO);
+			studentService.updateStudent(studentDTO);
 			return "redirect:/student";
 
 		} catch (IllegalArgumentException e) {
 
 			model.addAttribute("error", e.getMessage());
 
-			model.addAttribute("danhSachSinhVien", sinhVienService.layDanhSachTatCaSinhVien());
+			model.addAttribute("danhSachSinhVien", studentService.getAllStudents());
 
 			return "Student/Index";
 
@@ -92,23 +92,23 @@ public class StudentController {
 	}
 
 	@DeleteMapping("/delete")
-	public String delete(@Validated @ModelAttribute("sinhVienDTO") SinhVienDTO sinhVienDTO, BindingResult errors,
+	public String delete(@Validated @ModelAttribute("sinhVienDTO") StudentDTO sinhVienDTO, BindingResult errors,
 			ModelMap model) {
 		if (errors.hasErrors()) {
-			model.addAttribute("danhSachSinhVien", sinhVienService.layDanhSachTatCaSinhVien());
+			model.addAttribute("danhSachSinhVien", studentService.getAllStudents());
 
 			return "Student/Index";
 		}
 
 		try {
-			sinhVienService.xoaSinhVien(sinhVienDTO);
+			studentService.deleteStudent(sinhVienDTO);
 			return "redirect:/student";
 
 		} catch (IllegalArgumentException e) {
 
 			model.addAttribute("error", e.getMessage());
 
-			model.addAttribute("danhSachSinhVien", sinhVienService.layDanhSachTatCaSinhVien());
+			model.addAttribute("danhSachSinhVien", studentService.getAllStudents());
 
 			return "redirect:/student";
 		}

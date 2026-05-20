@@ -14,20 +14,20 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.tracnghiem.entity.MonHoc;
-import com.tracnghiem.service.MonHocService;
+import com.tracnghiem.entity.Subject;
+import com.tracnghiem.service.SubjectService;
 
 @Controller()
 @RequestMapping("subject")
 public class MonHocController {
 	@Autowired
-	private MonHocService monHocService;
+	private SubjectService monHocService;
 
 	@RequestMapping()
 	public String index(@RequestParam(value = "search", required = false) String search, ModelMap model) {
-		MonHoc monHoc = new MonHoc();
+		Subject monHoc = new Subject();
 
-		List<MonHoc> danhSachMonHoc;
+		List<Subject> danhSachMonHoc;
 		if (search != null && !search.trim().isEmpty()) {
 			danhSachMonHoc = monHocService.searchSubjects(search.trim());
 		} else {
@@ -41,10 +41,10 @@ public class MonHocController {
 	}
 
 	@PostMapping("/add")
-	public String add(@Validated @ModelAttribute("monHoc") MonHoc monHoc, BindingResult errors, ModelMap model) {
+	public String add(@Validated @ModelAttribute("monHoc") Subject monHoc, BindingResult errors, ModelMap model) {
 		if (errors.hasErrors()) {
 
-			List<MonHoc> danhSachMonHoc = monHocService.searchSubjects(null);
+			List<Subject> danhSachMonHoc = monHocService.searchSubjects(null);
 			model.addAttribute("danhSachMonHoc", danhSachMonHoc);
 
 			return "Subject/Index";
@@ -56,14 +56,14 @@ public class MonHocController {
 	}
 
 	@PutMapping("/update")
-	public String update(@Validated @ModelAttribute("monHoc") MonHoc monHoc) {
+	public String update(@Validated @ModelAttribute("monHoc") Subject monHoc) {
 		monHocService.updateSubject(monHoc.getMaMH(), monHoc.getTenMH());
 
 		return "redirect:/subject";
 	}
 
 	@DeleteMapping("/delete")
-	public String delete(@ModelAttribute("monHoc") MonHoc monHoc) {
+	public String delete(@ModelAttribute("monHoc") Subject monHoc) {
 		monHocService.deleteSubject(monHoc.getMaMH());
 
 		return "redirect:/subject";

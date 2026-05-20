@@ -12,14 +12,14 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import com.tracnghiem.entity.id.GiaoVienDangKyId;
+import com.tracnghiem.entity.id.TeacherRegistrationId;
 
 @Entity
 @Table(name = "GiaoVien_DangKy")
-public class GiaoVienDangKy {
+public class TeacherRegistration {
 
     @EmbeddedId
-    private GiaoVienDangKyId id;
+    private TeacherRegistrationId id;
 
     @ManyToOne
     @MapsId("maLop")
@@ -29,11 +29,11 @@ public class GiaoVienDangKy {
     @ManyToOne
     @MapsId("maMH")
     @JoinColumn(name = "MAMH")
-    private MonHoc monHoc;
+    private Subject monHoc;
 
     @ManyToOne
     @JoinColumn(name = "MAGV")
-    private GiaoVien giaoVien;
+    private Teacher giaoVien;
 
     @Column(name = "TRINHDO")
     private String trinhDo;
@@ -48,14 +48,14 @@ public class GiaoVienDangKy {
     @Column(name = "THOIGIAN")
     private Short thoiGian;
 
-    public GiaoVienDangKy() {
+    public TeacherRegistration() {
     }
 
-    public GiaoVienDangKyId getId() {
+    public TeacherRegistrationId getId() {
         return id;
     }
 
-    public void setId(GiaoVienDangKyId id) {
+    public void setId(TeacherRegistrationId id) {
         this.id = id;
     }
 
@@ -67,19 +67,19 @@ public class GiaoVienDangKy {
         this.lop = lop;
     }
 
-    public MonHoc getMonHoc() {
+    public Subject getMonHoc() {
         return monHoc;
     }
 
-    public void setMonHoc(MonHoc monHoc) {
+    public void setMonHoc(Subject monHoc) {
         this.monHoc = monHoc;
     }
 
-    public GiaoVien getGiaoVien() {
+    public Teacher getGiaoVien() {
         return giaoVien;
     }
 
-    public void setGiaoVien(GiaoVien giaoVien) {
+    public void setGiaoVien(Teacher giaoVien) {
         this.giaoVien = giaoVien;
     }
 
