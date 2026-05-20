@@ -15,13 +15,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.tracnghiem.entity.Subject;
-import com.tracnghiem.service.MonHocService;
+import com.tracnghiem.service.SubjectService;
 
 @Controller()
 @RequestMapping("subject")
 public class MonHocController {
 	@Autowired
-	private MonHocService monHocService;
+	private SubjectService monHocService;
 
 	@RequestMapping()
 	public String index(@RequestParam(value = "search", required = false) String search, ModelMap model) {

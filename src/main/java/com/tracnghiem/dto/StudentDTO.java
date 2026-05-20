@@ -10,89 +10,89 @@ import org.springframework.format.annotation.DateTimeFormat;
 public class StudentDTO {
 
 	@NotBlank(message = "Mã sinh viên không được để trống")
-	private String maSV;
+	private String studentId;
 
 	@NotBlank(message = "Họ không được để trống")
-	private String ho;
+	private String lastName;
 
 	@NotBlank(message = "Tên không được để trống")
-	private String ten;
+	private String firstName;
 
 	@NotNull(message = "Ngày sinh không được để trống")
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	private Date ngaySinh;
+	private Date birthDate;
 
 	@NotBlank(message = "Địa chỉ không được để trống")
-	private String diaChi;
+	private String address;
 
 	@NotBlank(message = "Mã lớp không được để trống")
-	private String maLop;
+	private String classId;
 
 	public StudentDTO() {
 		super();
 	}
 
-	public StudentDTO(@NotBlank(message = "Mã sinh viên không được để trống") String maSV,
-			@NotBlank(message = "Họ không được để trống") String ho,
-			@NotBlank(message = "Tên không được để trống") String ten,
-			@NotNull(message = "Ngày sinh không được để trống") Date ngaySinh,
-			@NotBlank(message = "Địa chỉ không được để trống") String diaChi,
-			@NotBlank(message = "Mã lớp không được để trống") String maLop) {
+	public StudentDTO(@NotBlank(message = "Mã sinh viên không được để trống") String studentId,
+			@NotBlank(message = "Họ không được để trống") String lastName,
+			@NotBlank(message = "Tên không được để trống") String firstName,
+			@NotNull(message = "Ngày sinh không được để trống") Date birthDate,
+			@NotBlank(message = "Địa chỉ không được để trống") String address,
+			@NotBlank(message = "Mã lớp không được để trống") String classId) {
 		super();
-		this.maSV = maSV;
-		this.ho = ho;
-		this.ten = ten;
-		this.ngaySinh = ngaySinh;
-		this.diaChi = diaChi;
-		this.maLop = maLop;
+		this.studentId = studentId;
+		this.lastName = lastName;
+		this.firstName = firstName;
+		this.birthDate = birthDate;
+		this.address = address;
+		this.classId = classId;
 	}
 
-	public String getMaSV() {
-		return maSV;
+	public String getStudentId() {
+		return studentId;
 	}
 
-	public void setMaSV(String maSV) {
-		this.maSV = maSV;
+	public void setStudentId(String studentId) {
+		this.studentId = studentId;
 	}
 
-	public String getHo() {
-		return ho;
+	public String getLastName() {
+		return lastName;
 	}
 
-	public void setHo(String ho) {
-		this.ho = ho;
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
 	}
 
-	public String getTen() {
-		return ten;
+	public String getFirstName() {
+		return firstName;
 	}
 
-	public void setTen(String ten) {
-		this.ten = ten;
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
 	}
 
-	public Date getNgaySinh() {
-		return ngaySinh;
+	public Date getBirthDate() {
+		return birthDate;
 	}
 
-	public void setNgaySinh(Date ngaySinh) {
-		this.ngaySinh = ngaySinh;
+	public void setBirthDate(Date birthDate) {
+		this.birthDate = birthDate;
 	}
 
-	public String getDiaChi() {
-		return diaChi;
+	public String getAddress() {
+		return address;
 	}
 
-	public void setDiaChi(String diaChi) {
-		this.diaChi = diaChi;
+	public void setAddress(String address) {
+		this.address = address;
 	}
 
-	public String getMaLop() {
-		return maLop;
+	public String getClassId() {
+		return classId;
 	}
 
-	public void setMaLop(String maLop) {
-		this.maLop = maLop;
+	public void setClassId(String classId) {
+		this.classId = classId;
 	}
 
 }

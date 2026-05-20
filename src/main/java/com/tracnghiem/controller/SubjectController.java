@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.tracnghiem.entity.Subject;
-import com.tracnghiem.service.MonHocService;
+import com.tracnghiem.service.SubjectService;
 
 /**
  * Controller for Subject (MonHoc) management.
@@ -30,7 +30,7 @@ import com.tracnghiem.service.MonHocService;
 public class SubjectController {
 
     @Autowired
-    private MonHocService monHocService;
+    private SubjectService monHocService;
 
     /**
      * Displays subject list with optional search.

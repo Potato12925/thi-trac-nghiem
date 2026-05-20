@@ -1,7 +1,6 @@
 package com.tracnghiem.service;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
@@ -9,11 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.tracnghiem.dao.ExamDAO;
-import com.tracnghiem.dao.ScoreDAO;
 import com.tracnghiem.dao.QuestionDAO;
 import com.tracnghiem.dao.TeacherRegistrationDAO;
 import com.tracnghiem.dao.SubjectDAO;
+import com.tracnghiem.dao.ExamDAO;
+import com.tracnghiem.dao.ScoreDAO;
 import com.tracnghiem.entity.Subject;
 
 /**
@@ -23,22 +22,22 @@ import com.tracnghiem.entity.Subject;
  * Flow: Controller -> Service -> DAO -> Database
  */
 @Service
-public class MonHocService {
+public class SubjectService {
 
     @Autowired
-    private SubjectDAO monHocDAO;
+    private SubjectDAO subjectDAO;
 
     @Autowired
-    private TeacherRegistrationDAO giaoVienDangKyDAO;
+    private TeacherRegistrationDAO teacherRegistrationDAO;
 
     @Autowired
-    private QuestionDAO boDeDAO;
+    private QuestionDAO questionDAO;
 
     @Autowired
-    private ExamDAO baiThiDAO;
+    private ExamDAO examDAO;
 
     @Autowired
-    private ScoreDAO bangDiemDAO;
+    private ScoreDAO scoreDAO;
 
     // Stack for storing operation history for undo functionality
     private Stack<Operation> operationHistory = new Stack<>();
@@ -111,7 +110,7 @@ public class MonHocService {
         if (maMH == null || maMH.trim().isEmpty()) {
             return false;
         }
-        Subject subject = monHocDAO.findById(maMH.trim());
+        Subject subject = subjectDAO.findById(maMH.trim());
         return subject != null;
     }
 
@@ -127,10 +126,10 @@ public class MonHocService {
             return false;
         }
 
-        List<Subject> subjects = monHocDAO.findByKeyword(tenMH.trim());
+        List<Subject> subjects = subjectDAO.findByKeyword(tenMH.trim());
         for (Subject subject : subjects) {
-            if (subject.getTenMH().equalsIgnoreCase(tenMH.trim())) {
-                if (excludeMaMH == null || !subject.getMaMH().equals(excludeMaMH)) {
+            if (subject.getSubjectName().equalsIgnoreCase(tenMH.trim())) {
+                if (excludeMaMH == null || !subject.getSubjectId().equals(excludeMaMH)) {
                     return true;
                 }
             }
@@ -157,28 +156,28 @@ public class MonHocService {
         String normalized = maMH.trim();
 
         // Check GiaoVienDangKy (Subject registration)
-        long giaoVienDangKyCount = monHocDAO.countGiaoVienDangKyByMaMH(normalized);
-        if (giaoVienDangKyCount > 0) {
-            return "Không thể xóa môn học. Có " + giaoVienDangKyCount
+        long teacherRegistrationCount = subjectDAO.countGiaoVienDangKyByMaMH(normalized);
+        if (teacherRegistrationCount > 0) {
+            return "Không thể xóa môn học. Có " + teacherRegistrationCount
                     + " giáo viên đã đăng ký môn học này";
         }
 
         // Check BoDe (Question bank)
-        long boDeCount = monHocDAO.countBoDeByMaMH(normalized);
-        if (boDeCount > 0) {
-            return "Không thể xóa môn học. Có " + boDeCount + " câu hỏi thuộc môn học này";
+        long questionCount = subjectDAO.countBoDeByMaMH(normalized);
+        if (questionCount > 0) {
+            return "Không thể xóa môn học. Có " + questionCount + " câu hỏi thuộc môn học này";
         }
 
         // Check BaiThi (Exam)
-        long baiThiCount = monHocDAO.countBaiThiByMaMH(normalized);
-        if (baiThiCount > 0) {
-            return "Không thể xóa môn học. Có " + baiThiCount + " bài thi của môn học này";
+        long examCount = subjectDAO.countBaiThiByMaMH(normalized);
+        if (examCount > 0) {
+            return "Không thể xóa môn học. Có " + examCount + " bài thi của môn học này";
         }
 
         // Check BangDiem (Grade)
-        long bangDiemCount = monHocDAO.countBangDiemByMaMH(normalized);
-        if (bangDiemCount > 0) {
-            return "Không thể xóa môn học. Có " + bangDiemCount + " bảng điểm của môn học này";
+        long scoreCount = subjectDAO.countBangDiemByMaMH(normalized);
+        if (scoreCount > 0) {
+            return "Không thể xóa môn học. Có " + scoreCount + " bảng điểm của môn học này";
         }
 
         return null;
@@ -214,26 +213,26 @@ public class MonHocService {
             return tenMHValidation;
         }
 
-        String normalized_maMH = maMH.trim();
-        String normalized_tenMH = tenMH.trim();
+        String normalizedSubjectCode = maMH.trim();
+        String normalizedSubjectName = tenMH.trim();
 
         // Check duplicate code
-        if (isMaMHExists(normalized_maMH)) {
-            return "Mã môn học '" + normalized_maMH + "' đã tồn tại";
+        if (isMaMHExists(normalizedSubjectCode)) {
+            return "Mã môn học '" + normalizedSubjectCode + "' đã tồn tại";
         }
 
         // Check duplicate name
-        if (isTenMHExists(normalized_tenMH, null)) {
-            return "Tên môn học '" + normalized_tenMH + "' đã tồn tại";
+        if (isTenMHExists(normalizedSubjectName, null)) {
+            return "Tên môn học '" + normalizedSubjectName + "' đã tồn tại";
         }
 
         // Create new subject
         Subject subject = new Subject();
-        subject.setMaMH(normalized_maMH);
-        subject.setTenMH(normalized_tenMH);
+        subject.setSubjectId(normalizedSubjectCode);
+        subject.setSubjectName(normalizedSubjectName);
 
         // Store to database
-        monHocDAO.create(subject);
+        subjectDAO.create(subject);
 
         // Record operation for undo
         Operation operation = new Operation(OP_CREATE, subject);
@@ -262,10 +261,10 @@ public class MonHocService {
             return "Mã môn học không hợp lệ";
         }
 
-        String normalized_maMH = maMH.trim();
+        String normalizedSubjectCode = maMH.trim();
 
         // Find subject to update
-        Subject subject = monHocDAO.findById(normalized_maMH);
+        Subject subject = subjectDAO.findById(normalizedSubjectCode);
         if (subject == null) {
             return "Môn học không tồn tại";
         }
@@ -276,21 +275,21 @@ public class MonHocService {
             return tenMHValidation;
         }
 
-        String normalized_tenMH = tenMH.trim();
+        String normalizedSubjectName = tenMH.trim();
 
         // Check if new name is already used by another subject
-        if (isTenMHExists(normalized_tenMH, normalized_maMH)) {
-            return "Tên môn học '" + normalized_tenMH + "' đã tồn tại";
+        if (isTenMHExists(normalizedSubjectName, normalizedSubjectCode)) {
+            return "Tên môn học '" + normalizedSubjectName + "' đã tồn tại";
         }
 
         // Store old data for undo
         Operation operation = new Operation(OP_UPDATE, new Subject());
-        operation.getOldEntity().setMaMH(subject.getMaMH());
-        operation.getOldEntity().setTenMH(subject.getTenMH());
+        operation.getOldEntity().setSubjectId(subject.getSubjectId());
+        operation.getOldEntity().setSubjectName(subject.getSubjectName());
 
         // Update subject
-        subject.setTenMH(normalized_tenMH);
-        monHocDAO.update(subject);
+        subject.setSubjectName(normalizedSubjectName);
+        subjectDAO.update(subject);
 
         // Record operation for undo
         operationHistory.push(operation);
@@ -316,16 +315,16 @@ public class MonHocService {
             return "Mã môn học không hợp lệ";
         }
 
-        String normalized_maMH = maMH.trim();
+        String normalizedSubjectCode = maMH.trim();
 
         // Find subject to delete
-        Subject subject = monHocDAO.findById(normalized_maMH);
+        Subject subject = subjectDAO.findById(normalizedSubjectCode);
         if (subject == null) {
             return "Môn học không tồn tại";
         }
 
         // Validate delete constraints
-        String constraintError = validateDeleteConstraint(normalized_maMH);
+        String constraintError = validateDeleteConstraint(normalizedSubjectCode);
         if (constraintError != null) {
             return constraintError;
         }
@@ -334,7 +333,7 @@ public class MonHocService {
         Operation operation = new Operation(OP_DELETE, subject);
 
         // Delete from database
-        monHocDAO.delete(subject);
+        subjectDAO.delete(subject);
 
         // Record operation for undo
         operationHistory.push(operation);
@@ -353,10 +352,10 @@ public class MonHocService {
      */
     public List<Subject> searchSubjects(String keyword) {
         if (keyword == null || keyword.trim().isEmpty()) {
-            return monHocDAO.findAll();
+            return subjectDAO.findAll();
         }
 
-        return monHocDAO.findByKeyword(keyword.trim());
+        return subjectDAO.findByKeyword(keyword.trim());
     }
 
     /**
@@ -365,7 +364,7 @@ public class MonHocService {
      * @return List of all subjects
      */
     public List<Subject> getAllSubjects() {
-        return monHocDAO.findAll();
+        return subjectDAO.findAll();
     }
 
     /**
@@ -378,7 +377,7 @@ public class MonHocService {
         if (maMH == null || maMH.trim().isEmpty()) {
             return null;
         }
-        return monHocDAO.findById(maMH.trim());
+        return subjectDAO.findById(maMH.trim());
     }
 
     // ==================== UNDO FUNCTIONALITY ====================
@@ -409,22 +408,22 @@ public class MonHocService {
             switch (operation.getOperationType()) {
                 case OP_CREATE:
                     // Undo CREATE by deleting
-                    monHocDAO.delete(operation.getEntity());
-                    return "Phục hồi: Xóa môn học '" + operation.getEntity().getMaMH() + "'";
+                    subjectDAO.delete(operation.getEntity());
+                    return "Phục hồi: Xóa môn học '" + operation.getEntity().getSubjectId() + "'";
 
                 case OP_UPDATE:
                     // Undo UPDATE by restoring old values
-                    Subject currentSubject = monHocDAO.findById(operation.getOldEntity().getMaMH());
+                    Subject currentSubject = subjectDAO.findById(operation.getOldEntity().getSubjectId());
                     if (currentSubject != null) {
-                        currentSubject.setTenMH(operation.getOldEntity().getTenMH());
-                        monHocDAO.update(currentSubject);
+                        currentSubject.setSubjectName(operation.getOldEntity().getSubjectName());
+                        subjectDAO.update(currentSubject);
                     }
-                    return "Phục hồi: Cập nhật môn học '" + operation.getOldEntity().getMaMH() + "'";
+                    return "Phục hồi: Cập nhật môn học '" + operation.getOldEntity().getSubjectId() + "'";
 
                 case OP_DELETE:
                     // Undo DELETE by creating again
-                    monHocDAO.create(operation.getEntity());
-                    return "Phục hồi: Thêm môn học '" + operation.getEntity().getMaMH() + "'";
+                    subjectDAO.create(operation.getEntity());
+                    return "Phục hồi: Thêm môn học '" + operation.getEntity().getSubjectId() + "'";
 
                 default:
                     return "Loại thao tác không hợp lệ";
