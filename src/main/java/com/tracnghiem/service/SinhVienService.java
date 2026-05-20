@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.tracnghiem.dao.SinhVienDAO;
-import com.tracnghiem.dto.SinhVienDTO;
+import com.tracnghiem.dto.StudentDTO;
 import com.tracnghiem.entity.ClassRoom;
 import com.tracnghiem.entity.SinhVien;
 
@@ -24,7 +24,7 @@ public class SinhVienService {
 	@Autowired
 	ClassRoomService lopService;
 
-	private SinhVien chuyenDoiSangEntity(SinhVienDTO dto) {
+	private SinhVien chuyenDoiSangEntity(StudentDTO dto) {
 		ClassRoom lop = lopService.timLopTheoMa(dto.getMaLop());
 
 		SinhVien sinhVien = new SinhVien();
@@ -42,17 +42,17 @@ public class SinhVienService {
 		return sinhVienDAO.findAll();
 	}
 
-	public void themSinhVien(SinhVienDTO dto) {
+	public void themSinhVien(StudentDTO dto) {
 		SinhVien sinhVien = chuyenDoiSangEntity(dto);
 		sinhVienDAO.create(sinhVien);
 	}
 
-	public void capNhatSinhVien(SinhVienDTO dto) {
+	public void capNhatSinhVien(StudentDTO dto) {
 		SinhVien sinhVien = chuyenDoiSangEntity(dto);
 		sinhVienDAO.update(sinhVien);
 	}
 
-	public void xoaSinhVien(SinhVienDTO dto) {
+	public void xoaSinhVien(StudentDTO dto) {
 		SinhVien sinhVien = chuyenDoiSangEntity(dto);
 
 		sinhVienDAO.delete(sinhVien);
@@ -70,7 +70,7 @@ public class SinhVienService {
 	}
 
 	@Transactional
-	public void themSinhVienVaTaiKhoan(SinhVienDTO dto) {
+	public void themSinhVienVaTaiKhoan(StudentDTO dto) {
 		validateSinhVienKhongTonTai(dto.getMaSV());
 
 		authService.taoTaiKhoan(dto.getMaSV());

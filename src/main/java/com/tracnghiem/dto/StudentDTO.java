@@ -7,7 +7,7 @@ import javax.validation.constraints.NotNull;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-public class SinhVienDTO {
+public class StudentDTO {
 
 	@NotBlank(message = "Mã sinh viên không được để trống")
 	private String maSV;
@@ -28,11 +28,11 @@ public class SinhVienDTO {
 	@NotBlank(message = "Mã lớp không được để trống")
 	private String maLop;
 
-	public SinhVienDTO() {
+	public StudentDTO() {
 		super();
 	}
 
-	public SinhVienDTO(@NotBlank(message = "Mã sinh viên không được để trống") String maSV,
+	public StudentDTO(@NotBlank(message = "Mã sinh viên không được để trống") String maSV,
 			@NotBlank(message = "Họ không được để trống") String ho,
 			@NotBlank(message = "Tên không được để trống") String ten,
 			@NotNull(message = "Ngày sinh không được để trống") Date ngaySinh,

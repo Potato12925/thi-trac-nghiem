@@ -5,11 +5,13 @@ import java.io.Serializable;
 import javax.persistence.Embeddable;
 
 @Embeddable
-public class BangDiemId implements Serializable {
+public class ScoreId implements Serializable {
 
-    private String masv;
-    private String mamh;
-    private Short lan;
+    private String studentId;
+
+    private String subjectId;
+
+    private Short attempt;
 
     // equals hashCode
 }

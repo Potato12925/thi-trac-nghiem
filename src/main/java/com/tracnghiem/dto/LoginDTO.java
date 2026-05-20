@@ -3,7 +3,7 @@ package com.tracnghiem.dto;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
-public class DangNhapDTO {
+public class LoginDTO {
 
     @NotBlank(message = "Mã đăng nhập không được để trống")
     @Size(max = 8, message = "Mã đăng nhập tối đa 8 ký tự")
@@ -13,7 +13,7 @@ public class DangNhapDTO {
     @Size(min = 6, message = "Mật khẩu tối thiểu 6 ký tự")
     private String password;
 
-    public DangNhapDTO() {
+    public LoginDTO() {
     }
 
     public String getMa() {

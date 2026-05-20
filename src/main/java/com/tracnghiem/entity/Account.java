@@ -7,11 +7,11 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "TAIKHOAN")
-public class TaiKhoan {
+public class Account {
 
 	@Id
 	@Column(name = "MA")
-	private String ma;
+	private String id;
 
 	@Column(name = "PASSWORD_HASH", nullable = false)
 	private String passwordHash;
@@ -19,22 +19,22 @@ public class TaiKhoan {
 	@Column(name = "ROLE", nullable = false)
 	private String role;
 
-	public TaiKhoan() {
+	public Account() {
 	}
 
-	public TaiKhoan(String ma, String passwordHash, String role) {
+	public Account(String id, String passwordHash, String role) {
 		super();
-		this.ma = ma;
+		this.id = id;
 		this.passwordHash = passwordHash;
 		this.role = role;
 	}
 
-	public String getMa() {
-		return ma;
+	public String getId() {
+		return id;
 	}
 
-	public void setMa(String ma) {
-		this.ma = ma;
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	public String getPasswordHash() {

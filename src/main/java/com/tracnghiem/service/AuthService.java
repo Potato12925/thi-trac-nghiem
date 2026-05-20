@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.tracnghiem.dao.TaiKhoanDAO;
-import com.tracnghiem.dto.DangNhapDTO;
+import com.tracnghiem.dto.LoginDTO;
 import com.tracnghiem.entity.TaiKhoan;
 
 @Service
@@ -21,7 +21,7 @@ public class AuthService {
 	private TaiKhoanDAO taiKhoanDAO;
 
 	@Transactional
-	public String login(DangNhapDTO dto, HttpSession session) {
+	public String login(LoginDTO dto, HttpSession session) {
 
 		String normalizedMa = dto.getMa().trim();
 

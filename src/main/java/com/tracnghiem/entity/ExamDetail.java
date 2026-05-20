@@ -14,7 +14,7 @@ import javax.persistence.UniqueConstraint;
 @Table(name = "ChiTietBaiThi", uniqueConstraints = {
         @UniqueConstraint(columnNames = { "BAITHI_ID", "CAUHOI" })
 })
-public class ChiTietBaiThi {
+public class ExamDetail {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,16 +23,16 @@ public class ChiTietBaiThi {
 
     @ManyToOne
     @JoinColumn(name = "BAITHI_ID")
-    private BaiThi baiThi;
+    private Exam exam;
 
     @ManyToOne
     @JoinColumn(name = "CAUHOI")
-    private BoDe boDe;
+    private Question question;
 
     @Column(name = "DAPAN_SV")
-    private String dapAnSV;
+    private String studentAnswer;
 
-    public ChiTietBaiThi() {
+    public ExamDetail() {
     }
 
     public Integer getId() {
@@ -43,27 +43,27 @@ public class ChiTietBaiThi {
         this.id = id;
     }
 
-    public BaiThi getBaiThi() {
-        return baiThi;
+    public Exam getExam() {
+        return exam;
     }
 
-    public void setBaiThi(BaiThi baiThi) {
-        this.baiThi = baiThi;
+    public void setExam(Exam exam) {
+        this.exam = exam;
     }
 
-    public BoDe getBoDe() {
-        return boDe;
+    public Question getQuestion() {
+        return question;
     }
 
-    public void setBoDe(BoDe boDe) {
-        this.boDe = boDe;
+    public void setQuestion(Question question) {
+        this.question = question;
     }
 
-    public String getDapAnSV() {
-        return dapAnSV;
+    public String getStudentAnswer() {
+        return studentAnswer;
     }
 
-    public void setDapAnSV(String dapAnSV) {
-        this.dapAnSV = dapAnSV;
+    public void setStudentAnswer(String studentAnswer) {
+        this.studentAnswer = studentAnswer;
     }
 }

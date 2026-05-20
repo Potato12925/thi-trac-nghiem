@@ -15,89 +15,95 @@ import javax.persistence.TemporalType;
 
 @Entity
 @Table(name = "SINHVIEN")
-public class SinhVien {
+public class Student {
 
 	@Id
 	@Column(name = "MASV", length = 8)
-	private String maSV;
+	private String studentId;
 
 	@Column(name = "HO", length = 40)
-	private String ho;
+	private String lastName;
 
 	@Column(name = "TEN", length = 10)
-	private String ten;
+	private String firstName;
 
 	@Temporal(TemporalType.DATE)
 	@Column(name = "NGAYSINH")
-	private Date ngaySinh;
+	private Date birthDate;
 
 	@Column(name = "DIACHI", length = 100)
-	private String diaChi;
+	private String address;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "MALOP", nullable = false)
-	private ClassRoom lop;
+	private ClassRoom classRoom;
 
 	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "MASV", referencedColumnName = "MA", insertable = false, updatable = false)
-	private TaiKhoan taiKhoan;
+	@JoinColumn(
+		name = "MASV",
+		referencedColumnName = "MA",
+		insertable = false,
+		updatable = false
+	)
+	private Account account;
 
-	public SinhVien() {
+	public Student() {
 	}
 
-	public String getMaSV() {
-		return maSV;
+	public String getStudentId() {
+		return studentId;
 	}
 
-	public void setMaSV(String maSV) {
-		this.maSV = maSV;
+	public void setStudentId(String studentId) {
+		this.studentId = studentId;
 	}
 
-	public String getHo() {
-		return ho;
+	public String getLastName() {
+		return lastName;
 	}
 
-	public void setHo(String ho) {
-		this.ho = ho;
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
 	}
 
-	public String getTen() {
-		return ten;
+	public String getFirstName() {
+		return firstName;
 	}
 
-	public void setTen(String ten) {
-		this.ten = ten;
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
 	}
 
-	public Date getNgaySinh() {
-		return ngaySinh;
+	public Date getBirthDate() {
+		return birthDate;
 	}
 
-	public void setNgaySinh(Date ngaySinh) {
-		this.ngaySinh = ngaySinh;
+	public void setBirthDate(Date birthDate) {
+		this.birthDate = birthDate;
 	}
 
-	public String getDiaChi() {
-		return diaChi;
+	public String getAddress() {
+		return address;
 	}
 
-	public void setDiaChi(String diaChi) {
-		this.diaChi = diaChi;
+	public void setAddress(String address) {
+		this.address = address;
 	}
 
-	public ClassRoom getLop() {
-		return lop;
+	public ClassRoom getClassRoom() {
+		return classRoom;
 	}
 
-	public void setLop(ClassRoom lop) {
-		this.lop = lop;
+	public void setClassRoom(ClassRoom classRoom) {
+		this.classRoom = classRoom;
 	}
 
-	public TaiKhoan getTaiKhoan() {
-		return taiKhoan;
+	public Account getAccount() {
+		return account;
 	}
 
-	public void setTaiKhoan(TaiKhoan taiKhoan) {
-		this.taiKhoan = taiKhoan;
+	public void setAccount(Account account) {
+		this.account = account;
 	}
+
 }
