@@ -99,7 +99,7 @@ String activeResult =
 			<!-- HOME -->
 			<li>
 				<a class="nav-link <%= activeHome %>"
-					href="${pageContext.request.contextPath}/home">
+					href="${pageContext.request.contextPath}/student/home">
 
 					<i class="bi bi-house-door"></i>
 					<span>Trang chủ</span>

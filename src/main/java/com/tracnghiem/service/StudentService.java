@@ -42,6 +42,10 @@ public class StudentService {
 		return studentDAO.findAll();
 	}
 
+	public Student getStudentById(String studentId) {
+		return studentDAO.findById(studentId);
+	}
+
 	public void addStudent(StudentDTO dto) {
 		Student student = changeToEntity(dto);
 		studentDAO.create(student);

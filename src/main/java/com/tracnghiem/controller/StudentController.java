@@ -1,7 +1,9 @@
 package com.tracnghiem.controller;
 
 import java.util.List;
+import java.util.Date;
 
+import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -41,6 +43,18 @@ public class StudentController {
 
 		return "Student/Index";
 	}
+
+	@GetMapping("/home")
+	public String Home(ModelMap model, HttpSession session) {
+		String studentId = (String) session.getAttribute("LOGIN_USER");
+		Student student = studentId != null ? studentService.getStudentById(studentId) : null;
+
+		model.addAttribute("pageTitle", "Trang chủ sinh viên");
+		model.addAttribute("studentProfile", student);
+		model.addAttribute("today", new Date());
+		return "Student/Home";
+	}
+
 
 	@PostMapping("/add")
 	public String add(@Validated @ModelAttribute("sinhVienDTO") StudentDTO sinhVien, BindingResult errors,

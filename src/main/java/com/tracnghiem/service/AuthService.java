@@ -23,12 +23,12 @@ public class AuthService {
 	@Transactional
 	public String login(LoginDTO dto, HttpSession session) {
 
-		String normalizedMa = dto.getMa().trim();
+		String normalizedUsername = dto.getUsername().trim();
 
-		Account user = accountDAO.findById(normalizedMa);
+		Account user = accountDAO.findById(normalizedUsername);
 
 		if (user == null) {
-			return "Mã đăng nhập không tồn tại";
+			return "Tên đăng nhập không tồn tại";
 		}
 
 		String inputHash = sha256(dto.getPassword());
