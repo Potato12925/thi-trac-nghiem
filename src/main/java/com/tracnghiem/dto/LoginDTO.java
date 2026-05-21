@@ -5,9 +5,9 @@ import javax.validation.constraints.Size;
 
 public class LoginDTO {
 
-    @NotBlank(message = "Mã đăng nhập không được để trống")
-    @Size(max = 8, message = "Mã đăng nhập tối đa 8 ký tự")
-    private String ma;
+    @NotBlank(message = "Tên đăng nhập không được để trống")
+    @Size(max = 8, message = "Tên đăng nhập tối đa 8 ký tự")
+    private String username;
 
     @NotBlank(message = "Mật khẩu không được để trống")
     @Size(min = 6, message = "Mật khẩu tối thiểu 6 ký tự")
@@ -16,12 +16,12 @@ public class LoginDTO {
     public LoginDTO() {
     }
 
-    public String getMa() {
-        return ma;
+    public String getUsername() {
+        return username;
     }
 
-    public void setMa(String ma) {
-        this.ma = ma;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {

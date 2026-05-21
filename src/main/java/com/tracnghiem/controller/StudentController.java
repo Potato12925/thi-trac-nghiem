@@ -42,6 +42,12 @@ public class StudentController {
 		return "Student/Index";
 	}
 
+	@GetMapping("/home")
+	public String Home(ModelMap model) {
+		return "Student/Home";
+	}
+
+
 	@PostMapping("/add")
 	public String add(@Validated @ModelAttribute("sinhVienDTO") StudentDTO sinhVien, BindingResult errors,
 			ModelMap model) {
