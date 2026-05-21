@@ -6,12 +6,11 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.validation.BindingResult;
 
 import com.tracnghiem.dto.LoginDTO;
 import com.tracnghiem.service.AuthService;
@@ -33,23 +32,38 @@ public class AuthController {
 
 	@PostMapping("/login")
 	public String login(
-			@Valid @ModelAttribute("taiKhoan") LoginDTO dto,
-			BindingResult result,
-			HttpSession session,
-			Model model) {
+	        @Valid @ModelAttribute("taiKhoan") LoginDTO dto,
+	        BindingResult result,
+	        HttpSession session,
+	        Model model) {
 
-		if (result.hasErrors()) {
-			return "Account/Login";
-		}
+	    if (result.hasErrors()) {
+	        return "Account/Login";
+	    }
 
-		String error = authService.login(dto, session);
+	    String error = authService.login(dto, session);
 
-		if (error != null) {
-			model.addAttribute("error", error);
-			return "Account/Login";
-		}
+	    if (error != null) {
+	        model.addAttribute("error", error);
+	        return "Account/Login";
+	    }
 
-		return "Home/Index";
+	    String role = (String) session.getAttribute("ROLE");
+
+	    switch (role) {
+	        case "SINHVIEN":
+	            return "redirect:/student/home";
+
+	        case "GIAOVIEN":
+	            return "redirect:/teacher/home";
+
+	        case "PGV":
+	            return "redirect:/admin/home";
+
+	        default:
+	            model.addAttribute("error", "Role không hợp lệ");
+	            return "Account/Login";
+	    }
 	}
 
 	@PostMapping("/logout")

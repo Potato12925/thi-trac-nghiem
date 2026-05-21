@@ -1,169 +1,417 @@
 ﻿<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <%@ include file="../Shared/_LayoutStart.jsp" %>
 
 <c:set var="fullName" value="${studentProfile.lastName} ${studentProfile.firstName}" />
 <c:set var="studentId" value="${empty studentProfile.studentId ? sessionScope.LOGIN_USER : studentProfile.studentId}" />
 <c:set var="className" value="${empty studentProfile.classRoom.className ? studentProfile.classRoom.classId : studentProfile.classRoom.className}" />
+
 <c:set var="totalSubjectsTakenValue" value="${empty totalSubjectsTaken ? 0 : totalSubjectsTaken}" />
 <c:set var="totalPendingExamsValue" value="${empty totalPendingExams ? 0 : totalPendingExams}" />
 <c:set var="averageScoreValue" value="${empty averageScore ? 0 : averageScore}" />
 <c:set var="recentSubjectValue" value="${empty recentSubject ? 'Chưa có dữ liệu' : recentSubject}" />
 
 <style>
-    .student-dashboard { display: grid; gap: 1.25rem; }
-    .welcome-card { border: 0; border-radius: 1rem; background: linear-gradient(135deg, #0b5ed7, #4b8ff9); color: #fff; box-shadow: 0 12px 24px rgba(11, 94, 215, 0.2); }
-    .welcome-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.9rem; }
-    .welcome-item { background: rgba(255, 255, 255, 0.15); border-radius: 0.8rem; padding: 0.75rem 0.85rem; }
-    .welcome-item .label { font-size: 0.8rem; opacity: 0.9; }
-    .welcome-item .value { font-weight: 700; }
 
-    .stat-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
-    .stat-card { border: 0; border-radius: 1rem; box-shadow: 0 10px 18px rgba(23, 44, 82, 0.08); }
-    .stat-icon { width: 44px; height: 44px; border-radius: 0.8rem; display: grid; place-items: center; font-size: 1.2rem; }
+    body {
+        background: #f4f7fb;
+    }
 
-    .icon-subject { background: #e8f1ff; color: #0d6efd; }
-    .icon-pending { background: #fff3e3; color: #ff8a00; }
-    .icon-score { background: #eafaf0; color: #16a34a; }
-    .icon-recent { background: #f1ecff; color: #6f42c1; }
+    .student-dashboard {
+        display: grid;
+        gap: 1.5rem;
+    }
 
-    .schedule-card { border: 0; border-radius: 1rem; box-shadow: 0 10px 18px rgba(23, 44, 82, 0.08); }
+    .profile-card {
+        border-radius: 28px;
+        overflow: hidden;
+        border: 0;
+        background:
+            linear-gradient(135deg, #2563eb, #4f46e5);
+        box-shadow: 0 20px 45px rgba(37, 99, 235, 0.18);
+        color: white;
+    }
+
+    .profile-top {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        padding: 2rem;
+    }
+
+    .avatar-box {
+        width: 95px;
+        height: 95px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.18);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.2rem;
+        font-weight: 700;
+        flex-shrink: 0;
+        backdrop-filter: blur(12px);
+        border: 2px solid rgba(255,255,255,0.2);
+    }
+
+    .student-name {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.4rem;
+    }
+
+    .student-meta {
+        font-size: 0.95rem;
+        opacity: 0.92;
+        margin-bottom: 0.25rem;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 1rem;
+        padding: 0 2rem 2rem;
+    }
+
+    .info-item {
+        background: rgba(255,255,255,0.12);
+        border-radius: 22px;
+        padding: 1rem;
+        backdrop-filter: blur(14px);
+        transition: 0.25s ease;
+    }
+
+    .info-item:hover {
+        transform: translateY(-3px);
+        background: rgba(255,255,255,0.18);
+    }
+
+    .info-label {
+        font-size: 0.82rem;
+        opacity: 0.85;
+        margin-bottom: 0.45rem;
+    }
+
+    .info-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    .recent-subject {
+        font-size: 1rem;
+        line-height: 1.4;
+    }
+
+    .schedule-card {
+        border: 0;
+        border-radius: 28px;
+        background: white;
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+    }
+
+    .schedule-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .schedule-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+    .table thead th {
+        border: 0;
+        background: #f8fafc;
+        color: #64748b;
+        font-size: 0.85rem;
+        font-weight: 600;
+        padding: 1rem;
+    }
+
+    .table tbody td {
+        padding: 1rem;
+        vertical-align: middle;
+        border-color: #f1f5f9;
+    }
+
+    .badge-soft {
+        background: #fff7ed;
+        color: #ea580c;
+        padding: 0.5rem 0.8rem;
+        border-radius: 999px;
+        font-size: 0.78rem;
+        font-weight: 600;
+    }
+
+    .empty-state {
+        padding: 2rem !important;
+        color: #94a3b8;
+    }
 
     @media (max-width: 992px) {
-        .welcome-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-        .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+        .info-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
     }
 
     @media (max-width: 576px) {
-        .welcome-grid { grid-template-columns: 1fr; }
-        .stat-grid { grid-template-columns: 1fr; }
+
+        .profile-top {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .student-name {
+            font-size: 1.6rem;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .schedule-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
     }
+
 </style>
 
 <div class="container-fluid student-dashboard">
-    <section class="card welcome-card">
-        <div class="card-body p-4">
-            <p class="mb-2 fw-semibold">Xin chào, ${empty studentProfile ? sessionScope.LOGIN_USER : fullName}.</p>
-            <h2 class="h4 mb-4">Chúc bạn có một buổi học hiệu quả và thi thật tốt.</h2>
 
-            <div class="welcome-grid">
-                <div class="welcome-item">
-                    <div class="label">Họ tên sinh viên</div>
-                    <div class="value">${empty studentProfile ? 'Chưa cập nhật' : fullName}</div>
-                </div>
-                <div class="welcome-item">
-                    <div class="label">Mã sinh viên</div>
-                    <div class="value">${studentId}</div>
-                </div>
-                <div class="welcome-item">
-                    <div class="label">Ngày sinh</div>
-                    <div class="value">
-                        <c:choose>
-                            <c:when test="${not empty studentProfile.birthDate}">
-                                <fmt:formatDate value="${studentProfile.birthDate}" pattern="dd/MM/yyyy" />
-                            </c:when>
-                            <c:otherwise>Chưa cập nhật</c:otherwise>
-                        </c:choose>
-                    </div>
-                </div>
-                <div class="welcome-item">
-                    <div class="label">Lớp</div>
-                    <div class="value">${empty className ? 'Chưa cập nhật' : className}</div>
-                </div>
-                <div class="welcome-item">
-                    <div class="label">Ngày hiện tại</div>
-                    <div class="value"><fmt:formatDate value="${today}" pattern="dd/MM/yyyy" /></div>
-                </div>
+    <!-- PROFILE -->
+
+    <section class="profile-card">
+
+        <div class="profile-top">
+
+            <div class="avatar-box">
+                <c:choose>
+                    <c:when test="${not empty studentProfile.firstName}">
+                        ${fn:substring(studentProfile.firstName,0,1)}
+                    </c:when>
+                    <c:otherwise>
+                        S
+                    </c:otherwise>
+                </c:choose>
             </div>
+
+            <div>
+
+                <div class="student-name">
+                    ${empty studentProfile ? sessionScope.LOGIN_USER : fullName}
+                </div>
+
+                <div class="student-meta">
+                    <i class="bi bi-person-badge"></i>
+                    MSSV: ${studentId}
+                </div>
+
+                <div class="student-meta">
+                    <i class="bi bi-mortarboard"></i>
+                    Lớp:
+                    ${empty className ? 'Chưa cập nhật' : className}
+                </div>
+
+                <div class="student-meta">
+
+                    <i class="bi bi-calendar-event"></i>
+
+                    Ngày sinh:
+
+                    <c:choose>
+
+                        <c:when test="${not empty studentProfile.birthDate}">
+                            <fmt:formatDate
+                                    value="${studentProfile.birthDate}"
+                                    pattern="dd/MM/yyyy" />
+                        </c:when>
+
+                        <c:otherwise>
+                            Chưa cập nhật
+                        </c:otherwise>
+
+                    </c:choose>
+
+                </div>
+
+            </div>
+
         </div>
+
+        <!-- STATS -->
+
+        <div class="info-grid">
+
+            <div class="info-item">
+
+                <div class="info-label">
+                    Tổng môn đã thi
+                </div>
+
+                <div class="info-value">
+                    ${totalSubjectsTakenValue}
+                </div>
+
+            </div>
+
+            <div class="info-item">
+
+                <div class="info-label">
+                    Bài thi chưa thi
+                </div>
+
+                <div class="info-value">
+                    ${totalPendingExamsValue}
+                </div>
+
+            </div>
+
+            <div class="info-item">
+
+                <div class="info-label">
+                    Điểm trung bình
+                </div>
+
+                <div class="info-value">
+
+                    <fmt:formatNumber
+                            value="${averageScoreValue}"
+                            maxFractionDigits="2"
+                            minFractionDigits="1" />
+
+                </div>
+
+            </div>
+
+            <div class="info-item">
+
+                <div class="info-label">
+                    Môn thi gần nhất
+                </div>
+
+                <div class="recent-subject">
+                    ${recentSubjectValue}
+                </div>
+
+            </div>
+
+        </div>
+
     </section>
 
-    <section class="stat-grid">
-        <article class="card stat-card">
-            <div class="card-body d-flex align-items-center justify-content-between">
-                <div>
-                    <div class="text-secondary small">Tổng số môn đã thi</div>
-                    <div class="h4 mb-0">${totalSubjectsTakenValue}</div>
-                </div>
-                <div class="stat-icon icon-subject"><i class="bi bi-journal-check"></i></div>
-            </div>
-        </article>
-
-        <article class="card stat-card">
-            <div class="card-body d-flex align-items-center justify-content-between">
-                <div>
-                    <div class="text-secondary small">Tổng số bài thi chưa thi</div>
-                    <div class="h4 mb-0">${totalPendingExamsValue}</div>
-                </div>
-                <div class="stat-icon icon-pending"><i class="bi bi-hourglass-split"></i></div>
-            </div>
-        </article>
-
-        <article class="card stat-card">
-            <div class="card-body d-flex align-items-center justify-content-between">
-                <div>
-                    <div class="text-secondary small">Điểm trung bình</div>
-                    <div class="h4 mb-0"><fmt:formatNumber value="${averageScoreValue}" maxFractionDigits="2" minFractionDigits="1" /></div>
-                </div>
-                <div class="stat-icon icon-score"><i class="bi bi-graph-up-arrow"></i></div>
-            </div>
-        </article>
-
-        <article class="card stat-card">
-            <div class="card-body d-flex align-items-center justify-content-between">
-                <div>
-                    <div class="text-secondary small">Môn thi gần nhất</div>
-                    <div class="h6 mb-0">${recentSubjectValue}</div>
-                </div>
-                <div class="stat-icon icon-recent"><i class="bi bi-clock-history"></i></div>
-            </div>
-        </article>
-    </section>
+    <!-- UPCOMING EXAMS -->
 
     <section class="card schedule-card">
+
         <div class="card-body p-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h3 class="h5 mb-0">Lịch thi / ca thi sắp tới</h3>
-                <span class="badge text-bg-primary">Sắp diễn ra</span>
+
+            <div class="schedule-header">
+
+                <div class="schedule-title">
+                    Lịch thi sắp tới
+                </div>
+
+                <span class="badge text-bg-primary">
+                    Sắp diễn ra
+                </span>
+
             </div>
 
             <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Môn thi</th>
-                            <th>Ngày thi</th>
-                            <th>Ca thi</th>
-                            <th>Phòng thi</th>
-                            <th>Trạng thái</th>
-                        </tr>
+
+                <table class="table align-middle">
+
+                    <thead>
+
+                    <tr>
+                        <th>Môn thi</th>
+                        <th>Ngày thi</th>
+                        <th>Ca thi</th>
+                        <th>Phòng thi</th>
+                        <th>Trạng thái</th>
+                    </tr>
+
                     </thead>
+
                     <tbody>
-                        <c:choose>
-                            <c:when test="${not empty upcomingExams}">
-                                <c:forEach var="exam" items="${upcomingExams}">
-                                    <tr>
-                                        <td>${exam.subjectName}</td>
-                                        <td>${exam.examDate}</td>
-                                        <td>${exam.shift}</td>
-                                        <td>${exam.room}</td>
-                                        <td><span class="badge text-bg-warning">Chưa thi</span></td>
-                                    </tr>
-                                </c:forEach>
-                            </c:when>
-                            <c:otherwise>
+
+                    <c:choose>
+
+                        <c:when test="${not empty upcomingExams}">
+
+                            <c:forEach var="exam" items="${upcomingExams}">
+
                                 <tr>
-                                    <td colspan="5" class="text-center text-secondary py-4">Chưa có lịch thi sắp tới.</td>
+
+                                    <td class="fw-semibold">
+                                        ${exam.subjectName}
+                                    </td>
+
+                                    <td>
+                                        ${exam.examDate}
+                                    </td>
+
+                                    <td>
+                                        ${exam.shift}
+                                    </td>
+
+                                    <td>
+                                        ${exam.room}
+                                    </td>
+
+                                    <td>
+                                        <span class="badge-soft">
+                                            Chưa thi
+                                        </span>
+                                    </td>
+
                                 </tr>
-                            </c:otherwise>
-                        </c:choose>
+
+                            </c:forEach>
+
+                        </c:when>
+
+                        <c:otherwise>
+
+                            <tr>
+
+                                <td colspan="5"
+                                    class="text-center empty-state">
+
+                                    Chưa có lịch thi sắp tới.
+
+                                </td>
+
+                            </tr>
+
+                        </c:otherwise>
+
+                    </c:choose>
+
                     </tbody>
+
                 </table>
+
             </div>
+
         </div>
+
     </section>
+
 </div>
 
 <%@ include file="../Shared/_LayoutEnd.jsp" %>
