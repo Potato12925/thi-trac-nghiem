@@ -182,17 +182,17 @@ body {
 								modelAttribute="taiKhoan">
 
 								<div class="mb-3">
-									<label for="ma" class="form-label small fw-bold field-label">
-										Mã đăng nhập </label>
+									<label for="username" class="form-label small fw-bold field-label">
+										Tên đăng nhập </label>
 
 									<div class="input-group-premium">
 										<i class="bi bi-person input-icon"></i>
 
-										<form:input path="ma" id="ma" cssClass="form-control-premium"
-											placeholder="Nhập mã đăng nhập..." />
+										<form:input path="username" id="username" cssClass="form-control-premium"
+											placeholder="Nhập tên đăng nhập..." />
 									</div>
 
-									<form:errors path="ma" cssClass="text-danger small" />
+									<form:errors path="username" cssClass="text-danger small" />
 								</div>
 
 								<div class="mb-4">
