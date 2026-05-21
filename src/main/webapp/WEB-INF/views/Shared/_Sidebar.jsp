@@ -42,7 +42,7 @@ String activeStudent =
         ? "active" : "";
 
 String activeTeacher =
-        path.equals("/teacher") || path.startsWith("/teacher/")
+        path.equals("/lecturer") || path.startsWith("/lecturer/")
         ? "active" : "";
 
 String activeSubject =
@@ -50,7 +50,7 @@ String activeSubject =
         ? "active" : "";
 
 String activeQuestion =
-        path.equals("/question") || path.startsWith("/question/")
+        path.equals("/questions") || path.startsWith("/questions/")
         ? "active" : "";
 
 String activeExamRegistration =

@@ -18,4 +18,8 @@ public class TeacherDAO extends GenericDAO<Teacher> {
                 .setParameter("keyword", "%" + keyword + "%")
                 .list();
     }
+
+    public boolean existsById(String maGV) {
+        return findById(maGV) != null;
+    }
 }

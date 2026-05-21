@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%
 request.setAttribute("pageTitle", "Quản lý Giảng viên");
 %>
@@ -10,49 +11,65 @@ request.setAttribute("pageTitle", "Quản lý Giảng viên");
         <h1 class="h3 mb-0">Danh sách Giảng viên</h1>
     </div>
 
-    <div class="card border-0 shadow-sm mb-4 p-3">
-        <form id="lecturerForm" action="${pageContext.request.contextPath}/lecturer/save" method="post" class="row g-3 align-items-end">
-            <div class="col-md-2">
-                <label class="form-label text-sm fw-medium">Mã GV</label>
-                <input type="text" name="maGV" class="form-control form-control-sm" placeholder="Mã giảng viên" value="${teacher.maGV}" />
-            </div>
-            <div class="col-md-2">
-                <label class="form-label text-sm fw-medium">Họ</label>
-                <input type="text" name="ho" class="form-control form-control-sm" placeholder="Họ" value="${teacher.ho}" />
-            </div>
-            <div class="col-md-2">
-                <label class="form-label text-sm fw-medium">Tên</label>
-                <input type="text" name="ten" class="form-control form-control-sm" placeholder="Tên" value="${teacher.ten}" />
-            </div>
-            <div class="col-md-2">
-                <label class="form-label text-sm fw-medium">SĐT</label>
-                <input type="text" name="soDT" class="form-control form-control-sm" placeholder="Số điện thoại" value="${teacher.soDT}" />
-            </div>
-            <div class="col-md-2">
-                <label class="form-label text-sm fw-medium">Địa chỉ</label>
-                <input type="text" name="diaChi" class="form-control form-control-sm" placeholder="Địa chỉ" value="${teacher.diaChi}" />
-            </div>
-            <div class="col-md-2 text-end">
-                <button class="btn btn-primary me-1" type="button" onclick="clearLecturerForm()">Thêm</button>
-                <button class="btn btn-success me-1" type="submit">Ghi</button>
-                <button class="btn btn-outline-secondary me-1" type="reset">Phục hồi</button>
-                <button class="btn btn-outline-danger me-1" type="submit" formaction="${pageContext.request.contextPath}/lecturer/delete" formmethod="post">Xóa</button>
-                <button class="btn btn-outline-primary" type="button" onclick="document.getElementById('lecturerForm').submit()">Hiệu chỉnh</button>
-            </div>
-            <div class="col-md-5">
-                <label class="form-label text-sm fw-medium">Tìm kiếm</label>
-                <div class="input-group input-group-sm">
-                    <input type="text" name="search" class="form-control" placeholder="Mã GV hoặc Tên GV" value="${search}" />
-                    <button class="btn btn-outline-secondary" type="submit" form="searchForm">
-                        <i class="bi bi-search"></i>
-                    </button>
+    <h3>${error}</h3>
+
+    <div class="border rounded-3 bg-white p-4 mb-4">
+        <form:form id="lecturerForm"
+            action="${pageContext.request.contextPath}/lecturer/add" method="post"
+            modelAttribute="giaoVienDTO">
+
+            <input type="hidden" id="_method" name="_method" value="POST" />
+
+            <div class="row g-3">
+                <div class="col-md-2">
+                    <label class="form-label small text-secondary">Mã GV</label>
+                    <form:input path="maGV" cssClass="form-control" />
+                    <form:errors path="maGV" cssClass="text-danger small mt-1 d-block" />
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label small text-secondary">Họ</label>
+                    <form:input path="ho" cssClass="form-control" />
+                    <form:errors path="ho" cssClass="text-danger small mt-1 d-block" />
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label small text-secondary">Tên</label>
+                    <form:input path="ten" cssClass="form-control" />
+                    <form:errors path="ten" cssClass="text-danger small mt-1 d-block" />
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label small text-secondary">SĐT</label>
+                    <form:input path="soDT" cssClass="form-control" />
+                    <form:errors path="soDT" cssClass="text-danger small mt-1 d-block" />
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label small text-secondary">Địa chỉ</label>
+                    <form:input path="diaChi" cssClass="form-control" />
+                    <form:errors path="diaChi" cssClass="text-danger small mt-1 d-block" />
                 </div>
             </div>
-            <div class="col-md-7 text-end">
-                <button class="btn btn-outline-primary" type="submit" form="searchForm">Tìm</button>
+
+            <div class="d-flex gap-2 mt-4">
+                <button type="submit" class="btn btn-dark px-4"
+                    onclick="submitForm('add', 'POST')">
+                    Thêm
+                </button>
+                <button type="submit" class="btn btn-outline-secondary px-4"
+                    onclick="submitForm('update', 'PUT')">
+                    Chỉnh sửa
+                </button>
+                <button type="submit" class="btn btn-outline-danger px-4"
+                    onclick="submitForm('delete', 'DELETE')">
+                    Xóa
+                </button>
+                <button type="button" class="btn btn-outline-dark"
+                    onclick="resetForm()">Reset</button>
             </div>
-        </form>
-        <form id="searchForm" action="${pageContext.request.contextPath}/lecturer" method="get" class="d-none"></form>
+
+        </form:form>
     </div>
 
     <div class="card border-0 shadow-sm">
@@ -61,7 +78,8 @@ request.setAttribute("pageTitle", "Quản lý Giảng viên");
                 <thead class="table-light">
                     <tr>
                         <th scope="col">Mã GV</th>
-                        <th scope="col">Họ và Tên</th>
+                        <th scope="col">Họ</th>
+                        <th scope="col">Tên</th>
                         <th scope="col">Số điện thoại</th>
                         <th scope="col">Địa chỉ</th>
                         <th scope="col" class="text-end">Hành động</th>
@@ -71,25 +89,20 @@ request.setAttribute("pageTitle", "Quản lý Giảng viên");
                     <c:forEach items="${teachers}" var="item">
                         <tr>
                             <td class="fw-medium text-success">${item.maGV}</td>
-                            <td>${item.ho} ${item.ten}</td>
+                            <td>${item.ho}</td>
+                            <td>${item.ten}</td>
                             <td>${item.soDT}</td>
                             <td>${item.diaChi}</td>
                             <td class="text-end">
-                                <a class="btn btn-sm btn-outline-primary me-1" href="${pageContext.request.contextPath}/lecturer?maGV=${item.maGV}&search=${search}">
+                                <button class="btn btn-sm btn-outline-secondary me-2 btn-edit">
                                     <i class="bi bi-pencil"></i>
-                                </a>
-                                <form action="${pageContext.request.contextPath}/lecturer/delete" method="post" class="d-inline">
-                                    <input type="hidden" name="maGV" value="${item.maGV}" />
-                                    <button class="btn btn-sm btn-outline-danger" type="submit">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
+                                </button>
                             </td>
                         </tr>
                     </c:forEach>
                     <c:if test="${empty teachers}">
                         <tr>
-                            <td colspan="5" class="text-center text-muted">Không có giảng viên.</td>
+                            <td colspan="6" class="text-center text-muted">Không có giảng viên.</td>
                         </tr>
                     </c:if>
                 </tbody>
@@ -98,6 +111,47 @@ request.setAttribute("pageTitle", "Quản lý Giảng viên");
     </div>
 </div>
 
+<script>
+    function fillFormFromRow(row) {
+        const cells = row.querySelectorAll("td");
+        
+        const maGV = cells[0].innerText;
+        const ho = cells[1].innerText;
+        const ten = cells[2].innerText;
+        const soDT = cells[3].innerText;
+        const diaChi = cells[4].innerText;
+        
+        document.getElementById("maGV").value = maGV;
+        document.getElementById("ho").value = ho;
+        document.getElementById("ten").value = ten;
+        document.getElementById("soDT").value = soDT;
+        document.getElementById("diaChi").value = diaChi;
+        
+        document.getElementById("maGV").readOnly = true;
+    }
+
+    const editButtons = document.querySelectorAll(".btn-edit");
+    
+    editButtons.forEach(button => {
+        button.addEventListener("click", function () {
+            const row = this.closest("tr");
+            fillFormFromRow(row);
+        });
+    });
+
+    function submitForm(action, method) {
+        const form = document.getElementById("lecturerForm");
+        form.action = "${pageContext.request.contextPath}/lecturer/" + action;
+        document.getElementById("_method").value = method;
+    }
+    
+    function resetForm() {
+        document.getElementById("lecturerForm").reset();
+        document.getElementById("maGV").readOnly = false;
+    }
+</script>
+
+<%@ include file="../Shared/_LayoutEnd.jsp" %>
 <script>
     function clearLecturerForm() {
         var form = document.getElementById('lecturerForm');
