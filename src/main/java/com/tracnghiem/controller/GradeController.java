@@ -1,4 +1,4 @@
-﻿package com.tracnghiem.controller;
+package com.tracnghiem.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -1,0 +1,126 @@
+package com.tracnghiem.controller;
+
+import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import com.tracnghiem.dao.GiaoVienDAO;
+import com.tracnghiem.dao.LopDAO;
+import com.tracnghiem.dao.MonHocDAO;
+import com.tracnghiem.dto.ExamRegistrationDTO;
+import com.tracnghiem.service.ExamRegistrationService;
+
+@Controller
+@RequestMapping("/exam-registration")
+public class ExamRegistrationController {
+
+    @Autowired
+    private ExamRegistrationService examRegistrationService;
+
+    @Autowired
+    private LopDAO lopDAO;
+
+    @Autowired
+    private MonHocDAO monHocDAO;
+
+    @Autowired
+    private GiaoVienDAO giaoVienDAO;
+
+    private void prepareFormModel(Model model, HttpSession session) {
+        model.addAttribute("dsLop", lopDAO.findAll());
+        model.addAttribute("dsMonHoc", monHocDAO.findAll());
+
+        String role = (String) session.getAttribute("ROLE");
+        if ("PGV".equals(role)) {
+            model.addAttribute("dsGiaoVien", giaoVienDAO.findAll());
+        }
+    }
+
+    private boolean isAuthorized(HttpSession session) {
+        String role = (String) session.getAttribute("ROLE");
+        return role != null && (role.equals("PGV") || role.equals("GIAOVIEN"));
+    }
+
+    @GetMapping
+    public String Index(Model model, HttpSession session) {
+        if (!isAuthorized(session)) {
+            return "redirect:/auth/login";
+        }
+        
+        String role = (String) session.getAttribute("ROLE");
+        String userMaGv = (String) session.getAttribute("LOGIN_USER");
+        
+        model.addAttribute("registrationDTO", new ExamRegistrationDTO());
+        prepareFormModel(model, session);
+        model.addAttribute("registrations", examRegistrationService.getRegistrations(userMaGv, role));
+        
+        return "ExamRegistration/Index";
+    }
+
+    @PostMapping("/add")
+    public String add(
+            @Validated @ModelAttribute("registrationDTO") ExamRegistrationDTO dto,
+            BindingResult bindingResult,
+            Model model,
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
+
+        String role = (String) session.getAttribute("ROLE");
+        String userMaGv = (String) session.getAttribute("LOGIN_USER");
+
+        if (role == null || (!role.equals("PGV") && !role.equals("GIAOVIEN"))) {
+            return "redirect:/auth/login";
+        }
+
+        if (bindingResult.hasErrors()) {
+            prepareFormModel(model, session);
+            model.addAttribute("registrations", examRegistrationService.getRegistrations(userMaGv, role));
+            return "ExamRegistration/Index";
+        }
+
+        try {
+            examRegistrationService.registerExam(dto, userMaGv, role);
+            redirectAttributes.addFlashAttribute("successMessage", "Đăng ký thi thành công!");
+            return "redirect:/exam-registration";
+        } catch (Exception e) {
+            model.addAttribute("error", e.getMessage());
+            prepareFormModel(model, session);
+            model.addAttribute("registrations", examRegistrationService.getRegistrations(userMaGv, role));
+            return "ExamRegistration/Index";
+        }
+    }
+
+    @DeleteMapping("/delete")
+    public String delete(
+            @ModelAttribute("registrationDTO") ExamRegistrationDTO dto,
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
+            
+        String role = (String) session.getAttribute("ROLE");
+        String userMaGv = (String) session.getAttribute("LOGIN_USER");
+
+        if (!isAuthorized(session)) {
+            return "redirect:/auth/login";
+        }
+
+        try {
+            examRegistrationService.deleteExam(dto.getMaLop(), dto.getMaMh(), dto.getLan(), userMaGv, role);
+            redirectAttributes.addFlashAttribute("successMessage", "Xóa lượt đăng ký thi thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+
+        return "redirect:/exam-registration";
+    }
+}
