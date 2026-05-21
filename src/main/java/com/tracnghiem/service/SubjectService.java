@@ -156,26 +156,26 @@ public class SubjectService {
         String normalized = maMH.trim();
 
         // Check GiaoVienDangKy (Subject registration)
-        long teacherRegistrationCount = subjectDAO.countGiaoVienDangKyByMaMH(normalized);
+        long teacherRegistrationCount = subjectDAO.countTeacherRegistrationsBySubjectId(normalized);
         if (teacherRegistrationCount > 0) {
             return "Không thể xóa môn học. Có " + teacherRegistrationCount
                     + " giáo viên đã đăng ký môn học này";
         }
 
         // Check BoDe (Question bank)
-        long questionCount = subjectDAO.countBoDeByMaMH(normalized);
+        long questionCount = subjectDAO.countQuestionsBySubjectId(normalized);
         if (questionCount > 0) {
             return "Không thể xóa môn học. Có " + questionCount + " câu hỏi thuộc môn học này";
         }
 
         // Check BaiThi (Exam)
-        long examCount = subjectDAO.countBaiThiByMaMH(normalized);
+        long examCount = subjectDAO.countExamsBySubjectId(normalized);
         if (examCount > 0) {
             return "Không thể xóa môn học. Có " + examCount + " bài thi của môn học này";
         }
 
         // Check BangDiem (Grade)
-        long scoreCount = subjectDAO.countBangDiemByMaMH(normalized);
+        long scoreCount = subjectDAO.countScoresBySubjectId(normalized);
         if (scoreCount > 0) {
             return "Không thể xóa môn học. Có " + scoreCount + " bảng điểm của môn học này";
         }

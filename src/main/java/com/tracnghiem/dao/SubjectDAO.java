@@ -7,25 +7,29 @@ import org.springframework.stereotype.Repository;
 import com.tracnghiem.entity.Subject;
 
 /**
- * DAO layer for Subject (MonHoc) entity.
- * Handles all database operations for MonHoc table.
+ * DAO layer for Subject entity.
+ * Handles all database operations for Subject table.
  */
 @Repository
 public class SubjectDAO extends GenericDAO<Subject> {
-	public void themMonHoc(Subject monHoc) {
-		create(monHoc);
-	}
+
+    public void addSubject(Subject subject) {
+        create(subject);
+    }
 
     /**
      * Searches subjects by keyword.
-     * Searches in both maMH (code) and tenMH (name) fields.
-     * 
+     * Searches in both subjectId and subjectName fields.
+     *
      * @param keyword Search keyword
      * @return List of matching subjects
      */
     public List<Subject> findByKeyword(String keyword) {
-        String hql = "FROM MonHoc m WHERE m.maMH LIKE :keyword OR m.tenMH LIKE :keyword";
-        return getSession().createQuery(hql, Subject.class)
+
+        String hql = " FROM Subject s WHERE s.subjectId LIKE :keyword OR s.subjectName LIKE :keyword ";
+
+        return getSession()
+                .createQuery(hql, Subject.class)
                 .setParameter("keyword", '%' + keyword + '%')
                 .list();
     }
@@ -33,73 +37,91 @@ public class SubjectDAO extends GenericDAO<Subject> {
     // ==================== FOREIGN KEY CONSTRAINT CHECKS ====================
 
     /**
-     * Counts how many GiaoVienDangKy (Subject registrations) exist for a subject.
-     * Used to validate if subject can be deleted.
-     * 
-     * @param maMH Subject code
-     * @return Count of registrations
+     * Counts TeacherRegistration records by subject.
+     * Used to validate whether subject can be deleted.
+     *
+     * @param subjectId Subject ID
+     * @return Number of registrations
      */
-    public long countGiaoVienDangKyByMaMH(String maMH) {
-        String hql = "SELECT COUNT(g) FROM GiaoVienDangKy g WHERE g.id.maMH = :maMH";
-        Long count = getSession().createQuery(hql, Long.class)
-                .setParameter("maMH", maMH)
+    public long countTeacherRegistrationsBySubjectId(String subjectId) {
+
+        String hql = " SELECT COUNT(tr) FROM TeacherRegistration tr WHERE tr.id.subjectId = :subjectId ";
+
+        Long count = getSession()
+                .createQuery(hql, Long.class)
+                .setParameter("subjectId", subjectId)
                 .uniqueResult();
+
         return count != null ? count : 0L;
     }
 
     /**
-     * Counts how many BoDe (Questions) exist for a subject.
-     * Used to validate if subject can be deleted.
-     * 
-     * @param maMH Subject code
-     * @return Count of questions
+     * Counts Question records by subject.
+     * Used to validate whether subject can be deleted.
+     *
+     * @param subjectId Subject ID
+     * @return Number of questions
      */
-    public long countBoDeByMaMH(String maMH) {
-        String hql = "SELECT COUNT(b) FROM BoDe b WHERE b.monHoc.maMH = :maMH";
-        Long count = getSession().createQuery(hql, Long.class)
-                .setParameter("maMH", maMH)
+    public long countQuestionsBySubjectId(String subjectId) {
+
+        String hql = " SELECT COUNT(q) FROM Question q WHERE q.subject.subjectId = :subjectId ";
+
+        Long count = getSession()
+                .createQuery(hql, Long.class)
+                .setParameter("subjectId", subjectId)
                 .uniqueResult();
+
         return count != null ? count : 0L;
     }
 
     /**
-     * Counts how many BaiThi (Exams) exist for a subject.
-     * Used to validate if subject can be deleted.
-     * 
-     * @param maMH Subject code
-     * @return Count of exams
+     * Counts Exam records by subject.
+     * Used to validate whether subject can be deleted.
+     *
+     * @param subjectId Subject ID
+     * @return Number of exams
      */
-    public long countBaiThiByMaMH(String maMH) {
-        String hql = "SELECT COUNT(b) FROM BaiThi b WHERE b.monHoc.maMH = :maMH";
-        Long count = getSession().createQuery(hql, Long.class)
-                .setParameter("maMH", maMH)
+    public long countExamsBySubjectId(String subjectId) {
+
+        String hql = " SELECT COUNT(e) FROM Exam e WHERE e.subject.subjectId = :subjectId ";
+
+        Long count = getSession()
+                .createQuery(hql, Long.class)
+                .setParameter("subjectId", subjectId)
                 .uniqueResult();
+
         return count != null ? count : 0L;
     }
 
     /**
-     * Counts how many BangDiem (Grades) exist for a subject.
-     * Used to validate if subject can be deleted.
-     * 
-     * @param maMH Subject code
-     * @return Count of grade records
+     * Counts Score records by subject.
+     * Used to validate whether subject can be deleted.
+     *
+     * @param subjectId Subject ID
+     * @return Number of score records
      */
-    public long countBangDiemByMaMH(String maMH) {
-        String hql = "SELECT COUNT(b) FROM BangDiem b WHERE b.monHoc.maMH = :maMH";
-        Long count = getSession().createQuery(hql, Long.class)
-                .setParameter("maMH", maMH)
+    public long countScoresBySubjectId(String subjectId) {
+
+        String hql = " SELECT COUNT(s) FROM Score s WHERE s.subject.subjectId = :subjectId ";
+
+        Long count = getSession()
+                .createQuery(hql, Long.class)
+                .setParameter("subjectId", subjectId)
                 .uniqueResult();
+
         return count != null ? count : 0L;
     }
 
     /**
-     * Checks if a subject exists by code.
-     * 
-     * @param maMH Subject code
-     * @return true if exists, false otherwise
+     * Checks whether subject exists.
+     *
+     * @param subjectId Subject ID
+     * @return true if exists, otherwise false
      */
-    public boolean exists(String maMH) {
-        Subject subject = findById(maMH);
+    public boolean exists(String subjectId) {
+
+        Subject subject = findById(subjectId);
+
         return subject != null;
     }
 }

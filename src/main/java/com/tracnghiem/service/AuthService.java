@@ -25,7 +25,7 @@ public class AuthService {
 
 		String normalizedMa = dto.getMa().trim();
 
-		Account user = accountDAO.findByMa(normalizedMa);
+		Account user = accountDAO.findById(normalizedMa);
 
 		if (user == null) {
 			return "Mã đăng nhập không tồn tại";

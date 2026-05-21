@@ -10,9 +10,12 @@ import com.tracnghiem.entity.Teacher;
 public class TeacherDAO extends GenericDAO<Teacher> {
 
     public List<Teacher> findByKeyword(String keyword) {
-        String hql = "FROM GiaoVien g WHERE g.maGV LIKE :keyword OR g.ho LIKE :keyword OR g.ten LIKE :keyword";
-        return getSession().createQuery(hql, Teacher.class)
-                .setParameter("keyword", '%' + keyword + '%')
+
+        String hql = "FROM Teacher t WHERE t.maGV LIKE :keyword OR t.ho LIKE :keyword OR t.ten LIKE :keyword";
+
+        return getSession()
+                .createQuery(hql, Teacher.class)
+                .setParameter("keyword", "%" + keyword + "%")
                 .list();
     }
-} 
+}

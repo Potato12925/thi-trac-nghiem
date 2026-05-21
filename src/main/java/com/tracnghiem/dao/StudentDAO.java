@@ -6,7 +6,7 @@ import com.tracnghiem.entity.Student;
 
 @Repository
 public class StudentDAO extends GenericDAO<Student> {
-	public boolean existsById(String maSV) {
-	    return findById(maSV) != null;
+	public boolean existsById(String studentId) {
+	    return findById(studentId) != null;
 	}
 }
