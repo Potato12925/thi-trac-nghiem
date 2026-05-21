@@ -4,120 +4,114 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import com.tracnghiem.dao.QuestionDAO;
-import com.tracnghiem.dao.TeacherDAO;
-import com.tracnghiem.dao.SubjectDAO;
+import com.tracnghiem.dto.QuestionDTO;
 import com.tracnghiem.entity.Question;
-import com.tracnghiem.entity.Teacher;
-import com.tracnghiem.entity.Subject;
+import com.tracnghiem.service.QuestionService;
 
 @Controller
-@RequestMapping("/question")
+@RequestMapping("/questions")
 public class QuestionController {
 
-    @Autowired
-    private QuestionDAO questionDAO;
+	@Autowired
+	private QuestionService questionService;
 
-    @Autowired
-    private SubjectDAO subjectDAO;
+	@GetMapping
+	public String showQuestionPage(ModelMap model) {
 
-    @Autowired
-    private TeacherDAO teacherDAO;
+		prepareQuestionPage(model);
 
-    @GetMapping
-    public String index(
-            @RequestParam(value = "search", required = false) String search,
-            @RequestParam(value = "questionId", required = false) Integer questionId,
-            Model model) {
+		model.addAttribute("questionForm", new QuestionDTO());
 
-        List<Question> questions;
-        if (search != null && !search.trim().isEmpty()) {
-            questions = questionDAO.findByKeyword(search.trim());
-        } else {
-            questions = questionDAO.findAll();
-        }
+		return "Question/Index";
+	}
 
-        Question selectedQuestion = null;
-        if (questionId != null) {
-            selectedQuestion = questionDAO.findById(questionId);
-        }
-        if (selectedQuestion == null) {
-            selectedQuestion = new Question();
-        }
+	@PostMapping("/create")
+	public String createQuestion(@Validated @ModelAttribute("questionForm") QuestionDTO questionForm,
+			BindingResult validationResult, ModelMap model) {
 
-        List<Subject> subjects = subjectDAO.findAll();
-        List<Teacher> teachers = teacherDAO.findAll();
+		if (validationResult.hasErrors()) {
+			return renderQuestionPage(model);
+		}
 
-        model.addAttribute("questions", questions);
-        model.addAttribute("question", selectedQuestion);
-        model.addAttribute("subjects", subjects);
-        model.addAttribute("teachers", teachers);
-        model.addAttribute("search", search);
+		try {
 
-        return "Question/Index";
-    }
+			questionService.addQuestion(questionForm);
 
-    @PostMapping("/save")
-    public String save(
-            @RequestParam(value = "questionId", required = false) Integer questionId,
-            @RequestParam("subjectId") String subjectId,
-            @RequestParam("level") String level,
-            @RequestParam("content") String content,
-            @RequestParam(value = "A", required = false) String answerA,
-            @RequestParam(value = "B", required = false) String answerB,
-            @RequestParam(value = "C", required = false) String answerC,
-            @RequestParam(value = "D", required = false) String answerD,
-            @RequestParam(value = "answer", required = false) String answer,
-            @RequestParam("teacherId") String teacherId) {
+			return "redirect:/questions";
 
-        Subject subject = subjectDAO.findById(subjectId.trim());
-        Teacher teacher = teacherDAO.findById(teacherId.trim());
+		} catch (IllegalArgumentException exception) {
 
-        if (subject == null || teacher == null) {
-            return "redirect:/question";
-        }
+			model.addAttribute("errorMessage", exception.getMessage());
 
-        Question question = null;
-        if (questionId != null) {
-            question = questionDAO.findById(questionId);
-        }
-        if (question == null) {
-            question = new Question();
-        }
+			return renderQuestionPage(model);
+		}
+	}
 
-        question.setSubject(subject);
-        question.setLevel(level != null ? level.trim() : "");
-        question.setContent(content != null ? content.trim() : "");
-        question.setOptionA(answerA != null ? answerA.trim() : "");
-        question.setOptionB(answerB != null ? answerB.trim() : "");
-        question.setOptionC(answerC != null ? answerC.trim() : "");
-        question.setOptionD(answerD != null ? answerD.trim() : "");
-        question.setCorrectAnswer(answer != null ? answer.trim() : "");
-        question.setTeacher(teacher);
+	@PutMapping("/edit")
+	public String editQuestion(@Validated @ModelAttribute("questionForm") QuestionDTO questionForm,
+			BindingResult validationResult, ModelMap model) {
 
-        if (question.getQuestionId() == null) {
-            questionDAO.create(question);
-        } else {
-            questionDAO.update(question);
-        }
+		if (validationResult.hasErrors()) {
+			return renderQuestionPage(model);
+		}
 
-        return "redirect:/question?questionId=" + question.getQuestionId();
-    }
+		try {
 
-    @PostMapping("/delete")
-    public String delete(@RequestParam("questionId") Integer questionId) {
-        if (questionId != null) {
-            Question question = questionDAO.findById(questionId);
-            if (question != null) {
-                questionDAO.delete(question);
-            }
-        }
-        return "redirect:/question";
-    }
+			questionService.updateQuestion(questionForm);
+
+			return "redirect:/questions";
+
+		} catch (IllegalArgumentException exception) {
+
+			model.addAttribute("errorMessage", exception.getMessage());
+
+			return renderQuestionPage(model);
+		}
+	}
+
+	@DeleteMapping("/remove")
+	public String removeQuestion(@Validated @ModelAttribute("questionForm") QuestionDTO questionForm,
+			BindingResult validationResult, ModelMap model) {
+
+		if (validationResult.hasErrors()) {
+			return renderQuestionPage(model);
+		}
+
+		try {
+
+			questionService.deleteQuestion(questionForm);
+
+			return "redirect:/questions";
+
+		} catch (IllegalArgumentException exception) {
+
+			model.addAttribute("errorMessage", exception.getMessage());
+
+			return renderQuestionPage(model);
+		}
+	}
+
+	private void prepareQuestionPage(ModelMap model) {
+
+		List<Question> questions = questionService.getAllQuestions();
+
+		model.addAttribute("questionList", questions);
+	}
+
+	private String renderQuestionPage(ModelMap model) {
+
+		prepareQuestionPage(model);
+
+		return "Question/Index";
+	}
 }
