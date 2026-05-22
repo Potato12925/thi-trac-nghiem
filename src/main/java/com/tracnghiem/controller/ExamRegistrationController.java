@@ -5,7 +5,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -37,7 +37,7 @@ public class ExamRegistrationController {
     @Autowired
     private TeacherDAO teacherDAO;
 
-    private void prepareFormModel(Model model, HttpSession session) {
+    private void prepareFormModel(ModelMap model, HttpSession session) {
         model.addAttribute("dsLop", classRoomDAO.findAll());
         model.addAttribute("dsMonHoc", subjectDAO.findAll());
 
@@ -53,7 +53,7 @@ public class ExamRegistrationController {
     }
 
     @GetMapping
-    public String Index(Model model, HttpSession session) {
+    public String Index(ModelMap model, HttpSession session) {
         if (!isAuthorized(session)) {
             return "redirect:/auth/login";
         }
@@ -72,7 +72,7 @@ public class ExamRegistrationController {
     public String add(
             @Validated @ModelAttribute("registrationDTO") ExamRegistrationDTO dto,
             BindingResult bindingResult,
-            Model model,
+            ModelMap model,
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
