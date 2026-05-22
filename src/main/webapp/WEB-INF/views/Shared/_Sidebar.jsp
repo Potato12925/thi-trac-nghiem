@@ -34,19 +34,19 @@ String activeHome =
         ? "active" : "";
 
 String activeClass =
-        path.equals("/classRoom") || path.startsWith("/classRoom/")
+        path.equals("/classRooms") || path.startsWith("/classRooms/")
         ? "active" : "";
 
 String activeStudent =
-        path.equals("/student") || path.startsWith("/student/")
+        path.equals("/students") || path.startsWith("/students/")
         ? "active" : "";
 
 String activeTeacher =
-        path.equals("/lecturer") || path.startsWith("/lecturer/")
+        path.equals("/lecturers") || path.startsWith("/lecturers/")
         ? "active" : "";
 
 String activeSubject =
-        path.equals("/subject") || path.startsWith("/subject/")
+        path.equals("/subjects") || path.startsWith("/subjects/")
         ? "active" : "";
 
 String activeQuestion =

@@ -1,83 +1,102 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 
-
 <%
-request.setAttribute("pageTitle", "Quản lý Sinh viên");
+request.setAttribute("pageTitle", "Student Management");
 %>
 
 <%@ include file="../Shared/_LayoutStart.jsp"%>
 
 <div class="container-fluid">
+
 	<div class="d-flex justify-content-between align-items-center mb-4">
-		<h1 class="h3 mb-0">Hồ sơ Sinh viên</h1>
+		<h1 class="h3 mb-0">Student Management</h1>
 	</div>
 
-	<h3>${error}</h3>
+	<c:if test="${not empty error}">
+		<div class="alert alert-danger">${error}</div>
+	</c:if>
 
 	<div class="border rounded-3 bg-white p-4 mb-4">
 
-		<form:form id="studentForm"
-			action="${pageContext.request.contextPath}/student/add" method="post"
-			modelAttribute="sinhVienDTO">
-
-			<input type="hidden" id="_method" name="_method" value="POST" />
+		<form:form id="studentForm" method="post"
+			action="${pageContext.request.contextPath}/students/add"
+			modelAttribute="studentDTO">
 
 			<div class="row g-3">
 
 				<div class="col-md-3">
 
-					<label class="form-label small text-secondary"> Mã sinh
-						viên </label>
+					<label class="form-label small text-secondary"> Student ID
+					</label>
 
-					<form:input path="maSV" cssClass="form-control" />
-					<form:errors path="maSV" cssClass="text-danger small mt-1 d-block" />
-				</div>
+					<form:input path="studentId" id="studentId" cssClass="form-control" />
 
-				<div class="col-md-5">
-
-					<label class="form-label small text-secondary"> Họ </label>
-
-					<form:input path="ho" cssClass="form-control" />
-					<form:errors path="ho" cssClass="text-danger small mt-1 d-block" />
-				</div>
-
-				<div class="col-md-2">
-
-					<label class="form-label small text-secondary"> Tên </label>
-
-					<form:input path="ten" cssClass="form-control" />
-					<form:errors path="ten" cssClass="text-danger small mt-1 d-block" />
-				</div>
-
-				<div class="col-md-2">
-
-					<label class="form-label small text-secondary"> Ngày sinh </label>
-
-					<form:input path="ngaySinh" cssClass="form-control"
-						placeholder="yyyy-MM-dd" />
-					<form:errors path="ngaySinh"
+					<form:errors path="studentId"
 						cssClass="text-danger small mt-1 d-block" />
+
+				</div>
+
+				<div class="col-md-4">
+
+					<label class="form-label small text-secondary"> Last Name </label>
+
+					<form:input path="lastName" id="lastName" cssClass="form-control" />
+
+					<form:errors path="lastName"
+						cssClass="text-danger small mt-1 d-block" />
+
 				</div>
 
 				<div class="col-md-2">
 
-					<label class="form-label small text-secondary"> Địa chỉ </label>
+					<label class="form-label small text-secondary"> First Name
+					</label>
 
-					<form:input path="diaChi" cssClass="form-control" />
-					<form:errors path="diaChi"
+					<form:input path="firstName" id="firstName" cssClass="form-control" />
+
+					<form:errors path="firstName"
 						cssClass="text-danger small mt-1 d-block" />
+
 				</div>
 
-				<div class="col-md-2">
+				<div class="col-md-3">
 
-					<label class="form-label small text-secondary">Mã lớp</label>
+					<label class="form-label small text-secondary"> Birth Date
+					</label>
 
-					<form:input path="maLop" cssClass="form-control" />
-					<form:errors path="maLop"
+					<form:input type="date" path="birthDate" id="birthDate"
+						cssClass="form-control" />
+
+					<form:errors path="birthDate"
 						cssClass="text-danger small mt-1 d-block" />
+
+				</div>
+
+				<div class="col-md-8">
+
+					<label class="form-label small text-secondary"> Address </label>
+
+					<form:input path="address" id="address" cssClass="form-control" />
+
+					<form:errors path="address"
+						cssClass="text-danger small mt-1 d-block" />
+
+				</div>
+
+				<div class="col-md-4">
+
+					<label class="form-label small text-secondary"> Class ID </label>
+
+					<form:input path="classId" id="classId" cssClass="form-control" />
+
+					<form:errors path="classId"
+						cssClass="text-danger small mt-1 d-block" />
+
 				</div>
 
 			</div>
@@ -85,31 +104,17 @@ request.setAttribute("pageTitle", "Quản lý Sinh viên");
 			<div class="d-flex gap-2 mt-4">
 
 				<button type="submit" class="btn btn-dark px-4"
-					onclick="submitForm(
-                        'add',
-                        'POST'
-                    )">
-
-					Thêm</button>
+					onclick="submitForm('add')">Add</button>
 
 				<button type="submit" class="btn btn-outline-secondary px-4"
-					onclick="submitForm(
-                        'update',
-                        'PUT'
-                    )">
-
-					Chỉnh sửa</button>
+					onclick="submitForm('update')">Update</button>
 
 				<button type="submit" class="btn btn-outline-danger px-4"
-					onclick="submitForm(
-                        'delete',
-                        'DELETE'
-                    )">
-
-					Xóa</button>
+					onclick="submitForm('delete')">Delete</button>
 
 				<button type="button" class="btn btn-outline-dark"
 					onclick="resetForm()">Reset</button>
+
 			</div>
 
 		</form:form>
@@ -117,98 +122,131 @@ request.setAttribute("pageTitle", "Quản lý Sinh viên");
 	</div>
 
 	<div class="card border-0 shadow-sm">
+
 		<div class="table-responsive p-3">
+
 			<table class="table table-hover align-middle mb-0">
+
 				<thead class="table-light">
+
 					<tr>
-						<th scope="col">Mã sinh viên</th>
-						<th scope="col">Họ</th>
-						<th scope="col">Tên</th>
-						<th scope="col">Ngày sinh</th>
-						<th scope="col">Địa chỉ</th>
-						<th scope="col">Lớp</th>
-						<th scope="col" class="text-end">Hành động</th>
+						<th>Student ID</th>
+
+						<th>Last Name</th>
+
+						<th>First Name</th>
+
+						<th>Birth Date</th>
+
+						<th>Address</th>
+
+						<th>Class ID</th>
+
+						<th class="text-end">Actions</th>
 					</tr>
+
 				</thead>
+
 				<tbody>
-					<c:forEach var="sv" items="${danhSachSinhVien}">
+
+					<c:forEach var="student" items="${students}">
 
 						<tr>
 
-							<td class="px-4 fw-medium">${sv.maSV}</td>
+							<td>${student.studentId}</td>
 
-							<td>${sv.ho}</td>
+							<td>${student.lastName}</td>
 
-							<td>${sv.ten}</td>
+							<td>${student.firstName}</td>
 
-							<td>${sv.ngaySinh}</td>
+							<td>${student.birthDate}</td>
 
-							<td>${sv.diaChi}</td>
+							<td>${student.address}</td>
 
-							<td>${sv.lop.maLop}</td>
+							<td>${student.classRoom.classId}</td>
 
-							<td class="text-end pe-4">
+							<td class="text-end">
 
-								<button class="btn btn-sm btn-outline-secondary me-2 btn-edit">
+								<button type="button"
+									class="btn btn-sm btn-outline-secondary btn-edit">
+
 									<i class="bi bi-pencil"></i>
+
 								</button>
+
 							</td>
+
 						</tr>
+
 					</c:forEach>
+
 				</tbody>
+
 			</table>
+
 		</div>
+
 	</div>
+
 </div>
 
 <script>
+
 	function fillFormFromRow(row) {
+
 		const cells = row.querySelectorAll("td");
-		
-		const maSV = cells[0].innerText;
-		const ho = cells[1].innerText;
-		const ten = cells[2].innerText;
-		const ngaySinh = cells[3].innerText;
-		const diaChi = cells[4].innerText;
-		const maLop = cells[5].innerText;
-		
-		document.getElementById("maSV").value = maSV;
-        document.getElementById("ho").value = ho;
-        document.getElementById("ten").value = ten;
-        document.getElementById("ngaySinh").value = ngaySinh;
-        document.getElementById("diaChi").value = diaChi;
-        document.getElementById("maLop").value = maLop;
-        
-        document.getElementById("maSV").readOnly = true;
+
+		document.getElementById("studentId").value =
+			cells[0].innerText.trim();
+
+		document.getElementById("lastName").value =
+			cells[1].innerText.trim();
+
+		document.getElementById("firstName").value =
+			cells[2].innerText.trim();
+
+		document.getElementById("birthDate").value =
+			cells[3].innerText.trim();
+
+		document.getElementById("address").value =
+			cells[4].innerText.trim();
+
+		document.getElementById("classId").value =
+			cells[5].innerText.trim();
+
+		document.getElementById("studentId").readOnly = true;
 	}
 
-	const editButtons = document.querySelectorAll(".btn-edit");
-	
-	editButtons.forEach(button => {
-		button.addEventListener("click", function () {
-			const row = this.closest("tr");
-			
-			fillFormFromRow(row);
-		});
-	});
+	document
+		.querySelectorAll(".btn-edit")
+		.forEach(button => {
 
-	function submitForm(action, method) {
+			button.addEventListener("click", function () {
+
+				const row = this.closest("tr");
+
+				fillFormFromRow(row);
+
+			});
+
+		});
+
+    function submitForm(action) {
 
         const form = document.getElementById("studentForm");
 
         form.action =
-            "${pageContext.request.contextPath}/student/"
-            + action;
-
-        document.getElementById("_method").value =
-            method;
+            "${pageContext.request.contextPath}/students/" + action;
     }
-	
-	function resetForm() {
-	    document.getElementById("studentForm").reset();
 
-	    document.getElementById("maSV").readOnly = false;
-	}
+    function resetForm() {
+
+        document.getElementById("studentForm").reset();
+
+        document.getElementById("studentId").readOnly = false;
+    }
+
+
 </script>
 
 <%@ include file="../Shared/_LayoutEnd.jsp"%>

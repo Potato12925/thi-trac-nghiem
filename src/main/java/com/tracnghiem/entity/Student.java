@@ -39,12 +39,7 @@ public class Student {
 	private ClassRoom classRoom;
 
 	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(
-		name = "MASV",
-		referencedColumnName = "MA",
-		insertable = false,
-		updatable = false
-	)
+	@JoinColumn(name = "MASV", referencedColumnName = "MA", insertable = false, updatable = false)
 	private Account account;
 
 	public Student() {
