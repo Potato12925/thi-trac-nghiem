@@ -17,4 +17,13 @@ public class QuestionDAO extends GenericDAO<Question> {
 	public boolean existsById(Integer questionId) {
 		return findById(questionId) != null;
 	}
+
+	public long countAvailableQuestions(String maMh, String trinhDo) {
+        String hql = "SELECT COUNT(b) FROM BoDe b WHERE b.monHoc.maMH = :maMh AND b.trinhDo = :trinhDo";
+        return getSession().createQuery(hql, Long.class)
+                .setParameter("maMh", maMh)
+                .setParameter("trinhDo", trinhDo)
+                .uniqueResult();
+    }
+
 }

@@ -3,7 +3,7 @@ package com.tracnghiem.service;
 import java.util.List;
 
 import com.tracnghiem.dto.ExamRegistrationDTO;
-import com.tracnghiem.entity.GiaoVienDangKy;
+import com.tracnghiem.entity.TeacherRegistration;
 
 public interface ExamRegistrationService {
     
@@ -33,5 +33,5 @@ public interface ExamRegistrationService {
      * @param role the logged in user's role
      * @return List of GiaoVienDangKy
      */
-    List<GiaoVienDangKy> getRegistrations(String userMaGv, String role);
+    List<TeacherRegistration> getRegistrations(String userMaGv, String role);
 }

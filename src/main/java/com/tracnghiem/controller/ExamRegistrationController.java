@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import com.tracnghiem.dao.GiaoVienDAO;
-import com.tracnghiem.dao.LopDAO;
-import com.tracnghiem.dao.MonHocDAO;
+import com.tracnghiem.dao.TeacherDAO;
+import com.tracnghiem.dao.ClassRoomDAO;
+import com.tracnghiem.dao.SubjectDAO;
 import com.tracnghiem.dto.ExamRegistrationDTO;
 import com.tracnghiem.service.ExamRegistrationService;
 
@@ -29,21 +29,21 @@ public class ExamRegistrationController {
     private ExamRegistrationService examRegistrationService;
 
     @Autowired
-    private LopDAO lopDAO;
+    private ClassRoomDAO classRoomDAO;
 
     @Autowired
-    private MonHocDAO monHocDAO;
+    private SubjectDAO subjectDAO;
 
     @Autowired
-    private GiaoVienDAO giaoVienDAO;
+    private TeacherDAO teacherDAO;
 
     private void prepareFormModel(Model model, HttpSession session) {
-        model.addAttribute("dsLop", lopDAO.findAll());
-        model.addAttribute("dsMonHoc", monHocDAO.findAll());
+        model.addAttribute("dsLop", classRoomDAO.findAll());
+        model.addAttribute("dsMonHoc", subjectDAO.findAll());
 
         String role = (String) session.getAttribute("ROLE");
         if ("PGV".equals(role)) {
-            model.addAttribute("dsGiaoVien", giaoVienDAO.findAll());
+            model.addAttribute("dsGiaoVien", teacherDAO.findAll());
         }
     }
 
