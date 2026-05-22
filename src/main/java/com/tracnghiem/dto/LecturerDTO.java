@@ -5,75 +5,75 @@ import javax.validation.constraints.NotBlank;
 public class LecturerDTO {
 
 	@NotBlank(message = "Mã giáo viên không được để trống")
-	private String maGV;
+	private String teacherId;
 
 	@NotBlank(message = "Họ không được để trống")
-	private String ho;
+	private String lastName;
 
 	@NotBlank(message = "Tên không được để trống")
-	private String ten;
+	private String firstName;
 
 	@NotBlank(message = "Số điện thoại không được để trống")
-	private String soDT;
+	private String phoneNumber;
 
 	@NotBlank(message = "Địa chỉ không được để trống")
-	private String diaChi;
+	private String address;
 
 	public LecturerDTO() {
 		super();
 	}
 
 	public LecturerDTO(
-			@NotBlank(message = "Mã giáo viên không được để trống") String maGV,
-			@NotBlank(message = "Họ không được để trống") String ho,
-			@NotBlank(message = "Tên không được để trống") String ten,
-			@NotBlank(message = "Số điện thoại không được để trống") String soDT,
-			@NotBlank(message = "Địa chỉ không được để trống") String diaChi) {
+			@NotBlank(message = "Mã giáo viên không được để trống") String teacherId,
+			@NotBlank(message = "Họ không được để trống") String lastName,
+			@NotBlank(message = "Tên không được để trống") String firstName,
+			@NotBlank(message = "Số điện thoại không được để trống") String phoneNumber,
+			@NotBlank(message = "Địa chỉ không được để trống") String address) {
 		super();
-		this.maGV = maGV;
-		this.ho = ho;
-		this.ten = ten;
-		this.soDT = soDT;
-		this.diaChi = diaChi;
+		this.teacherId = teacherId;
+		this.lastName = lastName;
+		this.firstName = firstName;
+		this.phoneNumber = phoneNumber;
+		this.address = address;
 	}
 
-	public String getMaGV() {
-		return maGV;
+	public String getTeacherId() {
+		return teacherId;
 	}
 
-	public void setMaGV(String maGV) {
-		this.maGV = maGV;
+	public void setTeacherId(String teacherId) {
+		this.teacherId = teacherId;
 	}
 
-	public String getHo() {
-		return ho;
+	public String getLastName() {
+		return lastName;
 	}
 
-	public void setHo(String ho) {
-		this.ho = ho;
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
 	}
 
-	public String getTen() {
-		return ten;
+	public String getFirstName() {
+		return firstName;
 	}
 
-	public void setTen(String ten) {
-		this.ten = ten;
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
 	}
 
-	public String getSoDT() {
-		return soDT;
+	public String getPhoneNumber() {
+		return phoneNumber;
 	}
 
-	public void setSoDT(String soDT) {
-		this.soDT = soDT;
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
 	}
 
-	public String getDiaChi() {
-		return diaChi;
+	public String getAddress() {
+		return address;
 	}
 
-	public void setDiaChi(String diaChi) {
-		this.diaChi = diaChi;
+	public void setAddress(String address) {
+		this.address = address;
 	}
 }

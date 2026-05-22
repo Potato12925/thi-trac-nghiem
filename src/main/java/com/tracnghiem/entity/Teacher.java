@@ -11,66 +11,66 @@ public class Teacher {
 
 	@Id
 	@Column(name = "MAGV", length = 8)
-	private String maGV;
+	private String teacherId;
 
 	@Column(name = "HO")
-	private String ho;
+	private String lastName;
 
 	@Column(name = "TEN")
-	private String ten;
+	private String firstName;
 
 	@Column(name = "SODTLL")
-	private String soDT;
+	private String phoneNumber;
 
 	@Column(name = "DIACHI")
-	private String diaChi;
+	private String address;
 
 	public Teacher() {
 	}
 
-	public String getMaGV() {
-		return maGV;
+	public String getTeacherId() {
+		return teacherId;
 	}
 
-	public void setMaGV(String maGV) {
-		this.maGV = maGV;
+	public void setTeacherId(String teacherId) {
+		this.teacherId = teacherId;
 	}
 
-	public String getHo() {
-		return ho;
+	public String getLastName() {
+		return lastName;
 	}
 
-	public void setHo(String ho) {
-		this.ho = ho;
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
 	}
 
-	public String getTen() {
-		return ten;
+	public String getFirstName() {
+		return firstName;
 	}
 
-	public void setTen(String ten) {
-		this.ten = ten;
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
 	}
 
-	public String getSoDT() {
-		return soDT;
+	public String getPhoneNumber() {
+		return phoneNumber;
 	}
 
-	public void setSoDT(String soDT) {
-		this.soDT = soDT;
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
 	}
 
-	public String getDiaChi() {
-		return diaChi;
+	public String getAddress() {
+		return address;
 	}
 
-	public void setDiaChi(String diaChi) {
-		this.diaChi = diaChi;
+	public void setAddress(String address) {
+		this.address = address;
 	}
 
 	@Override
 	public String toString() {
-		return "GiaoVien{" + "maGV='" + maGV + '\'' + ", ho='" + ho + '\'' + ", ten='" + ten + '\'' + ", soDT='" + soDT
-				+ '\'' + ", diaChi='" + diaChi + '\'' + '}';
+		return "GiaoVien{" + "teacherId='" + teacherId + '\'' + ", lastName='" + lastName + '\'' + ", firstName='" + firstName + '\'' + ", phoneNumber='" + phoneNumber
+				+ '\'' + ", address='" + address + '\'' + '}';
 	}
 }

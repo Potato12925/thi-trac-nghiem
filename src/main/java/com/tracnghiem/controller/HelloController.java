@@ -1,4 +1,4 @@
-﻿package com.tracnghiem.controller;
+package com.tracnghiem.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

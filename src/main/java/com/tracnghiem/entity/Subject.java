@@ -35,17 +35,17 @@ public class Subject {
 
 	private String subjectName;
 
-	@Column(name = "SOTIET_LT", nullable = false)
+	// @Column(name = "SOTIET_LT", nullable = false)
 
-	@Min(value = 0, message = "Số tiết lý thuyết phải lớn hơn 0")
+	// @Min(value = 0, message = "Số tiết lý thuyết phải lớn hơn 0")
 
-	private int theoryLessons;
+	// private int theoryLessons;
 
-	@Column(name = "SOTIET_TH", nullable = false)
+	// @Column(name = "SOTIET_TH", nullable = false)
 
-	@Min(value = 0, message = "Số tiết thực hành phải lớn hơn 0")
+	// @Min(value = 0, message = "Số tiết thực hành phải lớn hơn 0")
 
-	private int practiceLessons;
+	// private int practiceLessons;
 
 	public Subject() {
 		super();
@@ -67,19 +67,19 @@ public class Subject {
 		this.subjectName = subjectName;
 	}
 
-	public int getTheoryLessons() {
-		return theoryLessons;
-	}
+	// public int getTheoryLessons() {
+	// 	return theoryLessons;
+	// }
 
-	public void setTheoryLessons(int theoryLessons) {
-		this.theoryLessons = theoryLessons;
-	}
+	// public void setTheoryLessons(int theoryLessons) {
+	// 	this.theoryLessons = theoryLessons;
+	// }
 
-	public int getPracticeLessons() {
-		return practiceLessons;
-	}
+	// public int getPracticeLessons() {
+	// 	return practiceLessons;
+	// }
 
-	public void setPracticeLessons(int practiceLessons) {
-		this.practiceLessons = practiceLessons;
-	}
+	// public void setPracticeLessons(int practiceLessons) {
+	// 	this.practiceLessons = practiceLessons;
+	// }
 }

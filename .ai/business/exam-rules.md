@@ -1,13 +1,15 @@
 # Exam Rules
 
+## Question distribution rules
+
 Level A:
 
-- > = 70% A questions
+- >= 70% A questions
 - <= 30% B questions
 
 Level B:
 
-- > = 70% B questions
+- >= 70% B questions
 - <= 30% C questions
 
 Level C:

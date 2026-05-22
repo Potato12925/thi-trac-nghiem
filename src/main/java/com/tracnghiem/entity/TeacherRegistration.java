@@ -15,7 +15,7 @@ import javax.persistence.TemporalType;
 import com.tracnghiem.entity.id.TeacherRegistrationId;
 
 @Entity
-@Table(name = "GiaoVien_DangKy")
+@Table(name = "GIAOVIEN_DANGKY")
 public class TeacherRegistration {
 
     @EmbeddedId
@@ -24,29 +24,29 @@ public class TeacherRegistration {
     @ManyToOne
     @MapsId("maLop")
     @JoinColumn(name = "MALOP")
-    private ClassRoom lop;
+    private ClassRoom classRoom;
 
     @ManyToOne
     @MapsId("maMH")
     @JoinColumn(name = "MAMH")
-    private Subject monHoc;
+    private Subject subject;
 
     @ManyToOne
     @JoinColumn(name = "MAGV")
-    private Teacher giaoVien;
+    private Teacher teacher;
 
     @Column(name = "TRINHDO")
-    private String trinhDo;
+    private String level;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "NGAYTHI")
-    private Date ngayThi;
+    private Date examDate;
 
     @Column(name = "SOCAUTHI")
-    private Short soCauThi;
+    private Short numberOfQuestions;
 
     @Column(name = "THOIGIAN")
-    private Short thoiGian;
+    private Short duration;
 
     public TeacherRegistration() {
     }
@@ -59,59 +59,59 @@ public class TeacherRegistration {
         this.id = id;
     }
 
-    public ClassRoom getLop() {
-        return lop;
+    public ClassRoom getClassRoom() {
+        return classRoom;
     }
 
-    public void setLop(ClassRoom lop) {
-        this.lop = lop;
+    public void setClassRoom(ClassRoom classRoom) {
+        this.classRoom = classRoom;
     }
 
-    public Subject getMonHoc() {
-        return monHoc;
+    public Subject getSubject() {
+        return subject;
     }
 
-    public void setMonHoc(Subject monHoc) {
-        this.monHoc = monHoc;
+    public void setSubject(Subject subject) {
+        this.subject = subject;
     }
 
-    public Teacher getGiaoVien() {
-        return giaoVien;
+    public Teacher getTeacher() {
+        return teacher;
     }
 
-    public void setGiaoVien(Teacher giaoVien) {
-        this.giaoVien = giaoVien;
+    public void setTeacher(Teacher teacher) {
+        this.teacher = teacher;
     }
 
-    public String getTrinhDo() {
-        return trinhDo;
+    public String getLevel() {
+        return level;
     }
 
-    public void setTrinhDo(String trinhDo) {
-        this.trinhDo = trinhDo;
+    public void setLevel(String level) {
+        this.level = level;
     }
 
-    public Date getNgayThi() {
-        return ngayThi;
+    public Date getExamDate() {
+        return examDate;
     }
 
-    public void setNgayThi(Date ngayThi) {
-        this.ngayThi = ngayThi;
+    public void setExamDate(Date examDate) {
+        this.examDate = examDate;
     }
 
-    public Short getSoCauThi() {
-        return soCauThi;
+    public Short getNumberOfQuestions() {
+        return numberOfQuestions;
     }
 
-    public void setSoCauThi(Short soCauThi) {
-        this.soCauThi = soCauThi;
+    public void setNumberOfQuestions(Short numberOfQuestions) {
+        this.numberOfQuestions = numberOfQuestions;
     }
 
-    public Short getThoiGian() {
-        return thoiGian;
+    public Short getDuration() {
+        return duration;
     }
 
-    public void setThoiGian(Short thoiGian) {
-        this.thoiGian = thoiGian;
+    public void setDuration(Short duration) {
+        this.duration = duration;
     }
 }

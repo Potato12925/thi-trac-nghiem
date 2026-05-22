@@ -33,7 +33,7 @@ public class Exam {
     private Subject subject;
 
     @Column(name = "LAN")
-    private Short attempt;
+    private Short tryNumber;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "NGAYTHI")
@@ -81,11 +81,11 @@ public class Exam {
     }
 
     public Short getAttempt() {
-        return attempt;
+        return tryNumber;
     }
 
-    public void setAttempt(Short attempt) {
-        this.attempt = attempt;
+    public void setAttempt(Short tryNumber) {
+        this.tryNumber = tryNumber;
     }
 
     public Date getExamDate() {

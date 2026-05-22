@@ -1,4 +1,4 @@
-﻿package com.tracnghiem.controller;
+package com.tracnghiem.controller;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
