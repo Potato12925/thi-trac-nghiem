@@ -31,7 +31,7 @@ public class QuestionService {
 
 		Subject subject = subjectService.getSubjectById(dto.getSubjectId());
 
-		Lecturer teacher = lecturerService.findLecturerById(dto.getTeacherId());
+		Lecturer lecturer = lecturerService.findLecturerById(dto.getLecturerId());
 
 		question.setQuestionId(dto.getQuestionId());
 		question.setSubject(subject);
@@ -42,7 +42,7 @@ public class QuestionService {
 		question.setOptionC(dto.getOptionC());
 		question.setOptionD(dto.getOptionD());
 		question.setCorrectAnswer(dto.getCorrectAnswer());
-		question.setTeacher(teacher);
+		question.setLecturer(lecturer);
 
 		return question;
 	}

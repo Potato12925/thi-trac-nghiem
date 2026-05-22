@@ -7,11 +7,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.tracnghiem.dto.QuestionDTO;
@@ -30,13 +28,13 @@ public class QuestionController {
 
 		prepareQuestionPage(model);
 
-		model.addAttribute("questionForm", new QuestionDTO());
+		model.addAttribute("questionDTO", new QuestionDTO());
 
 		return "Question/Index";
 	}
 
-	@PostMapping("/create")
-	public String createQuestion(@Validated @ModelAttribute("questionForm") QuestionDTO questionForm,
+	@PostMapping("/add")
+	public String createQuestion(@Validated @ModelAttribute("questionDTO") QuestionDTO questionForm,
 			BindingResult validationResult, ModelMap model) {
 
 		if (validationResult.hasErrors()) {
@@ -57,8 +55,8 @@ public class QuestionController {
 		}
 	}
 
-	@PutMapping("/edit")
-	public String editQuestion(@Validated @ModelAttribute("questionForm") QuestionDTO questionForm,
+	@PostMapping("/update")
+	public String editQuestion(@Validated @ModelAttribute("questionDTO") QuestionDTO questionForm,
 			BindingResult validationResult, ModelMap model) {
 
 		if (validationResult.hasErrors()) {
@@ -79,8 +77,8 @@ public class QuestionController {
 		}
 	}
 
-	@DeleteMapping("/remove")
-	public String removeQuestion(@Validated @ModelAttribute("questionForm") QuestionDTO questionForm,
+	@PostMapping("/delete")
+	public String removeQuestion(@Validated @ModelAttribute("questionDTO") QuestionDTO questionForm,
 			BindingResult validationResult, ModelMap model) {
 
 		if (validationResult.hasErrors()) {
@@ -105,7 +103,7 @@ public class QuestionController {
 
 		List<Question> questions = questionService.getAllQuestions();
 
-		model.addAttribute("questionList", questions);
+		model.addAttribute("questions", questions);
 	}
 
 	private String renderQuestionPage(ModelMap model) {
