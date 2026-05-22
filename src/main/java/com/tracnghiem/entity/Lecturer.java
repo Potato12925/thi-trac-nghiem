@@ -7,11 +7,11 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "GiaoVien")
-public class Teacher {
+public class Lecturer {
 
 	@Id
 	@Column(name = "MAGV", length = 8)
-	private String teacherId;
+	private String lecturerId;
 
 	@Column(name = "HO")
 	private String lastName;
@@ -25,15 +25,15 @@ public class Teacher {
 	@Column(name = "DIACHI")
 	private String address;
 
-	public Teacher() {
+	public Lecturer() {
 	}
 
-	public String getTeacherId() {
-		return teacherId;
+	public String getLecturerId() {
+		return lecturerId;
 	}
 
-	public void setTeacherId(String teacherId) {
-		this.teacherId = teacherId;
+	public void setLecturerId(String lecturerId) {
+		this.lecturerId = lecturerId;
 	}
 
 	public String getLastName() {
@@ -70,7 +70,7 @@ public class Teacher {
 
 	@Override
 	public String toString() {
-		return "GiaoVien{" + "teacherId='" + teacherId + '\'' + ", lastName='" + lastName + '\'' + ", firstName='" + firstName + '\'' + ", phoneNumber='" + phoneNumber
-				+ '\'' + ", address='" + address + '\'' + '}';
+		return "Lecturer{" + "lecturerId='" + lecturerId + '\'' + ", lastName='" + lastName + '\'' + ", firstName='"
+				+ firstName + '\'' + ", phoneNumber='" + phoneNumber + '\'' + ", address='" + address + '\'' + '}';
 	}
 }

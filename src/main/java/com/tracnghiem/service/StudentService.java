@@ -48,11 +48,13 @@ public class StudentService {
 
 	public void addStudent(StudentDTO dto) {
 		Student student = changeToEntity(dto);
+		
 		studentDAO.create(student);
 	}
 
 	public void updateStudent(StudentDTO dto) {
 		Student student = changeToEntity(dto);
+		
 		studentDAO.update(student);
 	}
 

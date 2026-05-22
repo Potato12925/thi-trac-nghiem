@@ -33,7 +33,7 @@ public class TeacherRegistration {
 
     @ManyToOne
     @JoinColumn(name = "MAGV")
-    private Teacher teacher;
+    private Lecturer giaoVien;
 
     @Column(name = "TRINHDO")
     private String level;
@@ -75,12 +75,12 @@ public class TeacherRegistration {
         this.subject = subject;
     }
 
-    public Teacher getTeacher() {
-        return teacher;
+    public Lecturer getGiaoVien() {
+        return giaoVien;
     }
 
-    public void setTeacher(Teacher teacher) {
-        this.teacher = teacher;
+    public void setGiaoVien(Lecturer giaoVien) {
+        this.giaoVien = giaoVien;
     }
 
     public String getLevel() {

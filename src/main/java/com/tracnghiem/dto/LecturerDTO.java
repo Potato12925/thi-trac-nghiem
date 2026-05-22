@@ -1,48 +1,42 @@
 package com.tracnghiem.dto;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 public class LecturerDTO {
 
-	@NotBlank(message = "Mã giáo viên không được để trống")
-	private String teacherId;
+	@NotBlank(message = "Lecturer ID is required")
+	@Size(max = 8, message = "Lecturer ID must contain exactly 8 characters")
+	@Pattern(regexp = "^[A-Z0-9]+$", message = "Lecturer ID can only contain uppercase letters and numbers")
+	private String lecturerId;
 
-	@NotBlank(message = "Họ không được để trống")
+	@NotBlank(message = "Last name is required")
+	@Size(max = 40, message = "Last name must not exceed 40 characters")
 	private String lastName;
 
-	@NotBlank(message = "Tên không được để trống")
+	@NotBlank(message = "First name is required")
+	@Size(max = 10, message = "First name must not exceed 10 characters")
 	private String firstName;
 
-	@NotBlank(message = "Số điện thoại không được để trống")
+	@NotBlank(message = "Phone number is required")
+	@Size(max = 15, message = "Phone number must not exceed 15 characters")
+	@Pattern(regexp = "^[0-9+\\-\\s]+$", message = "Phone number is invalid")
 	private String phoneNumber;
 
-	@NotBlank(message = "Địa chỉ không được để trống")
+	@NotBlank(message = "Address is required")
+	@Size(max = 50, message = "Address must not exceed 50 characters")
 	private String address;
 
 	public LecturerDTO() {
-		super();
 	}
 
-	public LecturerDTO(
-			@NotBlank(message = "Mã giáo viên không được để trống") String teacherId,
-			@NotBlank(message = "Họ không được để trống") String lastName,
-			@NotBlank(message = "Tên không được để trống") String firstName,
-			@NotBlank(message = "Số điện thoại không được để trống") String phoneNumber,
-			@NotBlank(message = "Địa chỉ không được để trống") String address) {
-		super();
-		this.teacherId = teacherId;
-		this.lastName = lastName;
-		this.firstName = firstName;
-		this.phoneNumber = phoneNumber;
-		this.address = address;
+	public String getLecturerId() {
+		return lecturerId;
 	}
 
-	public String getTeacherId() {
-		return teacherId;
-	}
-
-	public void setTeacherId(String teacherId) {
-		this.teacherId = teacherId;
+	public void setLecturerId(String lecturerId) {
+		this.lecturerId = lecturerId;
 	}
 
 	public String getLastName() {

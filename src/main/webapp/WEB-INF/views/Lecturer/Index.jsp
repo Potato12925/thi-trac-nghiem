@@ -6,7 +6,7 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 
 <%
-request.setAttribute("pageTitle", "Student Management");
+request.setAttribute("pageTitle", "Lecturer Management");
 %>
 
 <%@ include file="../Shared/_LayoutStart.jsp"%>
@@ -14,7 +14,9 @@ request.setAttribute("pageTitle", "Student Management");
 <div class="container-fluid">
 
 	<div class="d-flex justify-content-between align-items-center mb-4">
-		<h1 class="h3 mb-0">Student Management</h1>
+
+		<h1 class="h3 mb-0">Lecturer Management</h1>
+
 	</div>
 
 	<c:if test="${not empty error}">
@@ -23,37 +25,32 @@ request.setAttribute("pageTitle", "Student Management");
 
 	<div class="border rounded-3 bg-white p-4 mb-4">
 
-		<form:form id="studentForm" method="post"
-			action="${pageContext.request.contextPath}/students/add"
-			modelAttribute="studentDTO">
+		<form:form id="lecturerForm" method="post"
+			action="${pageContext.request.contextPath}/lecturers/add"
+			modelAttribute="lecturerDTO">
 
 			<div class="row g-3">
-
-				<div class="col-md-3">
-
-					<label class="form-label small text-secondary"> Student ID
+				<div class="col-md-2">
+					<label class="form-label small text-secondary"> Lecturer ID
 					</label>
 
-					<form:input path="studentId" id="studentId" cssClass="form-control" />
+					<form:input path="lecturerId" id="lecturerId"
+						cssClass="form-control" />
 
-					<form:errors path="studentId"
+					<form:errors path="lecturerId"
 						cssClass="text-danger small mt-1 d-block" />
-
 				</div>
 
-				<div class="col-md-4">
-
+				<div class="col-md-3">
 					<label class="form-label small text-secondary"> Last Name </label>
 
 					<form:input path="lastName" id="lastName" cssClass="form-control" />
 
 					<form:errors path="lastName"
 						cssClass="text-danger small mt-1 d-block" />
-
 				</div>
 
 				<div class="col-md-2">
-
 					<label class="form-label small text-secondary"> First Name
 					</label>
 
@@ -64,45 +61,28 @@ request.setAttribute("pageTitle", "Student Management");
 
 				</div>
 
-				<div class="col-md-3">
+				<div class="col-md-2">
+					<label class="form-label small text-secondary"> Phone
+						Number </label>
 
-					<label class="form-label small text-secondary"> Birth Date
-					</label>
-
-					<form:input type="date" path="birthDate" id="birthDate"
+					<form:input path="phoneNumber" id="phoneNumber"
 						cssClass="form-control" />
 
-					<form:errors path="birthDate"
+					<form:errors path="phoneNumber"
 						cssClass="text-danger small mt-1 d-block" />
-
 				</div>
 
-				<div class="col-md-8">
-
+				<div class="col-md-3">
 					<label class="form-label small text-secondary"> Address </label>
 
 					<form:input path="address" id="address" cssClass="form-control" />
 
 					<form:errors path="address"
 						cssClass="text-danger small mt-1 d-block" />
-
 				</div>
-
-				<div class="col-md-4">
-
-					<label class="form-label small text-secondary"> Class ID </label>
-
-					<form:input path="classId" id="classId" cssClass="form-control" />
-
-					<form:errors path="classId"
-						cssClass="text-danger small mt-1 d-block" />
-
-				</div>
-
 			</div>
 
 			<div class="d-flex gap-2 mt-4">
-
 				<button type="submit" class="btn btn-dark px-4"
 					onclick="submitForm('add')">Add</button>
 
@@ -114,7 +94,6 @@ request.setAttribute("pageTitle", "Student Management");
 
 				<button type="button" class="btn btn-outline-dark"
 					onclick="resetForm()">Reset</button>
-
 			</div>
 
 		</form:form>
@@ -122,81 +101,60 @@ request.setAttribute("pageTitle", "Student Management");
 	</div>
 
 	<div class="card border-0 shadow-sm">
-
 		<div class="table-responsive p-3">
-
 			<table class="table table-hover align-middle mb-0">
-
 				<thead class="table-light">
-
 					<tr>
-						<th>Student ID</th>
+						<th>Lecturer ID</th>
 
 						<th>Last Name</th>
 
 						<th>First Name</th>
 
-						<th>Birth Date</th>
+						<th>Phone Number</th>
 
 						<th>Address</th>
 
-						<th>Class ID</th>
-
 						<th class="text-end">Actions</th>
 					</tr>
-
 				</thead>
 
 				<tbody>
-
-					<c:forEach var="student" items="${students}">
-
+					<c:forEach items="${lecturers}" var="lecturer">
 						<tr>
+							<td class="fw-medium text-success">${lecturer.lecturerId}</td>
 
-							<td>${student.studentId}</td>
+							<td>${lecturer.lastName}</td>
 
-							<td>${student.lastName}</td>
+							<td>${lecturer.firstName}</td>
 
-							<td>${student.firstName}</td>
+							<td>${lecturer.phoneNumber}</td>
 
-							<td>${student.birthDate}</td>
-
-							<td>${student.address}</td>
-
-							<td>${student.classRoom.classId}</td>
+							<td>${lecturer.address}</td>
 
 							<td class="text-end">
-
 								<button type="button"
-									class="btn btn-sm btn-outline-secondary btn-edit">
+									class="btn btn-sm btn-outline-secondary me-2 btn-edit">
 
 									<i class="bi bi-pencil"></i>
-
 								</button>
-
 							</td>
-
 						</tr>
-
 					</c:forEach>
-
 				</tbody>
-
 			</table>
-
 		</div>
-
 	</div>
-
 </div>
 
 <script>
 
 	function fillFormFromRow(row) {
 
-		const cells = row.querySelectorAll("td");
+		const cells =
+			row.querySelectorAll("td");
 
-		document.getElementById("studentId").value =
+		document.getElementById("lecturerId").value =
 			cells[0].innerText.trim();
 
 		document.getElementById("lastName").value =
@@ -205,16 +163,14 @@ request.setAttribute("pageTitle", "Student Management");
 		document.getElementById("firstName").value =
 			cells[2].innerText.trim();
 
-		document.getElementById("birthDate").value =
+		document.getElementById("phoneNumber").value =
 			cells[3].innerText.trim();
 
 		document.getElementById("address").value =
 			cells[4].innerText.trim();
 
-		document.getElementById("classId").value =
-			cells[5].innerText.trim();
-
-		document.getElementById("studentId").readOnly = true;
+		document.getElementById("lecturerId").readOnly =
+			true;
 	}
 
 	document
@@ -223,7 +179,8 @@ request.setAttribute("pageTitle", "Student Management");
 
 			button.addEventListener("click", function () {
 
-				const row = this.closest("tr");
+				const row =
+					this.closest("tr");
 
 				fillFormFromRow(row);
 
@@ -231,21 +188,26 @@ request.setAttribute("pageTitle", "Student Management");
 
 		});
 
-    function submitForm(action) {
+	function submitForm(action) {
 
-        const form = document.getElementById("studentForm");
+		const form =
+			document.getElementById("lecturerForm");
 
-        form.action =
-            "${pageContext.request.contextPath}/students/" + action;
-    }
+		form.action =
+			"${pageContext.request.contextPath}/lecturers/"
+			+ action;
+	}
 
-    function resetForm() {
+	function resetForm() {
 
-        document.getElementById("studentForm").reset();
+		document
+			.getElementById("lecturerForm")
+			.reset();
 
-        document.getElementById("studentId").readOnly = false;
-    }
-
+		document
+			.getElementById("lecturerId")
+			.readOnly = false;
+	}
 
 </script>
 
