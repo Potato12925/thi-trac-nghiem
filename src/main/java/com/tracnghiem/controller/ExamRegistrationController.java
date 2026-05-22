@@ -115,7 +115,7 @@ public class ExamRegistrationController {
         }
 
         try {
-            examRegistrationService.deleteExam(dto.getMaLop(), dto.getMaMh(), dto.getLan(), userMaGv, role);
+            examRegistrationService.deleteExam(dto.getClassId(), dto.getSubjectId(), dto.getTryNumber(), userMaGv, role);
             redirectAttributes.addFlashAttribute("successMessage", "Xóa lượt đăng ký thi thành công!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());

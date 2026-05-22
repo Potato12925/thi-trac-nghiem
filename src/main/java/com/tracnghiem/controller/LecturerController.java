@@ -66,7 +66,7 @@ public class LecturerController {
 
 		try {
 			lecturerService.addTeacherValidate(lecturerDTO);
-			return "redirect:/lecturer?maGV=" + lecturerDTO.getMaGV();
+			return "redirect:/lecturer?maGV=" + lecturerDTO.getTeacherId();
 
 		} catch (IllegalArgumentException e) {
 			model.addAttribute("error", e.getMessage());
@@ -86,7 +86,7 @@ public class LecturerController {
 
 		try {
 			lecturerService.updateTeacher(lecturerDTO);
-			return "redirect:/lecturer?maGV=" + lecturerDTO.getMaGV();
+			return "redirect:/lecturer?maGV=" + lecturerDTO.getTeacherId();
 
 		} catch (IllegalArgumentException e) {
 			model.addAttribute("error", e.getMessage());

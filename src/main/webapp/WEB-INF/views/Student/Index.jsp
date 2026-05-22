@@ -32,33 +32,33 @@ request.setAttribute("pageTitle", "Quản lý Sinh viên");
 					<label class="form-label small text-secondary"> Mã sinh
 						viên </label>
 
-					<form:input path="maSV" cssClass="form-control" />
-					<form:errors path="maSV" cssClass="text-danger small mt-1 d-block" />
+					<form:input path="studentId" cssClass="form-control" />
+					<form:errors path="studentId" cssClass="text-danger small mt-1 d-block" />
 				</div>
 
 				<div class="col-md-5">
 
 					<label class="form-label small text-secondary"> Họ </label>
 
-					<form:input path="ho" cssClass="form-control" />
-					<form:errors path="ho" cssClass="text-danger small mt-1 d-block" />
+					<form:input path="lastName" cssClass="form-control" />
+					<form:errors path="lastName" cssClass="text-danger small mt-1 d-block" />
 				</div>
 
 				<div class="col-md-2">
 
 					<label class="form-label small text-secondary"> Tên </label>
 
-					<form:input path="ten" cssClass="form-control" />
-					<form:errors path="ten" cssClass="text-danger small mt-1 d-block" />
+					<form:input path="firstName" cssClass="form-control" />
+					<form:errors path="firstName" cssClass="text-danger small mt-1 d-block" />
 				</div>
 
 				<div class="col-md-2">
 
 					<label class="form-label small text-secondary"> Ngày sinh </label>
 
-					<form:input path="ngaySinh" cssClass="form-control"
+					<form:input path="birthDate" cssClass="form-control"
 						placeholder="yyyy-MM-dd" />
-					<form:errors path="ngaySinh"
+					<form:errors path="birthDate"
 						cssClass="text-danger small mt-1 d-block" />
 				</div>
 
@@ -66,8 +66,8 @@ request.setAttribute("pageTitle", "Quản lý Sinh viên");
 
 					<label class="form-label small text-secondary"> Địa chỉ </label>
 
-					<form:input path="diaChi" cssClass="form-control" />
-					<form:errors path="diaChi"
+					<form:input path="address" cssClass="form-control" />
+					<form:errors path="address"
 						cssClass="text-danger small mt-1 d-block" />
 				</div>
 
@@ -75,8 +75,8 @@ request.setAttribute("pageTitle", "Quản lý Sinh viên");
 
 					<label class="form-label small text-secondary">Mã lớp</label>
 
-					<form:input path="maLop" cssClass="form-control" />
-					<form:errors path="maLop"
+					<form:input path="classId" cssClass="form-control" />
+					<form:errors path="classId"
 						cssClass="text-danger small mt-1 d-block" />
 				</div>
 
@@ -135,17 +135,17 @@ request.setAttribute("pageTitle", "Quản lý Sinh viên");
 
 						<tr>
 
-							<td class="px-4 fw-medium">${sv.maSV}</td>
+							<td class="px-4 fw-medium">${sv.studentId}</td>
 
-							<td>${sv.ho}</td>
+							<td>${sv.lastName}</td>
 
-							<td>${sv.ten}</td>
+							<td>${sv.firstName}</td>
 
-							<td>${sv.ngaySinh}</td>
+							<td>${sv.birthDate}</td>
 
-							<td>${sv.diaChi}</td>
+							<td>${sv.address}</td>
 
-							<td>${sv.lop.maLop}</td>
+							<td>${sv.classRoom.classId}</td>
 
 							<td class="text-end pe-4">
 
@@ -172,14 +172,14 @@ request.setAttribute("pageTitle", "Quản lý Sinh viên");
 		const diaChi = cells[4].innerText;
 		const maLop = cells[5].innerText;
 		
-		document.getElementById("maSV").value = maSV;
-        document.getElementById("ho").value = ho;
-        document.getElementById("ten").value = ten;
-        document.getElementById("ngaySinh").value = ngaySinh;
-        document.getElementById("diaChi").value = diaChi;
-        document.getElementById("maLop").value = maLop;
+		document.getElementById("studentId").value = maSV;
+        document.getElementById("lastName").value = ho;
+        document.getElementById("firstName").value = ten;
+        document.getElementById("birthDate").value = ngaySinh;
+        document.getElementById("address").value = diaChi;
+        document.getElementById("classId").value = maLop;
         
-        document.getElementById("maSV").readOnly = true;
+        document.getElementById("studentId").readOnly = true;
 	}
 
 	const editButtons = document.querySelectorAll(".btn-edit");
@@ -207,7 +207,7 @@ request.setAttribute("pageTitle", "Quản lý Sinh viên");
 	function resetForm() {
 	    document.getElementById("studentForm").reset();
 
-	    document.getElementById("maSV").readOnly = false;
+	    document.getElementById("studentId").readOnly = false;
 	}
 </script>
 

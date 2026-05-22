@@ -23,32 +23,32 @@ request.setAttribute("pageTitle", "Quản lý Giảng viên");
             <div class="row g-3">
                 <div class="col-md-2">
                     <label class="form-label small text-secondary">Mã GV</label>
-                    <form:input path="maGV" cssClass="form-control" />
-                    <form:errors path="maGV" cssClass="text-danger small mt-1 d-block" />
+                    <form:input path="teacherId" cssClass="form-control" />
+                    <form:errors path="teacherId" cssClass="text-danger small mt-1 d-block" />
                 </div>
 
                 <div class="col-md-2">
                     <label class="form-label small text-secondary">Họ</label>
-                    <form:input path="ho" cssClass="form-control" />
-                    <form:errors path="ho" cssClass="text-danger small mt-1 d-block" />
+                    <form:input path="lastName" cssClass="form-control" />
+                    <form:errors path="lastName" cssClass="text-danger small mt-1 d-block" />
                 </div>
 
                 <div class="col-md-2">
                     <label class="form-label small text-secondary">Tên</label>
-                    <form:input path="ten" cssClass="form-control" />
-                    <form:errors path="ten" cssClass="text-danger small mt-1 d-block" />
+                    <form:input path="firstName" cssClass="form-control" />
+                    <form:errors path="firstName" cssClass="text-danger small mt-1 d-block" />
                 </div>
 
                 <div class="col-md-2">
                     <label class="form-label small text-secondary">SĐT</label>
-                    <form:input path="soDT" cssClass="form-control" />
-                    <form:errors path="soDT" cssClass="text-danger small mt-1 d-block" />
+                    <form:input path="phoneNumber" cssClass="form-control" />
+                    <form:errors path="phoneNumber" cssClass="text-danger small mt-1 d-block" />
                 </div>
 
                 <div class="col-md-4">
                     <label class="form-label small text-secondary">Địa chỉ</label>
-                    <form:input path="diaChi" cssClass="form-control" />
-                    <form:errors path="diaChi" cssClass="text-danger small mt-1 d-block" />
+                    <form:input path="address" cssClass="form-control" />
+                    <form:errors path="address" cssClass="text-danger small mt-1 d-block" />
                 </div>
             </div>
 
@@ -88,11 +88,11 @@ request.setAttribute("pageTitle", "Quản lý Giảng viên");
                 <tbody>
                     <c:forEach items="${teachers}" var="item">
                         <tr>
-                            <td class="fw-medium text-success">${item.maGV}</td>
-                            <td>${item.ho}</td>
-                            <td>${item.ten}</td>
-                            <td>${item.soDT}</td>
-                            <td>${item.diaChi}</td>
+                            <td class="fw-medium text-success">${item.teacherId}</td>
+                            <td>${item.lastName}</td>
+                            <td>${item.firstName}</td>
+                            <td>${item.phoneNumber}</td>
+                            <td>${item.address}</td>
                             <td class="text-end">
                                 <button class="btn btn-sm btn-outline-secondary me-2 btn-edit">
                                     <i class="bi bi-pencil"></i>
@@ -115,19 +115,19 @@ request.setAttribute("pageTitle", "Quản lý Giảng viên");
     function fillFormFromRow(row) {
         const cells = row.querySelectorAll("td");
         
-        const maGV = cells[0].innerText;
-        const ho = cells[1].innerText;
-        const ten = cells[2].innerText;
-        const soDT = cells[3].innerText;
-        const diaChi = cells[4].innerText;
+        const teacherId = cells[0].innerText;
+        const lastName = cells[1].innerText;
+        const firstName = cells[2].innerText;
+        const phoneNumber = cells[3].innerText;
+        const address = cells[4].innerText;
         
-        document.getElementById("maGV").value = maGV;
-        document.getElementById("ho").value = ho;
-        document.getElementById("ten").value = ten;
-        document.getElementById("soDT").value = soDT;
-        document.getElementById("diaChi").value = diaChi;
+        document.getElementById("teacherId").value = teacherId;
+        document.getElementById("lastName").value = lastName;
+        document.getElementById("firstName").value = firstName;
+        document.getElementById("phoneNumber").value = phoneNumber;
+        document.getElementById("address").value = address;
         
-        document.getElementById("maGV").readOnly = true;
+        document.getElementById("teacherId").readOnly = true;
     }
 
     const editButtons = document.querySelectorAll(".btn-edit");
@@ -147,7 +147,7 @@ request.setAttribute("pageTitle", "Quản lý Giảng viên");
     
     function resetForm() {
         document.getElementById("lecturerForm").reset();
-        document.getElementById("maGV").readOnly = false;
+        document.getElementById("teacherId").readOnly = false;
     }
 </script>
 
@@ -156,11 +156,11 @@ request.setAttribute("pageTitle", "Quản lý Giảng viên");
     function clearLecturerForm() {
         var form = document.getElementById('lecturerForm');
         form.reset();
-        form.elements['maGV'].value = '';
-        form.elements['ho'].value = '';
-        form.elements['ten'].value = '';
-        form.elements['soDT'].value = '';
-        form.elements['diaChi'].value = '';
+        form.elements['teacherId'].value = '';
+        form.elements['lastName'].value = '';
+        form.elements['firstName'].value = '';
+        form.elements['phoneNumber'].value = '';
+        form.elements['address'].value = '';
     }
 </script>
 <%@ include file="../Shared/_LayoutEnd.jsp" %>

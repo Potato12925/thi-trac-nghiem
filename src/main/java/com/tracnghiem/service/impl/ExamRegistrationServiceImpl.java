@@ -41,22 +41,22 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
     @Override
     public void registerExam(ExamRegistrationDTO dto, String userMaGv, String role) throws Exception {
         // 1. Determine teacher ID based on role
-        String finalMaGv = "PGV".equals(role) ? dto.getMaGv() : userMaGv;
+        String finalMaGv = "PGV".equals(role) ? dto.getTeacherId() : userMaGv;
         if (finalMaGv == null || finalMaGv.trim().isEmpty()) {
             throw new Exception("Mã giáo viên không được để trống.");
         }
 
         // 2. Check if already exists
-        TeacherRegistrationId id = new TeacherRegistrationId(dto.getMaLop(), dto.getMaMh(), dto.getLan());
+        TeacherRegistrationId id = new TeacherRegistrationId(dto.getClassId(), dto.getSubjectId(), dto.getTryNumber());
         if (teacherRegistrationDAO.findById(id) != null) {
             throw new Exception("Lịch thi cho Lớp, Môn và Lần thi này đã tồn tại.");
         }
 
         // 3. Question distribution logic
-        int soCau = dto.getSoCauThi();
+        int soCau = dto.getNumberOfQuestions();
         int soCauToiThieu = (int) Math.ceil(0.7 * soCau);
-        String trinhDo = dto.getTrinhDo();
-        String maMh = dto.getMaMh();
+        String trinhDo = dto.getLevel();
+        String maMh = dto.getSubjectId();
 
         long totalA = questionDAO.countAvailableQuestions(maMh, "A");
         long totalB = questionDAO.countAvailableQuestions(maMh, "B");
@@ -94,8 +94,8 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
         }
 
         // 4. Save entity
-        ClassRoom classRoom = classRoomDAO.findById(dto.getMaLop());
-        Subject subject = subjectDAO.findById(dto.getMaMh());
+        ClassRoom classRoom = classRoomDAO.findById(dto.getClassId());
+        Subject subject = subjectDAO.findById(dto.getSubjectId());
         Teacher teacher = teacherDAO.findById(finalMaGv);
 
         if (classRoom == null || subject == null || teacher == null) {
@@ -109,9 +109,9 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
         entity.setGiaoVien(teacher);
 
         entity.setTrinhDo(trinhDo);
-        entity.setNgayThi(dto.getNgayThi());
-        entity.setSoCauThi(dto.getSoCauThi());
-        entity.setThoiGian(dto.getThoiGian());
+        entity.setNgayThi(dto.getExamDate());
+        entity.setSoCauThi(dto.getNumberOfQuestions());
+        entity.setThoiGian(dto.getDuration());
 
         teacherRegistrationDAO.create(entity);
     }
@@ -126,7 +126,7 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
         }
 
         // PGV can delete any, GV can only delete their own
-        if (!"PGV".equals(role) && !entity.getGiaoVien().getMaGV().equals(userMaGv)) {
+        if (!"PGV".equals(role) && !entity.getGiaoVien().getTeacherId().equals(userMaGv)) {
             throw new Exception("Bạn không có quyền xóa lịch thi của người khác.");
         }
 

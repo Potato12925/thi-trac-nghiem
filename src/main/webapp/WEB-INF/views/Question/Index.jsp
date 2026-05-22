@@ -372,7 +372,7 @@ request.setAttribute("pageTitle", "Quản lý câu hỏi");
 
 							<td>${question.correctAnswer}</td>
 
-							<td>${question.teacher.maGV}</td>
+							<td>${question.teacher.teacherId}</td>
 
 							<td class="text-end pe-4">
 

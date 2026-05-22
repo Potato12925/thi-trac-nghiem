@@ -17,11 +17,11 @@ public class LecturerService {
 
 	private Teacher changeToEntity(LecturerDTO dto) {
 		Teacher teacher = new Teacher();
-		teacher.setMaGV(dto.getMaGV());
-		teacher.setHo(dto.getHo());
-		teacher.setTen(dto.getTen());
-		teacher.setSoDT(dto.getSoDT());
-		teacher.setDiaChi(dto.getDiaChi());
+		teacher.setTeacherId(dto.getTeacherId());
+		teacher.setLastName(dto.getLastName());
+		teacher.setFirstName(dto.getFirstName());
+		teacher.setPhoneNumber(dto.getPhoneNumber());
+		teacher.setAddress(dto.getAddress());
 		return teacher;
 	}
 
@@ -59,7 +59,7 @@ public class LecturerService {
 	}
 
 	public void addTeacherValidate(LecturerDTO dto) {
-		validateTeacherKhongTonTai(dto.getMaGV());
+		validateTeacherKhongTonTai(dto.getTeacherId());
 		addTeacher(dto);
 	}
 }

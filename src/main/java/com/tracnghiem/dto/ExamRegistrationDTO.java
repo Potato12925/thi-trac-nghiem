@@ -12,100 +12,99 @@ import org.springframework.format.annotation.DateTimeFormat;
 public class ExamRegistrationDTO {
 
     @NotBlank(message = "Vui lòng chọn lớp")
-    private String maLop;
+    private String classId;
 
     @NotBlank(message = "Vui lòng chọn môn học")
-    private String maMh;
+    private String subjectId;
 
     @NotBlank(message = "Vui lòng chọn trình độ")
-    private String trinhDo;
+    private String level;
 
     @NotNull(message = "Vui lòng chọn lần thi")
     @Min(value = 1, message = "Lần thi phải là 1 hoặc 2")
     @Max(value = 2, message = "Lần thi phải là 1 hoặc 2")
-    private Short lan;
+    private Short tryNumber;
 
     @NotNull(message = "Vui lòng nhập số câu thi")
     @Min(value = 10, message = "Số câu thi tối thiểu là 10")
     @Max(value = 100, message = "Số câu thi tối đa là 100")
-    private Short soCauThi;
+    private Short numberOfQuestions;
 
     @NotNull(message = "Vui lòng nhập thời gian thi")
     @Min(value = 5, message = "Thời gian thi tối thiểu là 5 phút")
     @Max(value = 60, message = "Thời gian thi tối đa là 60 phút")
-    private Short thoiGian;
+    private Short duration;
 
     @NotNull(message = "Vui lòng chọn ngày thi")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date ngayThi;
+    private Date examDate;
 
-    // Field for PGV to select a teacher
-    private String maGv;
+    private String teacherId;
 
     public ExamRegistrationDTO() {
     }
 
-    public String getMaLop() {
-        return maLop;
+    public String getClassId() {
+        return classId;
     }
 
-    public void setMaLop(String maLop) {
-        this.maLop = maLop;
+    public void setClassId(String classId) {
+        this.classId = classId;
     }
 
-    public String getMaMh() {
-        return maMh;
+    public String getSubjectId() {
+        return subjectId;
     }
 
-    public void setMaMh(String maMh) {
-        this.maMh = maMh;
+    public void setSubjectId(String subjectId) {
+        this.subjectId = subjectId;
     }
 
-    public String getTrinhDo() {
-        return trinhDo;
+    public String getLevel() {
+        return level;
     }
 
-    public void setTrinhDo(String trinhDo) {
-        this.trinhDo = trinhDo;
+    public void setLevel(String level) {
+        this.level = level;
     }
 
-    public Short getLan() {
-        return lan;
+    public Short getTryNumber() {
+        return tryNumber;
     }
 
-    public void setLan(Short lan) {
-        this.lan = lan;
+    public void setTryNumber(Short tryNumber) {
+        this.tryNumber = tryNumber;
     }
 
-    public Short getSoCauThi() {
-        return soCauThi;
+    public Short getNumberOfQuestions() {
+        return numberOfQuestions;
     }
 
-    public void setSoCauThi(Short soCauThi) {
-        this.soCauThi = soCauThi;
+    public void setNumberOfQuestions(Short numberOfQuestions) {
+        this.numberOfQuestions = numberOfQuestions;
     }
 
-    public Short getThoiGian() {
-        return thoiGian;
+    public Short getDuration() {
+        return duration;
     }
 
-    public void setThoiGian(Short thoiGian) {
-        this.thoiGian = thoiGian;
+    public void setDuration(Short duration) {
+        this.duration = duration;
     }
 
-    public Date getNgayThi() {
-        return ngayThi;
+    public Date getExamDate() {
+        return examDate;
     }
 
-    public void setNgayThi(Date ngayThi) {
-        this.ngayThi = ngayThi;
+    public void setExamDate(Date examDate) {
+        this.examDate = examDate;
     }
 
-    public String getMaGv() {
-        return maGv;
+    public String getTeacherId() {
+        return teacherId;
     }
 
-    public void setMaGv(String maGv) {
-        this.maGv = maGv;
+    public void setTeacherId(String teacherId) {
+        this.teacherId = teacherId;
     }
 }

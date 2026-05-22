@@ -18,20 +18,20 @@ public interface ExamRegistrationService {
     
     /**
      * Deletes an existing exam registration.
-     * @param maLop class code
-     * @param maMh subject code
-     * @param lan exam try number
+     * @param classId class code
+     * @param subjectId subject code
+     * @param examTryNumber exam try number
      * @param userMaGv the logged in user's ID
      * @param role the logged in user's role
      * @throws Exception if deletion is not allowed
      */
-    void deleteExam(String maLop, String maMh, Short lan, String userMaGv, String role) throws Exception;
+    void deleteExam(String classId, String subjectId, Short examTryNumber, String userMaGv, String role) throws Exception;
     
     /**
      * Retrieves the list of exam registrations depending on user role.
      * @param userMaGv the logged in user's ID
      * @param role the logged in user's role
-     * @return List of GiaoVienDangKy
+     * @return List of TeacherRegistration
      */
     List<TeacherRegistration> getRegistrations(String userMaGv, String role);
 }
