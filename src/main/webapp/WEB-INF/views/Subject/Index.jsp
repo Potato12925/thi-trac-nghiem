@@ -14,7 +14,9 @@ request.setAttribute("pageTitle", "Quản lý Môn học");
 		<h1 class="h3 mb-0">Danh mục Môn học</h1>
 	</div>
 
-	<h3>${error}</h3>
+	<c:if test="${not empty error}">
+		<div class="alert alert-danger">${error}</div>
+	</c:if>
 
 	<div class="border rounded-3 bg-white p-4 mb-4">
 

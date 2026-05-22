@@ -5,61 +5,72 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.tracnghiem.dao.TeacherDAO;
+import com.tracnghiem.dao.LecturerDAO;
 import com.tracnghiem.dto.LecturerDTO;
-import com.tracnghiem.entity.Teacher;
+import com.tracnghiem.entity.Lecturer;
 
 @Service
 public class LecturerService {
 
 	@Autowired
-	private TeacherDAO teacherDAO;
+	private LecturerDAO lecturerDAO;
 
-	private Teacher changeToEntity(LecturerDTO dto) {
-		Teacher teacher = new Teacher();
-		teacher.setMaGV(dto.getMaGV());
-		teacher.setHo(dto.getHo());
-		teacher.setTen(dto.getTen());
-		teacher.setSoDT(dto.getSoDT());
-		teacher.setDiaChi(dto.getDiaChi());
-		return teacher;
+	private Lecturer convertToEntity(LecturerDTO dto) {
+
+		Lecturer lecturer = new Lecturer();
+
+		lecturer.setLecturerId(dto.getLecturerId());
+		lecturer.setLastName(dto.getLastName());
+		lecturer.setFirstName(dto.getFirstName());
+		lecturer.setPhoneNumber(dto.getPhoneNumber());
+		lecturer.setAddress(dto.getAddress());
+
+		return lecturer;
 	}
 
-	public List<Teacher> getAllTeachers() {
-		return teacherDAO.findAll();
+	public List<Lecturer> getAllLecturers() {
+
+		return lecturerDAO.findAll();
 	}
 
-	public Teacher findTeacherById(String maGV) {
-		return teacherDAO.findById(maGV);
+	public Lecturer findLecturerById(String lecturerId) {
+
+		return lecturerDAO.findById(lecturerId);
 	}
 
-	public List<Teacher> findTeacherByKeyword(String keyword) {
-		return teacherDAO.findByKeyword(keyword);
+	public List<Lecturer> findLecturerByKeyword(String keyword) {
+
+		return lecturerDAO.findByKeyword(keyword);
 	}
 
-	public void addTeacher(LecturerDTO dto) {
-		Teacher teacher = changeToEntity(dto);
-		teacherDAO.create(teacher);
+	public void addLecturer(LecturerDTO dto) {
+
+		validateLecturerNotExists(dto.getLecturerId());
+
+		Lecturer lecturer = convertToEntity(dto);
+
+		lecturerDAO.create(lecturer);
 	}
 
-	public void updateTeacher(LecturerDTO dto) {
-		Teacher teacher = changeToEntity(dto);
-		teacherDAO.update(teacher);
+	public void updateLecturer(LecturerDTO dto) {
+
+		Lecturer lecturer = convertToEntity(dto);
+
+		lecturerDAO.update(lecturer);
 	}
 
-	public void deleteTeacher(LecturerDTO dto) {
-		Teacher teacher = changeToEntity(dto);
-		teacherDAO.delete(teacher);
+	public void deleteLecturer(LecturerDTO dto) {
+
+		Lecturer lecturer = convertToEntity(dto);
+
+		lecturerDAO.delete(lecturer);
 	}
 
-	private void validateTeacherKhongTonTai(String maGV) {
-		if (teacherDAO.existsById(maGV)) {
-			throw new IllegalArgumentException("Mã giáo viên đã tồn tại");
+	private void validateLecturerNotExists(String lecturerId) {
+
+		if (lecturerDAO.existsById(lecturerId)) {
+
+			throw new IllegalArgumentException("Lecturer ID already exists");
 		}
-	}
-
-	public void addTeacherValidate(LecturerDTO dto) {
-		validateTeacherKhongTonTai(dto.getMaGV());
-		addTeacher(dto);
 	}
 }

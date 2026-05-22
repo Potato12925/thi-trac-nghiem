@@ -45,7 +45,7 @@ public class Question {
 
     @ManyToOne
     @JoinColumn(name = "MAGV")
-    private Teacher teacher;
+    private Lecturer teacher;
 
     public Question() {
     }
@@ -122,11 +122,11 @@ public class Question {
         this.correctAnswer = correctAnswer;
     }
 
-    public Teacher getTeacher() {
+    public Lecturer getTeacher() {
         return teacher;
     }
 
-    public void setTeacher(Teacher teacher) {
+    public void setTeacher(Lecturer teacher) {
         this.teacher = teacher;
     }
 }

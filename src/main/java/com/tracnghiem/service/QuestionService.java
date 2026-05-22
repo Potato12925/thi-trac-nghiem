@@ -9,7 +9,7 @@ import com.tracnghiem.dao.QuestionDAO;
 import com.tracnghiem.dto.QuestionDTO;
 import com.tracnghiem.entity.Question;
 import com.tracnghiem.entity.Subject;
-import com.tracnghiem.entity.Teacher;
+import com.tracnghiem.entity.Lecturer;
 
 @Service
 public class QuestionService {
@@ -20,7 +20,7 @@ public class QuestionService {
 	SubjectService subjectService;
 
 	@Autowired
-	TeacherService teacherService;
+	LecturerService lecturerService;
 
 	public Question findByQuestionId(String questionId) {
 		return questionDAO.findById(questionId);
@@ -31,7 +31,7 @@ public class QuestionService {
 
 		Subject subject = subjectService.getSubjectById(dto.getSubjectId());
 
-		Teacher teacher = teacherService.findByTeacherId(dto.getTeacherId());
+		Lecturer teacher = lecturerService.findLecturerById(dto.getTeacherId());
 
 		question.setQuestionId(dto.getQuestionId());
 		question.setSubject(subject);

@@ -33,7 +33,7 @@ public class TeacherRegistration {
 
     @ManyToOne
     @JoinColumn(name = "MAGV")
-    private Teacher giaoVien;
+    private Lecturer giaoVien;
 
     @Column(name = "TRINHDO")
     private String trinhDo;
@@ -75,11 +75,11 @@ public class TeacherRegistration {
         this.monHoc = monHoc;
     }
 
-    public Teacher getGiaoVien() {
+    public Lecturer getGiaoVien() {
         return giaoVien;
     }
 
-    public void setGiaoVien(Teacher giaoVien) {
+    public void setGiaoVien(Lecturer giaoVien) {
         this.giaoVien = giaoVien;
     }
 
