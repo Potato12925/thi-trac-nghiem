@@ -10,7 +10,7 @@ import com.tracnghiem.entity.Question;
 public class QuestionDAO extends GenericDAO<Question> {
 
 	public List<Question> findByKeyword(String keyword) {
-		String hql = "FROM BoDe b WHERE b.noiDung LIKE :keyword OR b.monHoc.maMH LIKE :keyword OR b.dapAn LIKE :keyword";
+		String hql = "FROM Question b WHERE b.content LIKE :keyword OR b.subject.subjectId LIKE :keyword OR b.correctAnswer LIKE :keyword";
 		return getSession().createQuery(hql, Question.class).setParameter("keyword", '%' + keyword + '%').list();
 	}
 
@@ -19,7 +19,7 @@ public class QuestionDAO extends GenericDAO<Question> {
 	}
 
 	public long countAvailableQuestions(String maMh, String trinhDo) {
-        String hql = "SELECT COUNT(b) FROM BoDe b WHERE b.monHoc.maMH = :maMh AND b.trinhDo = :trinhDo";
+        String hql = "SELECT COUNT(b) FROM Question b WHERE b.subject.subjectId = :maMh AND b.level = :trinhDo";
         return getSession().createQuery(hql, Long.class)
                 .setParameter("maMh", maMh)
                 .setParameter("trinhDo", trinhDo)

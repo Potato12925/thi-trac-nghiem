@@ -16,15 +16,15 @@ public class TeacherRegistrationId implements Serializable {
     private String subjectId;
 
     @Column(name = "LAN")
-    private Short attempt;
+    private Short tryNumber;
 
     public TeacherRegistrationId() {
     }
 
-    public TeacherRegistrationId(String classId, String subjectId, Short attempt) {
+    public TeacherRegistrationId(String classId, String subjectId, Short tryNumber) {
         this.classId = classId;
         this.subjectId = subjectId;
-        this.attempt = attempt;
+        this.tryNumber = tryNumber;
     }
 
     public String getClassId() {
@@ -43,17 +43,17 @@ public class TeacherRegistrationId implements Serializable {
         this.subjectId = subjectId;
     }
 
-    public Short getAttempt() {
-        return attempt;
+    public Short getTryNumber() {
+        return tryNumber;
     }
 
-    public void setAttempt(Short attempt) {
-        this.attempt = attempt;
+    public void setTryNumber(Short tryNumber) {
+        this.tryNumber = tryNumber;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(attempt, classId, subjectId);
+        return Objects.hash(tryNumber, classId, subjectId);
     }
 
     @Override
@@ -70,6 +70,6 @@ public class TeacherRegistrationId implements Serializable {
 
         return Objects.equals(classId, other.classId)
                 && Objects.equals(subjectId, other.subjectId)
-                && Objects.equals(attempt, other.attempt);
+                && Objects.equals(tryNumber, other.tryNumber);
     }
 }

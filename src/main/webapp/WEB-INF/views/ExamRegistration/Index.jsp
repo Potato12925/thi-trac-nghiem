@@ -145,11 +145,11 @@
                                         <tbody>
                                             <c:forEach var="reg" items="${registrations}">
                                                 <tr>
-                                                    <td class="px-4 fw-medium">${reg.lop.classId}</td>
-                                                    <td>${reg.monHoc.subjectId}</td>
+                                                    <td class="px-4 fw-medium">${reg.classRoom.classId}</td>
+                                                    <td>${reg.subject.subjectId}</td>
                                                     <td>${reg.id.tryNumber}</td>
                                                     <td>${reg.level}</td>
-                                                    <td>${reg.giaoVien.teacherId}</td>
+                                                    <td>${reg.teacher.teacherId}</td>
                                                     <td>${reg.numberOfQuestions}</td>
                                                     <td>${reg.duration}</td>
                                                     <td>
@@ -159,7 +159,7 @@
                                                     </td>
                                                     <td class="text-end pe-4">
                                                         <c:if
-                                                            test="${sessionScope.ROLE eq 'PGV' or sessionScope.LOGIN_USER eq reg.giaoVien.teacherId}">
+                                                            test="${sessionScope.ROLE eq 'PGV' or sessionScope.LOGIN_USER eq reg.teacher.teacherId}">
                                                             <button
                                                                 class="btn btn-sm btn-outline-secondary me-2 btn-edit">
                                                                 <i class="bi bi-pencil"></i>

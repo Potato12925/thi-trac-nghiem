@@ -11,7 +11,7 @@ public class ScoreId implements Serializable {
 
     private String subjectId;
 
-    private Short attempt;
+    private Short tryNumber;
 
     // equals hashCode
 }
