@@ -1,6 +1,9 @@
 package com.tracnghiem.controller;
 
+import java.util.Date;
 import java.util.List;
+
+import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,7 +21,7 @@ import com.tracnghiem.entity.Lecturer;
 import com.tracnghiem.service.LecturerService;
 
 @Controller
-@RequestMapping("/lecturers")
+@RequestMapping("/lecturer")
 public class LecturerController {
 
 	@Autowired
@@ -35,6 +38,17 @@ public class LecturerController {
 		model.addAttribute("lecturers", lectures);
 
 		return "Lecturer/Index";
+	}
+
+	@GetMapping("/home")
+	public String Home(ModelMap model, HttpSession session) {
+		String lecturerId = (String) session.getAttribute("LOGIN_USER");
+		Lecturer Lecturer = lecturerId != null ? lecturerService.findLecturerById(lecturerId) : null;
+
+		model.addAttribute("pageTitle", "Trang chu giang vien");
+		model.addAttribute("lecturerProfile", Lecturer);
+		model.addAttribute("today", new Date());
+		return "Lecturer/Home";
 	}
 
 	@PostMapping("/add")
@@ -69,7 +83,7 @@ public class LecturerController {
 
 		try {
 			lecturerService.updateLecturer(lecturerDTO);
-			return "redirect:/lecturers";
+			return "redirect:/lecturer";
 
 		} catch (IllegalArgumentException e) {
 			model.addAttribute("error", e.getMessage());
@@ -89,7 +103,7 @@ public class LecturerController {
 
 		try {
 			lecturerService.deleteLecturer(lecturerDTO);
-			return "redirect:/lecturers";
+			return "redirect:/lecturer";
 
 		} catch (IllegalArgumentException e) {
 			model.addAttribute("error", e.getMessage());

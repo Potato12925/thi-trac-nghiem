@@ -21,7 +21,7 @@ import com.tracnghiem.entity.Student;
 import com.tracnghiem.service.StudentService;
 
 @Controller
-@RequestMapping("/students")
+@RequestMapping("/student")
 public class StudentController {
 
 	@Autowired
@@ -67,7 +67,7 @@ public class StudentController {
 
 			studentService.addStudentWithAccount(studentDTO);
 
-			return "redirect:/students";
+			return "redirect:/student";
 
 		} catch (IllegalArgumentException e) {
 
@@ -94,7 +94,7 @@ public class StudentController {
 
 			studentService.updateStudent(studentDTO);
 
-			return "redirect:/students";
+			return "redirect:/student";
 
 		} catch (IllegalArgumentException e) {
 

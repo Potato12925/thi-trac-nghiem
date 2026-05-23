@@ -12,14 +12,14 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import com.tracnghiem.entity.id.TeacherRegistrationId;
+import com.tracnghiem.entity.id.LecturerRegistrationId;
 
 @Entity
 @Table(name = "GIAOVIEN_DANGKY")
-public class TeacherRegistration {
+public class LecturerRegistration {
 
     @EmbeddedId
-    private TeacherRegistrationId id;
+    private LecturerRegistrationId id;
 
     @ManyToOne
     @MapsId("maLop")
@@ -33,7 +33,7 @@ public class TeacherRegistration {
 
     @ManyToOne
     @JoinColumn(name = "MAGV")
-    private Lecturer giaoVien;
+    private Lecturer lecturer;
 
     @Column(name = "TRINHDO")
     private String level;
@@ -48,14 +48,14 @@ public class TeacherRegistration {
     @Column(name = "THOIGIAN")
     private Short duration;
 
-    public TeacherRegistration() {
+    public LecturerRegistration() {
     }
 
-    public TeacherRegistrationId getId() {
+    public LecturerRegistrationId getId() {
         return id;
     }
 
-    public void setId(TeacherRegistrationId id) {
+    public void setId(LecturerRegistrationId id) {
         this.id = id;
     }
 
@@ -75,12 +75,12 @@ public class TeacherRegistration {
         this.subject = subject;
     }
 
-    public Lecturer getGiaoVien() {
-        return giaoVien;
+    public Lecturer getLecturer() {
+        return lecturer;
     }
 
-    public void setGiaoVien(Lecturer giaoVien) {
-        this.giaoVien = giaoVien;
+    public void setLecturer(Lecturer lecturer) {
+        this.lecturer = lecturer;
     }
 
     public String getLevel() {

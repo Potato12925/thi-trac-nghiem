@@ -19,7 +19,7 @@ Repositories:
 Entities:
 
 - Student
-- Teacher
+- Lecturer
 - Subject
 - Question
 - Score

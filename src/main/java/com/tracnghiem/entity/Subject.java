@@ -6,7 +6,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "MonHoc")
+@Table(name = "MONHOC")
 public class Subject {
 
 	@Id

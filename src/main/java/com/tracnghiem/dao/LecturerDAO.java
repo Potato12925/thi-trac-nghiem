@@ -11,7 +11,7 @@ public class LecturerDAO extends GenericDAO<Lecturer> {
 
     public List<Lecturer> findByKeyword(String keyword) {
 
-        String hql = "FROM Teacher t WHERE t.maGV LIKE :keyword OR t.ho LIKE :keyword OR t.ten LIKE :keyword";
+        String hql = "FROM Lecturer t WHERE t.maGV LIKE :keyword OR t.ho LIKE :keyword OR t.ten LIKE :keyword";
 
         return getSession()
                 .createQuery(hql, Lecturer.class)

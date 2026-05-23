@@ -11,7 +11,7 @@
 
 <c:set var="totalClassroomsValue" value="${empty totalClassrooms ? 0 : totalClassrooms}" />
 <c:set var="totalStudentsValue" value="${empty totalStudents ? 0 : totalStudents}" />
-<c:set var="totalTeachersValue" value="${empty totalTeachers ? 0 : totalTeachers}" />
+<c:set var="totalLecturersValue" value="${empty totalLecturers ? 0 : totalLecturers}" />
 <c:set var="totalSubjectsValue" value="${empty totalSubjects ? 0 : totalSubjects}" />
 
 <style>
@@ -93,7 +93,7 @@
             </div>
             <div class="info-item">
                 <div class="info-label">Tong giang vien</div>
-                <div class="info-value">${totalTeachersValue}</div>
+                <div class="info-value">${totalLecturersValue}</div>
             </div>
             <div class="info-item">
                 <div class="info-label">Tong mon hoc</div>

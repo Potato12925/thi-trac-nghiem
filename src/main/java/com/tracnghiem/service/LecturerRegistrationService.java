@@ -7,23 +7,23 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.tracnghiem.dao.QuestionDAO;
-import com.tracnghiem.dao.TeacherDAO;
-import com.tracnghiem.dao.TeacherRegistrationDAO;
+import com.tracnghiem.dao.LecturerDAO;
+import com.tracnghiem.dao.LecturerRegistrationDAO;
 import com.tracnghiem.dao.ClassRoomDAO;
 import com.tracnghiem.dao.SubjectDAO;
-import com.tracnghiem.dto.ExamRegistrationDTO;
-import com.tracnghiem.entity.Teacher;
-import com.tracnghiem.entity.TeacherRegistration;
+import com.tracnghiem.dto.LecturerRegistrationDTO;
+import com.tracnghiem.entity.Lecturer;
+import com.tracnghiem.entity.LecturerRegistration;
 import com.tracnghiem.entity.ClassRoom;
 import com.tracnghiem.entity.Subject;
-import com.tracnghiem.entity.id.TeacherRegistrationId;
+import com.tracnghiem.entity.id.LecturerRegistrationId;
 
 @Service
 @Transactional
-public class ExamRegistrationService {
+public class LecturerRegistrationService {
 
     @Autowired
-    private TeacherRegistrationDAO teacherRegistrationDAO;
+    private LecturerRegistrationDAO lecturerRegistrationDAO;
 
     @Autowired
     private QuestionDAO questionDAO;
@@ -35,18 +35,19 @@ public class ExamRegistrationService {
     private SubjectDAO subjectDAO;
 
     @Autowired
-    private TeacherDAO teacherDAO;
+    private LecturerDAO LecturerDAO;
 
-    public void registerExam(ExamRegistrationDTO dto, String userMaGv, String role) throws Exception {
-        // 1. Determine teacher ID based on role
-        String finalMaGv = "PGV".equals(role) ? dto.getTeacherId() : userMaGv;
+    public void registerExam(LecturerRegistrationDTO dto, String userMaGv, String role) throws Exception {
+        // 1. Determine Lecturer ID based on role
+        String finalMaGv = "PGV".equals(role) ? dto.getLecturerId() : userMaGv;
         if (finalMaGv == null || finalMaGv.trim().isEmpty()) {
             throw new Exception("Mã giáo viên không được để trống.");
         }
 
         // 2. Check if already exists
-        TeacherRegistrationId id = new TeacherRegistrationId(dto.getClassId(), dto.getSubjectId(), dto.getTryNumber());
-        if (teacherRegistrationDAO.findById(id) != null) {
+        LecturerRegistrationId id = new LecturerRegistrationId(dto.getClassId(), dto.getSubjectId(),
+                dto.getTryNumber());
+        if (lecturerRegistrationDAO.findById(id) != null) {
             throw new Exception("Lịch thi cho Lớp, Môn và Lần thi này đã tồn tại.");
         }
 
@@ -94,47 +95,47 @@ public class ExamRegistrationService {
         // 4. Save entity
         ClassRoom classRoom = classRoomDAO.findById(dto.getClassId());
         Subject subject = subjectDAO.findById(dto.getSubjectId());
-        Teacher teacher = teacherDAO.findById(finalMaGv);
+        Lecturer Lecturer = LecturerDAO.findById(finalMaGv);
 
-        if (classRoom == null || subject == null || teacher == null) {
+        if (classRoom == null || subject == null || Lecturer == null) {
             throw new Exception("Dữ liệu Lớp, Môn Học hoặc Giáo Viên không hợp lệ trong hệ thống.");
         }
 
-        TeacherRegistration entity = new TeacherRegistration();
+        LecturerRegistration entity = new LecturerRegistration();
         entity.setId(id);
         entity.setClassRoom(classRoom);
         entity.setSubject(subject);
-        entity.setTeacher(teacher);
+        entity.setLecturer(Lecturer);
 
         entity.setLevel(trinhDo);
         entity.setExamDate(dto.getExamDate());
         entity.setNumberOfQuestions(dto.getNumberOfQuestions());
         entity.setDuration(dto.getDuration());
 
-        teacherRegistrationDAO.create(entity);
+        lecturerRegistrationDAO.create(entity);
     }
 
     public void deleteExam(String maLop, String maMh, Short lan, String userMaGv, String role) throws Exception {
-        TeacherRegistrationId id = new TeacherRegistrationId(maLop, maMh, lan);
-        TeacherRegistration entity = teacherRegistrationDAO.findById(id);
+        LecturerRegistrationId id = new LecturerRegistrationId(maLop, maMh, lan);
+        LecturerRegistration entity = lecturerRegistrationDAO.findById(id);
 
         if (entity == null) {
             throw new Exception("Không tìm thấy lịch thi này.");
         }
 
         // PGV can delete any, GV can only delete their own
-        if (!"PGV".equals(role) && !entity.getTeacher().getTeacherId().equals(userMaGv)) {
+        if (!"PGV".equals(role) && !entity.getLecturer().getLecturerId().equals(userMaGv)) {
             throw new Exception("Bạn không có quyền xóa lịch thi của người khác.");
         }
 
-        teacherRegistrationDAO.delete(entity);
+        lecturerRegistrationDAO.delete(entity);
     }
 
-    public List<TeacherRegistration> getRegistrations(String userMaGv, String role) {
+    public List<LecturerRegistration> getRegistrations(String lecturerId, String role) {
         if ("PGV".equals(role)) {
-            return teacherRegistrationDAO.findAll();
+            return lecturerRegistrationDAO.findAll();
         } else {
-            return teacherRegistrationDAO.findByTeacher(userMaGv);
+            return lecturerRegistrationDAO.findByLecturer(lecturerId);
         }
     }
 }

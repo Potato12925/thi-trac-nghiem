@@ -26,7 +26,7 @@ request.setAttribute("pageTitle", "Lecturer Management");
 	<div class="border rounded-3 bg-white p-4 mb-4">
 
 		<form:form id="lecturerForm" method="post"
-			action="${pageContext.request.contextPath}/lecturers/add"
+			action="${pageContext.request.contextPath}/lecturer/add"
 			modelAttribute="lecturerDTO">
 
 			<div class="row g-3">
@@ -194,7 +194,7 @@ request.setAttribute("pageTitle", "Lecturer Management");
 			document.getElementById("lecturerForm");
 
 		form.action =
-			"${pageContext.request.contextPath}/lecturers/"
+			"${pageContext.request.contextPath}/lecturer/"
 			+ action;
 	}
 

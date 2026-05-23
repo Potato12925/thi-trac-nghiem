@@ -4,13 +4,9 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
 <%
-String role = session.getAttribute("ROLE") != null
-        ? session.getAttribute("ROLE").toString()
-        : "";
+String role = session.getAttribute("ROLE") != null ? session.getAttribute("ROLE").toString() : "";
 
-String username = session.getAttribute("LOGIN_USER") != null
-        ? session.getAttribute("LOGIN_USER").toString()
-        : "User";
+String username = session.getAttribute("LOGIN_USER") != null ? session.getAttribute("LOGIN_USER").toString() : "User";
 
 /* ================= ACTIVE MENU ================= */
 
@@ -18,69 +14,45 @@ String path = request.getRequestURI();
 String contextPath = request.getContextPath();
 
 if (path.startsWith(contextPath)) {
-    path = path.substring(contextPath.length());
+	path = path.substring(contextPath.length());
 }
 
 if (path.isEmpty()) {
-    path = "/";
+	path = "/";
 }
 
 if (path.length() > 1 && path.endsWith("/")) {
-    path = path.substring(0, path.length() - 1);
+	path = path.substring(0, path.length() - 1);
 }
 
-String activeHome =
-        path.equals("/") || path.equals("/home")
-        ? "active" : "";
+String activeHome = path.equals("/") || path.equals("/home") || path.equals("/admin/home")
+		|| path.equals("/lecturer/home") || path.equals("/student/home") ? "active" : "";
 
-String activeClass =
-        path.equals("/classRooms") || path.startsWith("/classRooms/")
-        ? "active" : "";
+String activeClass = path.equals("/classRooms") || path.startsWith("/classRooms/") ? "active" : "";
 
-String activeStudent =
-        path.equals("/students") || path.startsWith("/students/")
-        ? "active" : "";
+String activeStudent = path.equals("/students") || path.startsWith("/students/") ? "active" : "";
 
-String activeTeacher =
-        path.equals("/lecturers") || path.startsWith("/lecturers/")
-        ? "active" : "";
+String activeLecturer = path.equals("/lecturer") || path.startsWith("/lecturer/") ? "active" : "";
 
-String activeSubject =
-        path.equals("/subjects") || path.startsWith("/subjects/")
-        ? "active" : "";
+String activeSubject = path.equals("/subjects") || path.startsWith("/subjects/") ? "active" : "";
 
-String activeQuestion =
-        path.equals("/questions") || path.startsWith("/questions/")
-        ? "active" : "";
+String activeQuestion = path.equals("/questions") || path.startsWith("/questions/") ? "active" : "";
 
-String activeExamRegistration =
-        path.equals("/exam-registration")
-        || path.startsWith("/exam-registration/")
-        ? "active" : "";
+String activeLecturerRegistration = path.equals("/lecturer-registration") || path.startsWith("/lecturer-registration/")
+		? "active"
+		: "";
 
-String activeScore =
-        path.equals("/score") || path.startsWith("/score/")
-        ? "active" : "";
+String activeScore = path.equals("/score") || path.startsWith("/score/") ? "active" : "";
 
-String activeAccount =
-        path.equals("/account") || path.startsWith("/account/")
-        ? "active" : "";
+String activeAccount = path.equals("/account") || path.startsWith("/account/") ? "active" : "";
 
-String activeReview =
-        path.equals("/review") || path.startsWith("/review/")
-        ? "active" : "";
+String activeReview = path.equals("/review") || path.startsWith("/review/") ? "active" : "";
 
-String activeExam =
-        path.equals("/exam") || path.startsWith("/exam/")
-        ? "active" : "";
+String activeExam = path.equals("/exam") || path.startsWith("/exam/") ? "active" : "";
 
-String activeHistory =
-        path.equals("/history") || path.startsWith("/history/")
-        ? "active" : "";
+String activeHistory = path.equals("/history") || path.startsWith("/history/") ? "active" : "";
 
-String activeResult =
-        path.equals("/result") || path.startsWith("/result/")
-        ? "active" : "";
+String activeResult = path.equals("/result") || path.startsWith("/result/") ? "active" : "";
 %>
 
 <aside class="app-sidebar" id="appSidebar">
@@ -95,102 +67,77 @@ String activeResult =
 	<nav class="sidebar-nav">
 
 		<ul>
+			<%
+			String homeUrl = "/";
 
+			if (role.equals("PGV")) {
+				homeUrl = "/admin/home";
+			} else if (role.equals("GIAOVIEN")) {
+				homeUrl = "/lecturer/home";
+			} else if (role.equals("SINHVIEN")) {
+				homeUrl = "/student/home";
+			}
+			%>
 			<!-- HOME -->
-			<li>
-				<a class="nav-link <%= activeHome %>"
-					href="${pageContext.request.contextPath}/student/home">
+			<li><a class="nav-link <%= activeHome %>"
+				href="${pageContext.request.contextPath}<%= homeUrl %>"> <i
+					class="bi bi-house-door"></i> <span>Trang chủ</span>
 
-					<i class="bi bi-house-door"></i>
-					<span>Trang chủ</span>
-
-				</a>
-			</li>
+			</a></li>
 
 			<!-- ================= PGV ================= -->
 			<%
 			if (role.equals("PGV")) {
 			%>
 
-			<li>
-				<a class="nav-link <%= activeClass %>"
-					href="${pageContext.request.contextPath}/class">
+			<li><a class="nav-link <%= activeClass %>"
+				href="${pageContext.request.contextPath}/class"> <i
+					class="bi bi-mortarboard"></i> <span>Lớp học</span>
 
-					<i class="bi bi-mortarboard"></i>
-					<span>Lớp học</span>
+			</a></li>
 
-				</a>
-			</li>
+			<li><a class="nav-link <%= activeStudent %>"
+				href="${pageContext.request.contextPath}/student"> <i
+					class="bi bi-people"></i> <span>Sinh viên</span>
 
-			<li>
-				<a class="nav-link <%= activeStudent %>"
-					href="${pageContext.request.contextPath}/student">
+			</a></li>
 
-					<i class="bi bi-people"></i>
-					<span>Sinh viên</span>
+			<li><a class="nav-link <%= activeLecturer %>"
+				href="${pageContext.request.contextPath}/Lecturer"> <i
+					class="bi bi-person-badge"></i> <span>Giảng viên</span>
 
-				</a>
-			</li>
+			</a></li>
 
-			<li>
-				<a class="nav-link <%= activeTeacher %>"
-					href="${pageContext.request.contextPath}/teacher">
+			<li><a class="nav-link <%= activeSubject %>"
+				href="${pageContext.request.contextPath}/subject"> <i
+					class="bi bi-book"></i> <span>Môn học</span>
 
-					<i class="bi bi-person-badge"></i>
-					<span>Giảng viên</span>
+			</a></li>
 
-				</a>
-			</li>
+			<li><a class="nav-link <%= activeQuestion %>"
+				href="${pageContext.request.contextPath}/question"> <i
+					class="bi bi-patch-question"></i> <span>Bộ đề</span>
 
-			<li>
-				<a class="nav-link <%= activeSubject %>"
-					href="${pageContext.request.contextPath}/subject">
+			</a></li>
 
-					<i class="bi bi-book"></i>
-					<span>Môn học</span>
+			<li><a class="nav-link <%= activeLecturerRegistration %>"
+				href="${pageContext.request.contextPath}/lecturer-registration">
 
-				</a>
-			</li>
+					<i class="bi bi-pencil-square"></i> <span>Đăng ký thi</span>
 
-			<li>
-				<a class="nav-link <%= activeQuestion %>"
-					href="${pageContext.request.contextPath}/question">
+			</a></li>
 
-					<i class="bi bi-patch-question"></i>
-					<span>Bộ đề</span>
+			<li><a class="nav-link <%= activeScore %>"
+				href="${pageContext.request.contextPath}/score"> <i
+					class="bi bi-bar-chart"></i> <span>Bảng điểm</span>
 
-				</a>
-			</li>
+			</a></li>
 
-			<li>
-				<a class="nav-link <%= activeExamRegistration %>"
-					href="${pageContext.request.contextPath}/exam-registration">
+			<li><a class="nav-link <%= activeAccount %>"
+				href="${pageContext.request.contextPath}/account"> <i
+					class="bi bi-person-lock"></i> <span>Tài khoản</span>
 
-					<i class="bi bi-pencil-square"></i>
-					<span>Đăng ký thi</span>
-
-				</a>
-			</li>
-
-			<li>
-				<a class="nav-link <%= activeScore %>"
-					href="${pageContext.request.contextPath}/score">
-
-					<i class="bi bi-bar-chart"></i>
-					<span>Bảng điểm</span>
-
-				</a>
-			</li>
-
-			<li>
-				<a class="nav-link <%= activeAccount %>"
-					href="${pageContext.request.contextPath}/account">
-
-					<i class="bi bi-person-lock"></i>
-					<span>Tài khoản</span>
-
-				</a>
-			</li>
+			</a></li>
 
 			<%
 			}
@@ -201,45 +148,30 @@ String activeResult =
 			if (role.equals("GIAOVIEN")) {
 			%>
 
-			<li>
-				<a class="nav-link <%= activeQuestion %>"
-					href="${pageContext.request.contextPath}/question">
+			<li><a class="nav-link <%= activeQuestion %>"
+				href="${pageContext.request.contextPath}/question"> <i
+					class="bi bi-patch-question"></i> <span>Câu hỏi thi</span>
 
-					<i class="bi bi-patch-question"></i>
-					<span>Câu hỏi thi</span>
+			</a></li>
 
-				</a>
-			</li>
+			<li><a class="nav-link <%= activeLecturerRegistration %>"
+				href="${pageContext.request.contextPath}/lecturer-registration">
 
-			<li>
-				<a class="nav-link <%= activeExamRegistration %>"
-					href="${pageContext.request.contextPath}/exam-registration">
+					<i class="bi bi-pencil-square"></i> <span>Đăng ký thi</span>
 
-					<i class="bi bi-pencil-square"></i>
-					<span>Đăng ký thi</span>
+			</a></li>
 
-				</a>
-			</li>
+			<li><a class="nav-link <%= activeScore %>"
+				href="${pageContext.request.contextPath}/score"> <i
+					class="bi bi-bar-chart"></i> <span>Bảng điểm</span>
 
-			<li>
-				<a class="nav-link <%= activeScore %>"
-					href="${pageContext.request.contextPath}/score">
+			</a></li>
 
-					<i class="bi bi-bar-chart"></i>
-					<span>Bảng điểm</span>
+			<li><a class="nav-link <%= activeReview %>"
+				href="${pageContext.request.contextPath}/review"> <i
+					class="bi bi-file-earmark-text"></i> <span>Xem bài thi</span>
 
-				</a>
-			</li>
-
-			<li>
-				<a class="nav-link <%= activeReview %>"
-					href="${pageContext.request.contextPath}/review">
-
-					<i class="bi bi-file-earmark-text"></i>
-					<span>Xem bài thi</span>
-
-				</a>
-			</li>
+			</a></li>
 
 			<%
 			}
@@ -250,35 +182,23 @@ String activeResult =
 			if (role.equals("SINHVIEN")) {
 			%>
 
-			<li>
-				<a class="nav-link <%= activeExam %>"
-					href="${pageContext.request.contextPath}/exam">
+			<li><a class="nav-link <%= activeExam %>"
+				href="${pageContext.request.contextPath}/exam"> <i
+					class="bi bi-ui-checks-grid"></i> <span>Thi trắc nghiệm</span>
 
-					<i class="bi bi-ui-checks-grid"></i>
-					<span>Thi trắc nghiệm</span>
+			</a></li>
 
-				</a>
-			</li>
+			<li><a class="nav-link <%= activeHistory %>"
+				href="${pageContext.request.contextPath}/history"> <i
+					class="bi bi-clock-history"></i> <span>Lịch sử thi</span>
 
-			<li>
-				<a class="nav-link <%= activeHistory %>"
-					href="${pageContext.request.contextPath}/history">
+			</a></li>
 
-					<i class="bi bi-clock-history"></i>
-					<span>Lịch sử thi</span>
+			<li><a class="nav-link <%= activeResult %>"
+				href="${pageContext.request.contextPath}/result"> <i
+					class="bi bi-award"></i> <span>Kết quả</span>
 
-				</a>
-			</li>
-
-			<li>
-				<a class="nav-link <%= activeResult %>"
-					href="${pageContext.request.contextPath}/result">
-
-					<i class="bi bi-award"></i>
-					<span>Kết quả</span>
-
-				</a>
-			</li>
+			</a></li>
 
 			<%
 			}
@@ -296,8 +216,7 @@ String activeResult =
 
 			<button type="submit" class="sidebar-logout">
 
-				<i class="bi bi-box-arrow-left"></i>
-				Đăng xuất
+				<i class="bi bi-box-arrow-left"></i> Đăng xuất
 
 			</button>
 
