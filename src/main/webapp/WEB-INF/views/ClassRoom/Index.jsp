@@ -11,10 +11,12 @@ request.setAttribute("pageTitle", "Quản lý Lớp");
 
 <div class="container-fluid">
 	<div class="d-flex justify-content-between align-items-center mb-4">
-		<h1 class="h3 mb-0">Quản lý Lớp</h1>
+		<h1 class="h3 mb-0">Class Room Management</h1>
 	</div>
 
-	<h3>${error}</h3>
+	<c:if test="${not empty error}">
+		<div class="alert alert-danger">${error}</div>
+	</c:if>
 
 	<div class="border rounded-3 bg-white p-4 mb-4">
 
@@ -28,18 +30,20 @@ request.setAttribute("pageTitle", "Quản lý Lớp");
 
 				<div class="col-md-3">
 
-					<label class="form-label small text-secondary"> Mã lớp </label>
+					<label class="form-label small text-secondary"> Class ID </label>
 
-					<form:input path="maLop" cssClass="form-control" />
-					<form:errors path="maLop" cssClass="text-danger small mt-1 d-block" />
+					<form:input path="classId" cssClass="form-control" />
+					<form:errors path="classId"
+						cssClass="text-danger small mt-1 d-block" />
 				</div>
 
 				<div class="col-md-5">
 
-					<label class="form-label small text-secondary"> Tên lớp </label>
+					<label class="form-label small text-secondary"> Class Name
+					</label>
 
-					<form:input path="tenLop" cssClass="form-control" />
-					<form:errors path="tenLop"
+					<form:input path="className" cssClass="form-control" />
+					<form:errors path="className"
 						cssClass="text-danger small mt-1 d-block" />
 				</div>
 			</div>
@@ -49,23 +53,20 @@ request.setAttribute("pageTitle", "Quản lý Lớp");
 				<button type="submit" class="btn btn-dark px-4"
 					onclick="submitForm(
                         'add',
-                        'POST'
                     )">
 
-					Thêm</button>
+					Add</button>
 
 				<button type="submit" class="btn btn-outline-secondary px-4"
 					onclick="submitForm(
                         'update',
-                        'PUT'
                     )">
 
-					Chỉnh sửa</button>
+					Update</button>
 
 				<button type="submit" class="btn btn-outline-danger px-4"
 					onclick="submitForm(
                         'delete',
-                        'DELETE'
                     )">
 
 					Xóa</button>
@@ -83,11 +84,11 @@ request.setAttribute("pageTitle", "Quản lý Lớp");
 			<table class="table table-hover align-middle mb-0">
 				<thead class="table-light">
 					<tr>
-						<th scope="col">Mã lớp</th>
+						<th scope="col">Class ID</th>
 
-						<th scope="col">Tên lớp</th>
+						<th scope="col">Class Name</th>
 
-						<th scope="col" class="text-end">Hành động</th>
+						<th scope="col" class="text-end">Actions</th>
 					</tr>
 				</thead>
 
@@ -96,9 +97,9 @@ request.setAttribute("pageTitle", "Quản lý Lớp");
 
 						<tr>
 
-							<td>${cr.maLop}</td>
+							<td>${cr.classId}</td>
 
-							<td>${cr.tenLop}</td>
+							<td>${cr.className}</td>
 
 							<td class="text-end pe-4">
 
@@ -121,10 +122,10 @@ request.setAttribute("pageTitle", "Quản lý Lớp");
 		const maLop = cells[0].innerText;
 		const tenLop = cells[1].innerText;
 		
-		document.getElementById("maLop").value = maLop;
-        document.getElementById("tenLop").value = tenLop;
+		document.getElementById("classId").value = maLop;
+        document.getElementById("className").value = tenLop;
  
-        document.getElementById("maLop").readOnly = true;
+        document.getElementById("classId").readOnly = true;
 	}
 
 	const editButtons = document.querySelectorAll(".btn-edit");
@@ -137,22 +138,19 @@ request.setAttribute("pageTitle", "Quản lý Lớp");
 		});
 	});
 
-	function submitForm(action, method) {
+	function submitForm(action) {
 
         const form = document.getElementById("classRoomForm");
 
         form.action =
             "${pageContext.request.contextPath}/classRoom/"
             + action;
-
-        document.getElementById("_method").value =
-            method;
     }
 	
 	function resetForm() {
 	    document.getElementById("classRoomForm").reset();
 
-	    document.getElementById("maLop").readOnly = false;
+	    document.getElementById("classId").readOnly = false;
 	}
 </script>
 

@@ -19,20 +19,18 @@ import com.tracnghiem.entity.ClassRoom;
 import com.tracnghiem.service.ClassRoomService;
 
 @Controller
-@RequestMapping("/classRoom")
-public class ClassController {
+@RequestMapping("/classRooms")
+public class ClassRoomController {
 
 	@Autowired
 	ClassRoomService classRoomService;
 
 	@GetMapping()
 	public String Index(ModelMap model) {
-		ClassRoom classRoom = new ClassRoom();
 		ClassRoomDTO classRoomDTO = new ClassRoomDTO();
 		List<ClassRoom> classRoomList = classRoomService.getAllClassRoomList();
 
 		model.addAttribute("classRoomDTO", classRoomDTO);
-		model.addAttribute("classRoom", classRoom);
 		model.addAttribute("classRoomList", classRoomList);
 
 		return "ClassRoom/Index";

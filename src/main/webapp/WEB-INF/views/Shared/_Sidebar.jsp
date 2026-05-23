@@ -114,7 +114,7 @@ String activeResult =
 
 			<li>
 				<a class="nav-link <%= activeClass %>"
-					href="${pageContext.request.contextPath}/class">
+					href="${pageContext.request.contextPath}/classRooms">
 
 					<i class="bi bi-mortarboard"></i>
 					<span>Lớp học</span>
@@ -124,7 +124,7 @@ String activeResult =
 
 			<li>
 				<a class="nav-link <%= activeStudent %>"
-					href="${pageContext.request.contextPath}/student">
+					href="${pageContext.request.contextPath}/students">
 
 					<i class="bi bi-people"></i>
 					<span>Sinh viên</span>
@@ -134,7 +134,7 @@ String activeResult =
 
 			<li>
 				<a class="nav-link <%= activeTeacher %>"
-					href="${pageContext.request.contextPath}/teacher">
+					href="${pageContext.request.contextPath}/lecturers">
 
 					<i class="bi bi-person-badge"></i>
 					<span>Giảng viên</span>
@@ -144,7 +144,7 @@ String activeResult =
 
 			<li>
 				<a class="nav-link <%= activeSubject %>"
-					href="${pageContext.request.contextPath}/subject">
+					href="${pageContext.request.contextPath}/subjects">
 
 					<i class="bi bi-book"></i>
 					<span>Môn học</span>
@@ -154,7 +154,7 @@ String activeResult =
 
 			<li>
 				<a class="nav-link <%= activeQuestion %>"
-					href="${pageContext.request.contextPath}/question">
+					href="${pageContext.request.contextPath}/questions">
 
 					<i class="bi bi-patch-question"></i>
 					<span>Bộ đề</span>
@@ -203,7 +203,7 @@ String activeResult =
 
 			<li>
 				<a class="nav-link <%= activeQuestion %>"
-					href="${pageContext.request.contextPath}/question">
+					href="${pageContext.request.contextPath}/questions">
 
 					<i class="bi bi-patch-question"></i>
 					<span>Câu hỏi thi</span>
@@ -223,7 +223,7 @@ String activeResult =
 
 			<li>
 				<a class="nav-link <%= activeScore %>"
-					href="${pageContext.request.contextPath}/score">
+					href="${pageContext.request.contextPath}/scores">
 
 					<i class="bi bi-bar-chart"></i>
 					<span>Bảng điểm</span>

@@ -16,7 +16,6 @@ public class LecturerService {
 	private LecturerDAO lecturerDAO;
 
 	private Lecturer convertToEntity(LecturerDTO dto) {
-
 		Lecturer lecturer = new Lecturer();
 
 		lecturer.setLecturerId(dto.getLecturerId());
@@ -34,42 +33,31 @@ public class LecturerService {
 	}
 
 	public Lecturer findLecturerById(String lecturerId) {
-
 		return lecturerDAO.findById(lecturerId);
 	}
 
 	public List<Lecturer> findLecturerByKeyword(String keyword) {
-
 		return lecturerDAO.findByKeyword(keyword);
 	}
 
 	public void addLecturer(LecturerDTO dto) {
-
 		validateLecturerNotExists(dto.getLecturerId());
-
 		Lecturer lecturer = convertToEntity(dto);
-
 		lecturerDAO.create(lecturer);
 	}
 
 	public void updateLecturer(LecturerDTO dto) {
-
 		Lecturer lecturer = convertToEntity(dto);
-
 		lecturerDAO.update(lecturer);
 	}
 
 	public void deleteLecturer(LecturerDTO dto) {
-
 		Lecturer lecturer = convertToEntity(dto);
-
 		lecturerDAO.delete(lecturer);
 	}
 
 	private void validateLecturerNotExists(String lecturerId) {
-
 		if (lecturerDAO.existsById(lecturerId)) {
-
 			throw new IllegalArgumentException("Lecturer ID already exists");
 		}
 	}

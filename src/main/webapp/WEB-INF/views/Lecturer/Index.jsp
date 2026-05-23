@@ -12,11 +12,8 @@ request.setAttribute("pageTitle", "Lecturer Management");
 <%@ include file="../Shared/_LayoutStart.jsp"%>
 
 <div class="container-fluid">
-
 	<div class="d-flex justify-content-between align-items-center mb-4">
-
 		<h1 class="h3 mb-0">Lecturer Management</h1>
-
 	</div>
 
 	<c:if test="${not empty error}">
@@ -24,7 +21,6 @@ request.setAttribute("pageTitle", "Lecturer Management");
 	</c:if>
 
 	<div class="border rounded-3 bg-white p-4 mb-4">
-
 		<form:form id="lecturerForm" method="post"
 			action="${pageContext.request.contextPath}/lecturers/add"
 			modelAttribute="lecturerDTO">
@@ -58,7 +54,6 @@ request.setAttribute("pageTitle", "Lecturer Management");
 
 					<form:errors path="firstName"
 						cssClass="text-danger small mt-1 d-block" />
-
 				</div>
 
 				<div class="col-md-2">
@@ -83,14 +78,18 @@ request.setAttribute("pageTitle", "Lecturer Management");
 			</div>
 
 			<div class="d-flex gap-2 mt-4">
-				<button type="submit" class="btn btn-dark px-4"
-					onclick="submitForm('add')">Add</button>
+				<button type="submit"
+					formaction="${pageContext.request.contextPath}/lecturers/add"
+					class="btn btn-dark px-4">Add</button>
 
-				<button type="submit" class="btn btn-outline-secondary px-4"
-					onclick="submitForm('update')">Update</button>
+				<button type="submit" disabled id="btnUpdate"
+					formaction="${pageContext.request.contextPath}/lecturers/update"
+					class="btn btn-outline-secondary px-4">Update</button>
 
-				<button type="submit" class="btn btn-outline-danger px-4"
-					onclick="submitForm('delete')">Delete</button>
+				<button type="submit"
+					formaction="${pageContext.request.contextPath}/lecturers/delete"
+					disabled id="btnDelete" class="btn btn-outline-danger px-4"
+					onclick="return confirm('Delete this lecturer?')">Delete</button>
 
 				<button type="button" class="btn btn-outline-dark"
 					onclick="resetForm()">Reset</button>
@@ -121,7 +120,12 @@ request.setAttribute("pageTitle", "Lecturer Management");
 
 				<tbody>
 					<c:forEach items="${lecturers}" var="lecturer">
-						<tr>
+						<tr data-id="${lecturer.lecturerId}"
+							data-lastname="${lecturer.lastName}"
+							data-firstname="${lecturer.firstName}"
+							data-phone="${lecturer.phoneNumber}"
+							data-address="${lecturer.address}">
+
 							<td class="fw-medium text-success">${lecturer.lecturerId}</td>
 
 							<td>${lecturer.lastName}</td>
@@ -140,6 +144,13 @@ request.setAttribute("pageTitle", "Lecturer Management");
 								</button>
 							</td>
 						</tr>
+
+						<c:if test="${empty lecturers}">
+							<tr>
+								<td colspan="6" class="text-center text-muted py-4">No
+									lecturers found</td>
+							</tr>
+						</c:if>
 					</c:forEach>
 				</tbody>
 			</table>
@@ -149,54 +160,41 @@ request.setAttribute("pageTitle", "Lecturer Management");
 
 <script>
 
-	function fillFormFromRow(row) {
+function fillFormFromRow(row) {
 
-		const cells =
-			row.querySelectorAll("td");
+	document.getElementById("lecturerId").value =
+		row.dataset.id.trim();
 
-		document.getElementById("lecturerId").value =
-			cells[0].innerText.trim();
+	document.getElementById("lastName").value =
+		row.dataset.lastname;
 
-		document.getElementById("lastName").value =
-			cells[1].innerText.trim();
+	document.getElementById("firstName").value =
+		row.dataset.firstname;
 
-		document.getElementById("firstName").value =
-			cells[2].innerText.trim();
+	document.getElementById("phoneNumber").value =
+		row.dataset.phone;
 
-		document.getElementById("phoneNumber").value =
-			cells[3].innerText.trim();
+	document.getElementById("address").value =
+		row.dataset.address;
 
-		document.getElementById("address").value =
-			cells[4].innerText.trim();
-
-		document.getElementById("lecturerId").readOnly =
-			true;
-	}
+	document.getElementById("lecturerId").readOnly = true;
+}
 
 	document
 		.querySelectorAll(".btn-edit")
 		.forEach(button => {
 
 			button.addEventListener("click", function () {
-
 				const row =
 					this.closest("tr");
 
 				fillFormFromRow(row);
 
+				document.getElementById("btnUpdate").disabled = false;
+				document.getElementById("btnDelete").disabled = false;
 			});
 
 		});
-
-	function submitForm(action) {
-
-		const form =
-			document.getElementById("lecturerForm");
-
-		form.action =
-			"${pageContext.request.contextPath}/lecturers/"
-			+ action;
-	}
 
 	function resetForm() {
 
@@ -207,6 +205,14 @@ request.setAttribute("pageTitle", "Lecturer Management");
 		document
 			.getElementById("lecturerId")
 			.readOnly = false;
+		
+		document
+		.getElementById("btnUpdate")
+		.disabled = true;
+
+	document
+		.getElementById("btnDelete")
+		.disabled = true;
 	}
 
 </script>
