@@ -229,7 +229,7 @@ PGV:
 
 - Full access
 - Create accounts
-- Manage teachers
+- Manage lecturers
 - Manage subjects
 - No exam participation
 

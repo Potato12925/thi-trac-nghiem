@@ -9,7 +9,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "Lop")
+@Table(name = "LOP")
 public class ClassRoom {
 
 	@Id

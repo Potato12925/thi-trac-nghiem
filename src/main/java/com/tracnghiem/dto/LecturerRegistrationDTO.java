@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-public class ExamRegistrationDTO {
+public class LecturerRegistrationDTO {
 
     @NotBlank(message = "Vui lòng chọn lớp")
     private String classId;
@@ -39,9 +39,9 @@ public class ExamRegistrationDTO {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date examDate;
 
-    private String teacherId;
+    private String lecturerId;
 
-    public ExamRegistrationDTO() {
+    public LecturerRegistrationDTO() {
     }
 
     public String getClassId() {
@@ -100,11 +100,11 @@ public class ExamRegistrationDTO {
         this.examDate = examDate;
     }
 
-    public String getTeacherId() {
-        return teacherId;
+    public String getLecturerId() {
+        return lecturerId;
     }
 
-    public void setTeacherId(String teacherId) {
-        this.teacherId = teacherId;
+    public void setLecturerId(String lecturerId) {
+        this.lecturerId = lecturerId;
     }
 }

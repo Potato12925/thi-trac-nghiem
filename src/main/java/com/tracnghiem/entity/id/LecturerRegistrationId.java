@@ -7,7 +7,7 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
 @Embeddable
-public class TeacherRegistrationId implements Serializable {
+public class LecturerRegistrationId implements Serializable {
 
     @Column(name = "MALOP")
     private String classId;
@@ -18,10 +18,10 @@ public class TeacherRegistrationId implements Serializable {
     @Column(name = "LAN")
     private Short tryNumber;
 
-    public TeacherRegistrationId() {
+    public LecturerRegistrationId() {
     }
 
-    public TeacherRegistrationId(String classId, String subjectId, Short tryNumber) {
+    public LecturerRegistrationId(String classId, String subjectId, Short tryNumber) {
         this.classId = classId;
         this.subjectId = subjectId;
         this.tryNumber = tryNumber;
@@ -62,11 +62,11 @@ public class TeacherRegistrationId implements Serializable {
             return true;
         }
 
-        if (!(obj instanceof TeacherRegistrationId)) {
+        if (!(obj instanceof LecturerRegistrationId)) {
             return false;
         }
 
-        TeacherRegistrationId other = (TeacherRegistrationId) obj;
+        LecturerRegistrationId other = (LecturerRegistrationId) obj;
 
         return Objects.equals(classId, other.classId)
                 && Objects.equals(subjectId, other.subjectId)

@@ -15,18 +15,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import com.tracnghiem.dao.TeacherDAO;
+import com.tracnghiem.dao.LecturerDAO;
 import com.tracnghiem.dao.ClassRoomDAO;
 import com.tracnghiem.dao.SubjectDAO;
-import com.tracnghiem.dto.ExamRegistrationDTO;
-import com.tracnghiem.service.ExamRegistrationService;
+import com.tracnghiem.dto.LecturerRegistrationDTO;
+import com.tracnghiem.service.LecturerRegistrationService;
 
 @Controller
-@RequestMapping("/exam-registration")
-public class ExamRegistrationController {
+@RequestMapping("/lecturer-registration")
+public class LecturerRegistrationController {
 
     @Autowired
-    private ExamRegistrationService examRegistrationService;
+    private LecturerRegistrationService lecturerRegistrationService;
 
     @Autowired
     private ClassRoomDAO classRoomDAO;
@@ -35,7 +35,7 @@ public class ExamRegistrationController {
     private SubjectDAO subjectDAO;
 
     @Autowired
-    private TeacherDAO teacherDAO;
+    private LecturerDAO lecturerDAO;
 
     private void prepareFormModel(ModelMap model, HttpSession session) {
         model.addAttribute("dsLop", classRoomDAO.findAll());
@@ -43,7 +43,7 @@ public class ExamRegistrationController {
 
         String role = (String) session.getAttribute("ROLE");
         if ("PGV".equals(role)) {
-            model.addAttribute("dsGiaoVien", teacherDAO.findAll());
+            model.addAttribute("dsGiaoVien", lecturerDAO.findAll());
         }
     }
 
@@ -57,20 +57,20 @@ public class ExamRegistrationController {
         if (!isAuthorized(session)) {
             return "redirect:/auth/login";
         }
-        
+
         String role = (String) session.getAttribute("ROLE");
         String userMaGv = (String) session.getAttribute("LOGIN_USER");
-        
-        model.addAttribute("registrationDTO", new ExamRegistrationDTO());
+
+        model.addAttribute("registrationDTO", new LecturerRegistrationDTO());
         prepareFormModel(model, session);
-        model.addAttribute("registrations", examRegistrationService.getRegistrations(userMaGv, role));
-        
-        return "ExamRegistration/Index";
+        model.addAttribute("registrations", lecturerRegistrationService.getRegistrations(userMaGv, role));
+
+        return "LecturerRegistration/Index";
     }
 
     @PostMapping("/add")
     public String add(
-            @Validated @ModelAttribute("registrationDTO") ExamRegistrationDTO dto,
+            @Validated @ModelAttribute("registrationDTO") LecturerRegistrationDTO dto,
             BindingResult bindingResult,
             ModelMap model,
             HttpSession session,
@@ -85,28 +85,28 @@ public class ExamRegistrationController {
 
         if (bindingResult.hasErrors()) {
             prepareFormModel(model, session);
-            model.addAttribute("registrations", examRegistrationService.getRegistrations(userMaGv, role));
-            return "ExamRegistration/Index";
+            model.addAttribute("registrations", lecturerRegistrationService.getRegistrations(userMaGv, role));
+            return "LecturerRegistration/Index";
         }
 
         try {
-            examRegistrationService.registerExam(dto, userMaGv, role);
+            lecturerRegistrationService.registerExam(dto, userMaGv, role);
             redirectAttributes.addFlashAttribute("successMessage", "Đăng ký thi thành công!");
-            return "redirect:/exam-registration";
+            return "redirect:/lecturer-registration";
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
             prepareFormModel(model, session);
-            model.addAttribute("registrations", examRegistrationService.getRegistrations(userMaGv, role));
-            return "ExamRegistration/Index";
+            model.addAttribute("registrations", lecturerRegistrationService.getRegistrations(userMaGv, role));
+            return "LecturerRegistration/Index";
         }
     }
 
     @DeleteMapping("/delete")
     public String delete(
-            @ModelAttribute("registrationDTO") ExamRegistrationDTO dto,
+            @ModelAttribute("registrationDTO") LecturerRegistrationDTO dto,
             HttpSession session,
             RedirectAttributes redirectAttributes) {
-            
+
         String role = (String) session.getAttribute("ROLE");
         String userMaGv = (String) session.getAttribute("LOGIN_USER");
 
@@ -115,12 +115,13 @@ public class ExamRegistrationController {
         }
 
         try {
-            examRegistrationService.deleteExam(dto.getClassId(), dto.getSubjectId(), dto.getTryNumber(), userMaGv, role);
+            lecturerRegistrationService.deleteExam(dto.getClassId(), dto.getSubjectId(), dto.getTryNumber(), userMaGv,
+                    role);
             redirectAttributes.addFlashAttribute("successMessage", "Xóa lượt đăng ký thi thành công!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
 
-        return "redirect:/exam-registration";
+        return "redirect:/lecturer-registration";
     }
 }

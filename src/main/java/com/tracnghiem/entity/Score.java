@@ -15,7 +15,7 @@ import javax.persistence.TemporalType;
 import com.tracnghiem.entity.id.ScoreId;
 
 @Entity
-@Table(name = "BangDiem")
+@Table(name = "BANGDIEM")
 public class Score {
 
     @EmbeddedId

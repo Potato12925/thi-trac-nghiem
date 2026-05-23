@@ -6,17 +6,17 @@
 
 <%@ include file="../Shared/_LayoutStart.jsp" %>
 
-<c:set var="teacherName" value="${empty teacherProfile ? sessionScope.LOGIN_USER : teacherProfile.ho} ${empty teacherProfile ? '' : teacherProfile.ten}" />
-<c:set var="teacherId" value="${empty teacherProfile.maGV ? sessionScope.LOGIN_USER : teacherProfile.maGV}" />
+<c:set var="lecturerName" value="${empty lecturerProfile ? sessionScope.LOGIN_USER : lecturerProfile.ho} ${empty lecturerProfile ? '' : lecturerProfile.ten}" />
+<c:set var="lecturerId" value="${empty lecturerProfile.maGV ? sessionScope.LOGIN_USER : lecturerProfile.maGV}" />
 
 <c:set var="totalQuestionsValue" value="${empty totalQuestions ? 0 : totalQuestions}" />
-<c:set var="totalExamRegistrationsValue" value="${empty totalExamRegistrations ? 0 : totalExamRegistrations}" />
+<c:set var="totalLecturerRegistrationsValue" value="${empty totalLecturerRegistrations ? 0 : totalLecturerRegistrations}" />
 <c:set var="totalScoresPublishedValue" value="${empty totalScoresPublished ? 0 : totalScoresPublished}" />
 <c:set var="lastActiveSubjectValue" value="${empty lastActiveSubject ? 'Chua co du lieu' : lastActiveSubject}" />
 
 <style>
     body { background: #f4f7fb; }
-    .teacher-dashboard { display: grid; gap: 1.5rem; }
+    .Lecturer-dashboard { display: grid; gap: 1.5rem; }
     .profile-card {
         border-radius: 28px;
         overflow: hidden;
@@ -33,8 +33,8 @@
         font-size: 2.2rem; font-weight: 700; flex-shrink: 0;
         backdrop-filter: blur(12px); border: 2px solid rgba(255,255,255,0.2);
     }
-    .teacher-name { font-size: 2rem; font-weight: 700; margin-bottom: 0.4rem; }
-    .teacher-meta { font-size: 0.95rem; opacity: 0.92; margin-bottom: 0.25rem; }
+    .Lecturer-name { font-size: 2rem; font-weight: 700; margin-bottom: 0.4rem; }
+    .Lecturer-meta { font-size: 0.95rem; opacity: 0.92; margin-bottom: 0.25rem; }
     .info-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; padding: 0 2rem 2rem; }
     .info-item {
         background: rgba(255,255,255,0.12);
@@ -58,28 +58,28 @@
     @media (max-width: 992px) { .info-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
     @media (max-width: 576px) {
         .profile-top { flex-direction: column; text-align: center; }
-        .teacher-name { font-size: 1.6rem; }
+        .Lecturer-name { font-size: 1.6rem; }
         .info-grid { grid-template-columns: 1fr; }
         .task-header { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
     }
 </style>
 
-<div class="container-fluid teacher-dashboard">
+<div class="container-fluid Lecturer-dashboard">
 
     <section class="profile-card">
         <div class="profile-top">
             <div class="avatar-box">
                 <c:choose>
-                    <c:when test="${not empty teacherProfile.ten}">${fn:substring(teacherProfile.ten,0,1)}</c:when>
+                    <c:when test="${not empty lecturerProfile.ten}">${fn:substring(lecturerProfile.ten,0,1)}</c:when>
                     <c:otherwise>G</c:otherwise>
                 </c:choose>
             </div>
 
             <div>
-                <div class="teacher-name">${teacherName}</div>
-                <div class="teacher-meta"><i class="bi bi-person-badge"></i> Ma giang vien: ${teacherId}</div>
-                <div class="teacher-meta"><i class="bi bi-briefcase"></i> Vai tro: Giang vien</div>
-                <div class="teacher-meta"><i class="bi bi-calendar-event"></i> Hom nay: <fmt:formatDate value="${today}" pattern="dd/MM/yyyy" /></div>
+                <div class="Lecturer-name">${lecturerName}</div>
+                <div class="Lecturer-meta"><i class="bi bi-person-badge"></i> Ma giang vien: ${lecturerId}</div>
+                <div class="Lecturer-meta"><i class="bi bi-briefcase"></i> Vai tro: Giang vien</div>
+                <div class="Lecturer-meta"><i class="bi bi-calendar-event"></i> Hom nay: <fmt:formatDate value="${today}" pattern="dd/MM/yyyy" /></div>
             </div>
         </div>
 
@@ -90,7 +90,7 @@
             </div>
             <div class="info-item">
                 <div class="info-label">Dot dang ky thi</div>
-                <div class="info-value">${totalExamRegistrationsValue}</div>
+                <div class="info-value">${totalLecturerRegistrationsValue}</div>
             </div>
             <div class="info-item">
                 <div class="info-label">Bang diem da cong bo</div>

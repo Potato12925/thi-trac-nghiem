@@ -32,38 +32,38 @@ public class AuthController {
 
 	@PostMapping("/login")
 	public String login(
-	        @Valid @ModelAttribute("taiKhoan") LoginDTO dto,
-	        BindingResult result,
-	        HttpSession session,
-	        Model model) {
+			@Valid @ModelAttribute("taiKhoan") LoginDTO dto,
+			BindingResult result,
+			HttpSession session,
+			Model model) {
 
-	    if (result.hasErrors()) {
-	        return "Account/Login";
-	    }
+		if (result.hasErrors()) {
+			return "Account/Login";
+		}
 
-	    String error = authService.login(dto, session);
+		String error = authService.login(dto, session);
 
-	    if (error != null) {
-	        model.addAttribute("error", error);
-	        return "Account/Login";
-	    }
+		if (error != null) {
+			model.addAttribute("error", error);
+			return "Account/Login";
+		}
 
-	    String role = (String) session.getAttribute("ROLE");
+		String role = (String) session.getAttribute("ROLE");
 
-	    switch (role) {
-	        case "SINHVIEN":
-	            return "redirect:/student/home";
+		switch (role) {
+			case "SINHVIEN":
+				return "redirect:/student/home";
 
-	        case "GIAOVIEN":
-	            return "redirect:/teacher/home";
+			case "GIAOVIEN":
+				return "redirect:/Lecturer/home";
 
-	        case "PGV":
-	            return "redirect:/admin/home";
+			case "PGV":
+				return "redirect:/admin/home";
 
-	        default:
-	            model.addAttribute("error", "Role không hợp lệ");
-	            return "Account/Login";
-	    }
+			default:
+				model.addAttribute("error", "Role không hợp lệ");
+				return "Account/Login";
+		}
 	}
 
 	@PostMapping("/logout")
