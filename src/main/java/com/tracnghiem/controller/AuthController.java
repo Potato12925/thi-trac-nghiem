@@ -55,7 +55,7 @@ public class AuthController {
 				return "redirect:/student/home";
 
 			case "GIAOVIEN":
-				return "redirect:/Lecturer/home";
+				return "redirect:/lecturer/home";
 
 			case "PGV":
 				return "redirect:/admin/home";

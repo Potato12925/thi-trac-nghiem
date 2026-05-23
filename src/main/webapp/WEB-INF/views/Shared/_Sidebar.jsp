@@ -32,7 +32,7 @@ String activeClass = path.equals("/classRooms") || path.startsWith("/classRooms/
 
 String activeStudent = path.equals("/students") || path.startsWith("/students/") ? "active" : "";
 
-String activeLecturer = path.equals("/lecturers") || path.startsWith("/lecturers/") ? "active" : "";
+String activeLecturer = path.equals("/lecturer") || path.startsWith("/lecturer/") ? "active" : "";
 
 String activeSubject = path.equals("/subjects") || path.startsWith("/subjects/") ? "active" : "";
 

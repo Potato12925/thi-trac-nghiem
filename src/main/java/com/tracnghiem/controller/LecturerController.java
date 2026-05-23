@@ -21,7 +21,7 @@ import com.tracnghiem.entity.Lecturer;
 import com.tracnghiem.service.LecturerService;
 
 @Controller
-@RequestMapping("/lecturers")
+@RequestMapping("/lecturer")
 public class LecturerController {
 
 	@Autowired
@@ -83,7 +83,7 @@ public class LecturerController {
 
 		try {
 			lecturerService.updateLecturer(lecturerDTO);
-			return "redirect:/lecturers";
+			return "redirect:/lecturer";
 
 		} catch (IllegalArgumentException e) {
 			model.addAttribute("error", e.getMessage());
@@ -103,7 +103,7 @@ public class LecturerController {
 
 		try {
 			lecturerService.deleteLecturer(lecturerDTO);
-			return "redirect:/lecturers";
+			return "redirect:/lecturer";
 
 		} catch (IllegalArgumentException e) {
 			model.addAttribute("error", e.getMessage());
