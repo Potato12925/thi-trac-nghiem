@@ -4,18 +4,31 @@ import org.springframework.stereotype.Repository;
 
 import com.tracnghiem.entity.Question;
 
+import java.util.Collections;
+import java.util.List;
+
 @Repository
 public class QuestionDAO extends GenericDAO<Question> {
-	public boolean existsById(Integer questionId) {
-		return findById(questionId) != null;
-	}
+    public boolean existsById(Integer questionId) {
+        return findById(questionId) != null;
+    }
 
-	public long countAvailableQuestions(String maMh, String trinhDo) {
+    public long countAvailableQuestions(String maMh, String trinhDo) {
         String hql = "SELECT COUNT(b) FROM Question b WHERE b.subject.subjectId = :maMh AND b.level = :trinhDo";
         return getSession().createQuery(hql, Long.class)
                 .setParameter("maMh", maMh)
                 .setParameter("trinhDo", trinhDo)
                 .uniqueResult();
+    }
+
+    public List<Question> getRandomQuestions(String maMh, String trinhDo, int limit) {
+        String hql = "FROM Question b WHERE b.subject.subjectId = :maMh AND b.level = :trinhDo";
+        List<Question> list = getSession().createQuery(hql, Question.class)
+                .setParameter("maMh", maMh)
+                .setParameter("trinhDo", trinhDo)
+                .getResultList();
+        Collections.shuffle(list);
+        return list.subList(0, Math.min(limit, list.size()));
     }
 
 }

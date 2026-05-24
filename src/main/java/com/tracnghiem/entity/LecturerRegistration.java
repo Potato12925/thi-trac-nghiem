@@ -11,6 +11,10 @@ import javax.persistence.MapsId;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.ManyToMany;
+import javax.persistence.JoinTable;
+import javax.persistence.FetchType;
+import java.util.List;
 
 import com.tracnghiem.entity.id.LecturerRegistrationId;
 
@@ -48,7 +52,27 @@ public class LecturerRegistration {
     @Column(name = "THOIGIAN")
     private Short duration;
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "CT_GIAOVIEN_DANGKY",
+        joinColumns = {
+            @JoinColumn(name = "MALOP", referencedColumnName = "MALOP"),
+            @JoinColumn(name = "MAMH", referencedColumnName = "MAMH"),
+            @JoinColumn(name = "LAN", referencedColumnName = "LAN")
+        },
+        inverseJoinColumns = @JoinColumn(name = "CAUHOI", referencedColumnName = "CAUHOI")
+    )
+    private List<Question> questions;
+
     public LecturerRegistration() {
+    }
+
+    public List<Question> getQuestions() {
+        return questions;
+    }
+
+    public void setQuestions(List<Question> questions) {
+        this.questions = questions;
     }
 
     public LecturerRegistrationId getId() {

@@ -10,11 +10,11 @@ import com.tracnghiem.entity.ClassRoom;
 public class ClassRoomDAO extends GenericDAO<ClassRoom> {
 
 	public List<ClassRoom> findByKeyword(String keyword) {
-		String hql = "FROM Lop l WHERE l.maLop LIKE :keyword OR l.tenLop LIKE :keyword";
+		String hql = "FROM ClassRoom c WHERE c.classRoomId LIKE :keyword OR c.className LIKE :keyword";
 		return getSession().createQuery(hql, ClassRoom.class).setParameter("keyword", '%' + keyword + '%').list();
 	}
 
-	public boolean existsById(String maLop) {
-		return findById(maLop) != null;
+	public boolean existsById(String classRoomId) {
+		return findById(classRoomId) != null;
 	}
 }

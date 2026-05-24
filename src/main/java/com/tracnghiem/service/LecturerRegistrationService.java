@@ -1,5 +1,6 @@
 package com.tracnghiem.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import com.tracnghiem.dao.SubjectDAO;
 import com.tracnghiem.dto.LecturerRegistrationDTO;
 import com.tracnghiem.entity.Lecturer;
 import com.tracnghiem.entity.LecturerRegistration;
+import com.tracnghiem.entity.Question;
 import com.tracnghiem.entity.ClassRoom;
 import com.tracnghiem.entity.Subject;
 import com.tracnghiem.entity.id.LecturerRegistrationId;
@@ -51,45 +53,15 @@ public class LecturerRegistrationService {
             throw new Exception("Lịch thi cho Lớp, Môn và Lần thi này đã tồn tại.");
         }
 
-        // 3. Question distribution logic
+        // 3. Question distribution logic & selection
         int soCau = dto.getNumberOfQuestions();
-        int soCauToiThieu = (int) Math.ceil(0.7 * soCau);
         String trinhDo = dto.getLevel();
         String maMh = dto.getSubjectId();
 
-        long totalA = questionDAO.countAvailableQuestions(maMh, "A");
-        long totalB = questionDAO.countAvailableQuestions(maMh, "B");
-        long totalC = questionDAO.countAvailableQuestions(maMh, "C");
-
-        if ("A".equals(trinhDo)) {
-            if (totalA < soCauToiThieu) {
-                throw new Exception("Không đủ số câu hỏi mức A. Cần ít nhất " + soCauToiThieu
-                        + " câu mức A (70%), hiện có " + totalA + " câu.");
-            }
-            long takeA = Math.min(totalA, soCau);
-            long takeB = soCau - takeA;
-            if (takeB > totalB) {
-                throw new Exception(
-                        "Không đủ câu hỏi bù mức B. Cần bù " + takeB + " câu B nhưng kho chỉ có " + totalB + " câu.");
-            }
-        } else if ("B".equals(trinhDo)) {
-            if (totalB < soCauToiThieu) {
-                throw new Exception("Không đủ số câu hỏi mức B. Cần ít nhất " + soCauToiThieu
-                        + " câu mức B (70%), hiện có " + totalB + " câu.");
-            }
-            long takeB = Math.min(totalB, soCau);
-            long takeC = soCau - takeB;
-            if (takeC > totalC) {
-                throw new Exception(
-                        "Không đủ câu hỏi bù mức C. Cần bù " + takeC + " câu C nhưng kho chỉ có " + totalC + " câu.");
-            }
-        } else if ("C".equals(trinhDo)) {
-            if (totalC < soCau) {
-                throw new Exception(
-                        "Không đủ số câu hỏi mức C. Cần " + soCau + " câu mức C, hiện có " + totalC + " câu.");
-            }
-        } else {
-            throw new Exception("Trình độ không hợp lệ.");
+        // Check if enough questions exist and can generate a valid exam
+        List<Question> selectedQuestions = generateExamQuestions(maMh, trinhDo, soCau);
+        if (selectedQuestions.size() != soCau) {
+            throw new Exception("Không thể tạo đủ số lượng câu hỏi yêu cầu.");
         }
 
         // 4. Save entity
@@ -111,6 +83,7 @@ public class LecturerRegistrationService {
         entity.setExamDate(dto.getExamDate());
         entity.setNumberOfQuestions(dto.getNumberOfQuestions());
         entity.setDuration(dto.getDuration());
+        entity.setQuestions(selectedQuestions);
 
         lecturerRegistrationDAO.create(entity);
     }
@@ -137,5 +110,61 @@ public class LecturerRegistrationService {
         } else {
             return lecturerRegistrationDAO.findByLecturer(lecturerId);
         }
+    }
+
+    public List<Question> generateExamQuestions(String maMh, String trinhDo, int soCau) throws Exception {
+        int soCauToiThieu = (int) Math.ceil(0.7 * soCau);
+
+        long totalA = questionDAO.countAvailableQuestions(maMh, "A");
+        long totalB = questionDAO.countAvailableQuestions(maMh, "B");
+        long totalC = questionDAO.countAvailableQuestions(maMh, "C");
+
+        List<Question> examQuestions = new ArrayList<>();
+
+        if ("A".equals(trinhDo)) {
+            if (totalA < soCauToiThieu) {
+                throw new Exception("Không đủ số câu hỏi mức A. Cần ít nhất " + soCauToiThieu
+                        + " câu mức A (70%), hiện có " + totalA + " câu.");
+            }
+
+            int takeA = (int) Math.min(totalA, soCau);
+            int takeB = soCau - takeA;
+            
+            if (takeB > totalB) {
+                throw new Exception(
+                        "Không đủ câu hỏi bù mức B. Cần bù " + takeB + " câu B nhưng kho chỉ có " + totalB + " câu.");
+            }
+
+            examQuestions.addAll(questionDAO.getRandomQuestions(maMh, "A", takeA));
+            if (takeB > 0) {
+                examQuestions.addAll(questionDAO.getRandomQuestions(maMh, "B", takeB));
+            }
+        } else if ("B".equals(trinhDo)) {
+            if (totalB < soCauToiThieu) {
+                throw new Exception("Không đủ số câu hỏi mức B. Cần ít nhất " + soCauToiThieu
+                        + " câu mức B (70%), hiện có " + totalB + " câu.");
+            }
+            int takeB = (int) Math.min(totalB, soCau);
+            int takeC = soCau - takeB;
+            if (takeC > totalC) {
+                throw new Exception(
+                        "Không đủ câu hỏi bù mức C. Cần bù " + takeC + " câu C nhưng kho chỉ có " + totalC + " câu.");
+            }
+            examQuestions.addAll(questionDAO.getRandomQuestions(maMh, "B", takeB));
+            if (takeC > 0) {
+                examQuestions.addAll(questionDAO.getRandomQuestions(maMh, "C", takeC));
+            }
+        } else if ("C".equals(trinhDo)) {
+            if (totalC < soCau) {
+                throw new Exception(
+                        "Không đủ số câu hỏi mức C. Cần " + soCau + " câu mức C, hiện có " + totalC + " câu.");
+            }
+            examQuestions.addAll(questionDAO.getRandomQuestions(maMh, "C", soCau));
+        } else {
+            throw new Exception("Trình độ không hợp lệ.");
+        }
+
+        java.util.Collections.shuffle(examQuestions);
+        return examQuestions;
     }
 }

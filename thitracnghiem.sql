@@ -170,6 +170,20 @@ CREATE TABLE BODE (
     MAGV NCHAR(8) NOT NULL
 )
 
+/* =========================================
+            TABLE CT_GIAOVIEN_DANGKY
+========================================= */
+
+CREATE TABLE CT_GIAOVIEN_DANGKY (
+    MALOP nchar(15),
+    MAMH nchar(5),
+    LAN smallint,
+    CAUHOI int,
+    PRIMARY KEY (MALOP, MAMH, LAN, CAUHOI),
+    FOREIGN KEY (MALOP, MAMH, LAN) REFERENCES GIAOVIEN_DANGKY(MALOP, MAMH, LAN),
+    FOREIGN KEY (CAUHOI) REFERENCES BODE(CAUHOI)
+);
+
 SET IDENTITY_INSERT [dbo].[BODE] ON
 
 
