@@ -149,7 +149,7 @@
                                                     <td>${reg.subject.subjectId}</td>
                                                     <td>${reg.id.tryNumber}</td>
                                                     <td>${reg.level}</td>
-                                                    <td>${reg.Lecturer.lecturerId}</td>
+                                                    <td>${reg.lecturer.lecturerId}</td>
                                                     <td>${reg.numberOfQuestions}</td>
                                                     <td>${reg.duration}</td>
                                                     <td>
@@ -159,7 +159,7 @@
                                                     </td>
                                                     <td class="text-end pe-4">
                                                         <c:if
-                                                            test="${sessionScope.ROLE eq 'PGV' or sessionScope.LOGIN_USER eq reg.Lecturer.lecturerId}">
+                                                            test="${sessionScope.ROLE eq 'PGV' or sessionScope.LOGIN_USER eq reg.lecturer.lecturerId}">
                                                             <button
                                                                 class="btn btn-sm btn-outline-secondary me-2 btn-edit">
                                                                 <i class="bi bi-pencil"></i>
