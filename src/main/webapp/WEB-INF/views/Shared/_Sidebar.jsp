@@ -109,7 +109,7 @@ String activeResult = path.equals("/result") || path.startsWith("/result/") ? "a
 			</a></li>
 
 			<li>
-				<a class="nav-link <%= activeTeacher %>"
+				<a class="nav-link <%= activeLecturer %>"
 					href="${pageContext.request.contextPath}/lecturers">
 
 					<i class="bi bi-person-badge"></i>

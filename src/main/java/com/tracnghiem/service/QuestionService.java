@@ -7,75 +7,81 @@ import org.springframework.stereotype.Service;
 
 import com.tracnghiem.dao.QuestionDAO;
 import com.tracnghiem.dto.QuestionDTO;
+import com.tracnghiem.entity.Lecturer;
 import com.tracnghiem.entity.Question;
 import com.tracnghiem.entity.Subject;
-import com.tracnghiem.entity.Lecturer;
 
 @Service
 public class QuestionService {
-	@Autowired
-	QuestionDAO questionDAO;
 
-	@Autowired
-	SubjectService subjectService;
+    @Autowired
+    QuestionDAO questionDAO;
 
-	@Autowired
-	LecturerService lecturerService;
+    @Autowired
+    SubjectService subjectService;
 
-	public Question findByQuestionId(String questionId) {
-		return questionDAO.findById(questionId);
-	}
+    @Autowired
+    LecturerService lecturerService;
 
-	private Question mapToEntity(QuestionDTO dto) {
-		Question question = new Question();
+    public Question findByQuestionId(String questionId) {
+        return questionDAO.findById(questionId);
+    }
 
-		Subject subject = subjectService.getSubjectById(dto.getSubjectId());
+    private Question mapToEntity(QuestionDTO dto) {
+        Question question = new Question();
 
-		Lecturer lecturer = lecturerService.findLecturerById(dto.getLecturerId());
+        Subject subject = subjectService.getSubjectById(dto.getSubjectId());
 
-		question.setQuestionId(dto.getQuestionId());
-		question.setSubject(subject);
-		question.setLevel(dto.getLevel());
-		question.setContent(dto.getContent());
-		question.setOptionA(dto.getOptionA());
-		question.setOptionB(dto.getOptionB());
-		question.setOptionC(dto.getOptionC());
-		question.setOptionD(dto.getOptionD());
-		question.setCorrectAnswer(dto.getCorrectAnswer());
-		question.setLecturer(lecturer);
+        Lecturer lecturer = lecturerService.findLecturerById(dto.getLecturerId());
 
-		return question;
-	}
+        question.setQuestionId(dto.getQuestionId());
+        question.setSubject(subject);
+        question.setLevel(dto.getLevel());
+        question.setContent(dto.getContent());
+        question.setOptionA(dto.getOptionA());
+        question.setOptionB(dto.getOptionB());
+        question.setOptionC(dto.getOptionC());
+        question.setOptionD(dto.getOptionD());
+        question.setCorrectAnswer(dto.getCorrectAnswer());
+        question.setLecturer(lecturer);
 
-	public List<Question> getAllQuestions() {
-		return questionDAO.findAll();
-	}
+        return question;
+    }
 
-	private void validateExitsQuestion(Integer questionId) {
+    public List<Question> getQuestions(int page, int pageSize) {
 
-		if (questionDAO.existsById(questionId)) {
+        return questionDAO.getQuestions(page, pageSize);
+    }
 
-			throw new IllegalArgumentException("Mã câu hỏi đã tồn tại");
-		}
-	}
+    public long countQuestion() {
+        return questionDAO.countQuestions();
+    }
 
-	public void addQuestion(QuestionDTO dto) {
-		validateExitsQuestion(dto.getQuestionId());
+    private void validateExitsQuestion(Integer questionId) {
 
-		Question question = mapToEntity(dto);
+        if (questionDAO.existsById(questionId)) {
 
-		questionDAO.create(question);
-	}
+            throw new IllegalArgumentException("Mã câu hỏi đã tồn tại");
+        }
+    }
 
-	public void updateQuestion(QuestionDTO dto) {
-		Question question = mapToEntity(dto);
+    public void addQuestion(QuestionDTO dto) {
+        validateExitsQuestion(dto.getQuestionId());
 
-		questionDAO.update(question);
-	}
+        Question question = mapToEntity(dto);
 
-	public void deleteQuestion(QuestionDTO dto) {
-		Question question = mapToEntity(dto);
+        questionDAO.create(question);
+    }
 
-		questionDAO.delete(question);
-	}
+    public void updateQuestion(QuestionDTO dto) {
+        Question question = mapToEntity(dto);
+
+        questionDAO.update(question);
+    }
+
+    public void deleteQuestion(QuestionDTO dto) {
+        Question question = mapToEntity(dto);
+
+        questionDAO.delete(question);
+    }
 }

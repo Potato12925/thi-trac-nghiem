@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.tracnghiem.dto.QuestionDTO;
 import com.tracnghiem.entity.Question;
@@ -20,96 +21,102 @@ import com.tracnghiem.service.QuestionService;
 @RequestMapping("/questions")
 public class QuestionController {
 
-	@Autowired
-	private QuestionService questionService;
+    @Autowired
+    private QuestionService questionService;
 
-	@GetMapping
-	public String showQuestionPage(ModelMap model) {
+    @GetMapping
+    public String showQuestionPage(@RequestParam(defaultValue = "1") int page, ModelMap model) {
+        prepareQuestionPage(model, page);
 
-		prepareQuestionPage(model);
+        model.addAttribute("questionDTO", new QuestionDTO());
 
-		model.addAttribute("questionDTO", new QuestionDTO());
+        return "Question/Index";
+    }
 
-		return "Question/Index";
-	}
+    @PostMapping("/add")
+    public String createQuestion(@RequestParam(defaultValue = "1") int page, @Validated @ModelAttribute("questionDTO") QuestionDTO questionForm,
+            BindingResult validationResult, ModelMap model) {
 
-	@PostMapping("/add")
-	public String createQuestion(@Validated @ModelAttribute("questionDTO") QuestionDTO questionForm,
-			BindingResult validationResult, ModelMap model) {
+        if (validationResult.hasErrors()) {
+            return renderQuestionPage(model, page);
+        }
 
-		if (validationResult.hasErrors()) {
-			return renderQuestionPage(model);
-		}
+        try {
 
-		try {
+            questionService.addQuestion(questionForm);
 
-			questionService.addQuestion(questionForm);
+            return "redirect:/questions";
 
-			return "redirect:/questions";
+        } catch (IllegalArgumentException exception) {
 
-		} catch (IllegalArgumentException exception) {
+            model.addAttribute("errorMessage", exception.getMessage());
 
-			model.addAttribute("errorMessage", exception.getMessage());
+            return renderQuestionPage(model, page);
+        }
+    }
 
-			return renderQuestionPage(model);
-		}
-	}
+    @PostMapping("/update")
+    public String editQuestion(@RequestParam(defaultValue = "1") int page, @Validated @ModelAttribute("questionDTO") QuestionDTO questionForm,
+            BindingResult validationResult, ModelMap model) {
 
-	@PostMapping("/update")
-	public String editQuestion(@Validated @ModelAttribute("questionDTO") QuestionDTO questionForm,
-			BindingResult validationResult, ModelMap model) {
+        if (validationResult.hasErrors()) {
+            return renderQuestionPage(model, page);
+        }
 
-		if (validationResult.hasErrors()) {
-			return renderQuestionPage(model);
-		}
+        try {
 
-		try {
+            questionService.updateQuestion(questionForm);
 
-			questionService.updateQuestion(questionForm);
+            return "redirect:/questions";
 
-			return "redirect:/questions";
+        } catch (IllegalArgumentException exception) {
 
-		} catch (IllegalArgumentException exception) {
+            model.addAttribute("errorMessage", exception.getMessage());
 
-			model.addAttribute("errorMessage", exception.getMessage());
+            return renderQuestionPage(model, page);
+        }
+    }
 
-			return renderQuestionPage(model);
-		}
-	}
+    @PostMapping("/delete")
+    public String removeQuestion(@RequestParam(defaultValue = "1") int page, @Validated @ModelAttribute("questionDTO") QuestionDTO questionForm,
+            BindingResult validationResult, ModelMap model) {
 
-	@PostMapping("/delete")
-	public String removeQuestion(@Validated @ModelAttribute("questionDTO") QuestionDTO questionForm,
-			BindingResult validationResult, ModelMap model) {
+        if (validationResult.hasErrors()) {
+            return renderQuestionPage(model, page);
+        }
 
-		if (validationResult.hasErrors()) {
-			return renderQuestionPage(model);
-		}
+        try {
 
-		try {
+            questionService.deleteQuestion(questionForm);
 
-			questionService.deleteQuestion(questionForm);
+            return "redirect:/questions";
 
-			return "redirect:/questions";
+        } catch (IllegalArgumentException exception) {
 
-		} catch (IllegalArgumentException exception) {
+            model.addAttribute("errorMessage", exception.getMessage());
 
-			model.addAttribute("errorMessage", exception.getMessage());
+            return renderQuestionPage(model, page);
+        }
+    }
 
-			return renderQuestionPage(model);
-		}
-	}
+    private void prepareQuestionPage(ModelMap model, int page) {
+        int pageSize = 10;
 
-	private void prepareQuestionPage(ModelMap model) {
+        List<Question> questions = questionService.getQuestions(page, pageSize);
 
-		List<Question> questions = questionService.getAllQuestions();
+        long totalQuestions = questionService.countQuestion();
 
-		model.addAttribute("questions", questions);
-	}
+        int totalPages = (int) Math.ceil((double) totalQuestions / pageSize);
 
-	private String renderQuestionPage(ModelMap model) {
+        model.addAttribute("questions", questions);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+    }
 
-		prepareQuestionPage(model);
+    private String renderQuestionPage(ModelMap model, int page) {
 
-		return "Question/Index";
-	}
+        prepareQuestionPage(model, page);
+
+        return "Question/Index";
+    }
 }
