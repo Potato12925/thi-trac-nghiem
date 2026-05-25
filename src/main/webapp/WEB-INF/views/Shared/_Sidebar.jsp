@@ -90,33 +90,48 @@ String activeResult = path.equals("/result") || path.startsWith("/result/") ? "a
 			if (role.equals("PGV")) {
 			%>
 
-			<li><a class="nav-link <%= activeClass %>"
-				href="${pageContext.request.contextPath}/class"> <i
-					class="bi bi-mortarboard"></i> <span>Lớp học</span>
+			<li>
+				<a class="nav-link <%= activeClass %>"
+					href="${pageContext.request.contextPath}/classRooms">
+
+					<i class="bi bi-mortarboard"></i>
+					<span>Lớp học</span>
 
 			</a></li>
 
-			<li><a class="nav-link <%= activeStudent %>"
-				href="${pageContext.request.contextPath}/student"> <i
-					class="bi bi-people"></i> <span>Sinh viên</span>
+			<li>
+				<a class="nav-link <%= activeStudent %>"
+					href="${pageContext.request.contextPath}/students">
+
+					<i class="bi bi-people"></i>
+					<span>Sinh viên</span>
 
 			</a></li>
 
-			<li><a class="nav-link <%= activeLecturer %>"
-				href="${pageContext.request.contextPath}/Lecturer"> <i
-					class="bi bi-person-badge"></i> <span>Giảng viên</span>
+			<li>
+				<a class="nav-link <%= activeTeacher %>"
+					href="${pageContext.request.contextPath}/lecturers">
+
+					<i class="bi bi-person-badge"></i>
+					<span>Giảng viên</span>
 
 			</a></li>
 
-			<li><a class="nav-link <%= activeSubject %>"
-				href="${pageContext.request.contextPath}/subject"> <i
-					class="bi bi-book"></i> <span>Môn học</span>
+			<li>
+				<a class="nav-link <%= activeSubject %>"
+					href="${pageContext.request.contextPath}/subjects">
+
+					<i class="bi bi-book"></i>
+					<span>Môn học</span>
 
 			</a></li>
 
-			<li><a class="nav-link <%= activeQuestion %>"
-				href="${pageContext.request.contextPath}/question"> <i
-					class="bi bi-patch-question"></i> <span>Bộ đề</span>
+			<li>
+				<a class="nav-link <%= activeQuestion %>"
+					href="${pageContext.request.contextPath}/questions">
+
+					<i class="bi bi-patch-question"></i>
+					<span>Bộ đề</span>
 
 			</a></li>
 
@@ -148,9 +163,12 @@ String activeResult = path.equals("/result") || path.startsWith("/result/") ? "a
 			if (role.equals("GIAOVIEN")) {
 			%>
 
-			<li><a class="nav-link <%= activeQuestion %>"
-				href="${pageContext.request.contextPath}/question"> <i
-					class="bi bi-patch-question"></i> <span>Câu hỏi thi</span>
+			<li>
+				<a class="nav-link <%= activeQuestion %>"
+					href="${pageContext.request.contextPath}/questions">
+
+					<i class="bi bi-patch-question"></i>
+					<span>Câu hỏi thi</span>
 
 			</a></li>
 
@@ -161,9 +179,12 @@ String activeResult = path.equals("/result") || path.startsWith("/result/") ? "a
 
 			</a></li>
 
-			<li><a class="nav-link <%= activeScore %>"
-				href="${pageContext.request.contextPath}/score"> <i
-					class="bi bi-bar-chart"></i> <span>Bảng điểm</span>
+			<li>
+				<a class="nav-link <%= activeScore %>"
+					href="${pageContext.request.contextPath}/scores">
+
+					<i class="bi bi-bar-chart"></i>
+					<span>Bảng điểm</span>
 
 			</a></li>
 

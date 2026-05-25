@@ -20,11 +20,15 @@ public class SubjectController {
 	@Autowired
 	private SubjectService subjectService;
 
+	private void loadPageData(ModelMap model) {
+		model.addAttribute("subjects", subjectService.getAllSubjects());
+		model.addAttribute("subjectDTO", new SubjectDTO());
+	}
+
 	@GetMapping
 	public String index(ModelMap model) {
 
-		model.addAttribute("subjects", subjectService.getAllSubjects());
-		model.addAttribute("subjectDTO", new SubjectDTO());
+		loadPageData(model);
 
 		return "Subject/Index";
 	}
@@ -34,9 +38,7 @@ public class SubjectController {
 			ModelMap model) {
 
 		if (errors.hasErrors()) {
-
-			model.addAttribute("subjects", subjectService.getAllSubjects());
-
+			loadPageData(model);
 			return "Subject/Index";
 		}
 
@@ -50,9 +52,7 @@ public class SubjectController {
 			ModelMap model) {
 
 		if (errors.hasErrors()) {
-
-			model.addAttribute("subjects", subjectService.getAllSubjects());
-
+			loadPageData(model);
 			return "Subject/Index";
 		}
 
@@ -62,7 +62,12 @@ public class SubjectController {
 	}
 
 	@PostMapping("/delete")
-	public String delete(@ModelAttribute("subject") SubjectDTO subjectDTO) {
+	public String delete(@ModelAttribute("subject") SubjectDTO subjectDTO, BindingResult errors, ModelMap model) {
+
+		if (errors.hasErrors()) {
+			loadPageData(model);
+			return "Subject/Index";
+		}
 
 		subjectService.deleteSubject(subjectDTO);
 

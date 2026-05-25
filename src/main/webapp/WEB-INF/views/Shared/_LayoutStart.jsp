@@ -44,7 +44,6 @@
     </style>
 </head>
 <body>
-    <a href="#main-content" class="skip-to-main-content">Bỏ qua để đến nội dung chính</a>
     <div class="app-layout <c:if test="${empty sessionScope.LOGIN_USER}">is-unauthenticated</c:if>">
         <c:if test="${not empty sessionScope.LOGIN_USER}">
             <jsp:include page="/WEB-INF/views/Shared/_Sidebar.jsp" />

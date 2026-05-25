@@ -15,12 +15,12 @@ public class SubjectService {
 	@Autowired
 	private SubjectDAO subjectDAO;
 
-	private Subject changeToEntity(SubjectDTO dto) {
+	private Subject mapToEntity(SubjectDTO dto) {
 		Subject subject = new Subject();
 
 		subject.setSubjectId(dto.getSubjectId());
 		subject.setSubjectName(dto.getSubjectName());
-        
+
 		return subject;
 	}
 
@@ -32,28 +32,40 @@ public class SubjectService {
 		return subjectDAO.findById(subjectId);
 	}
 
-	private void validateSubjectDoesNotExist(String subjectId) {
+	private void ensureSubjectNotExists(String subjectId) {
+
 		if (subjectDAO.existsById(subjectId)) {
 			throw new IllegalArgumentException("Mã môn học đã tồn tại");
 		}
 	}
 
-	public void addSubject(SubjectDTO dto) {
-		validateSubjectDoesNotExist(dto.getSubjectId());
+	private void ensureSubjectExists(String subjectId) {
 
-		Subject subject = changeToEntity(dto);
+		if (!subjectDAO.existsById(subjectId)) {
+			throw new IllegalArgumentException("Môn học không tồn tại");
+		}
+	}
+
+	public void addSubject(SubjectDTO dto) {
+		ensureSubjectNotExists(dto.getSubjectId());
+
+		Subject subject = mapToEntity(dto);
 
 		subjectDAO.create(subject);
 	}
 
 	public void updateSubject(SubjectDTO dto) {
-		Subject subject = changeToEntity(dto);
+		ensureSubjectExists(dto.getSubjectId());
+
+		Subject subject = mapToEntity(dto);
 
 		subjectDAO.update(subject);
 	}
 
 	public void deleteSubject(SubjectDTO dto) {
-		Subject subject = changeToEntity(dto);
+		ensureSubjectExists(dto.getSubjectId());
+
+		Subject subject = mapToEntity(dto);
 
 		subjectDAO.delete(subject);
 	}
