@@ -12,49 +12,59 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public abstract class GenericDAO<T> {
 
-    @Autowired
-    protected SessionFactory factory;
+	@Autowired
+	protected SessionFactory factory;
 
-    protected Class<T> entityClass;
+	protected Class<T> entityClass;
 
-    @SuppressWarnings("unchecked")
-    public GenericDAO() {
+	@SuppressWarnings("unchecked")
+	public GenericDAO() {
 
-        entityClass = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass())
-                .getActualTypeArguments()[0];
-    }
+		entityClass = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+	}
 
-    protected Session getSession() {
-        return factory.getCurrentSession();
-    }
+	protected Session getSession() {
+		return factory.getCurrentSession();
+	}
 
-    // CREATE
-    public void create(T entity) {
-        getSession().save(entity);
-    }
+	// CREATE
+	public void create(T entity) {
+		getSession().save(entity);
+	}
 
-    // UPDATE
-    public void update(T entity) {
-        getSession().update(entity);
-    }
+	// UPDATE
+	public void update(T entity) {
+		getSession().update(entity);
+	}
 
-    // DELETE
-    public void delete(T entity) {
-        getSession().delete(entity);
-    }
+	// DELETE
+	public void delete(T entity) {
+		getSession().delete(entity);
+	}
 
-    // FIND BY ID
-    public T findById(Serializable id) {
-        return getSession().get(entityClass, id);
-    }
+	// FIND BY ID
+	public T findById(Serializable id) {
+		return getSession().get(entityClass, id);
+	}
 
-    // FIND ALL
-    public List<T> findAll() {
+	// FIND ALL
+	public List<T> findAll() {
 
-        String hql = "FROM " + entityClass.getSimpleName();
+		String hql = "FROM " + entityClass.getSimpleName();
 
-        return getSession()
-                .createQuery(hql, entityClass)
-                .list();
-    }
+		return getSession().createQuery(hql, entityClass).list();
+	}
+
+	public List<T> getPagination(int page, int pageSize) {
+		String hql = "FROM " + entityClass.getSimpleName();
+
+		int offset = (page - 1) * pageSize;
+
+		return getSession().createQuery(hql, entityClass).setFirstResult(offset).setMaxResults(pageSize).list();
+	}
+
+	public long count() {
+		String hql = "SELECT COUNT(*) FROM " + entityClass.getSimpleName();
+		return getSession().createQuery(hql, Long.class).uniqueResult();
+	}
 }

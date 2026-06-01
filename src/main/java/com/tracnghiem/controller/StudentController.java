@@ -1,7 +1,6 @@
 package com.tracnghiem.controller;
 
 import java.util.Date;
-import java.util.List;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -15,121 +14,111 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.tracnghiem.dto.StudentDTO;
 import com.tracnghiem.entity.Student;
 import com.tracnghiem.service.StudentService;
 
 @Controller
-@RequestMapping("/student")
+@RequestMapping("/students")
 public class StudentController {
 
-	@Autowired
-	private StudentService studentService;
+    private static final String INDEX_VIEW = "Student/Index";
+    private static final String REDIRECT_INDEX = "redirect:/student";
 
-	@GetMapping
-	public String index(ModelMap model) {
+    @Autowired
+    private StudentService studentService;
 
-		List<Student> students = studentService.getAllStudents();
+    @GetMapping
+    public String index(@RequestParam(defaultValue = "1") int page, ModelMap model) {
+        populateIndexPageModel(model, page);
+        model.addAttribute("studentDTO", new StudentDTO());
+        return INDEX_VIEW;
+    }
 
-		model.addAttribute("studentDTO", new StudentDTO());
-		model.addAttribute("students", students);
+    @GetMapping("/home")
+    public String home(ModelMap model, HttpSession session) {
 
-		return "Student/Index";
-	}
+        String studentId = (String) session.getAttribute("LOGIN_USER");
 
-	@GetMapping("/home")
-	public String home(ModelMap model, HttpSession session) {
+        Student student = studentId != null ? studentService.getStudentById(studentId) : null;
 
-		String studentId = (String) session.getAttribute("LOGIN_USER");
+        model.addAttribute("pageTitle", "Student Home");
+        model.addAttribute("studentProfile", student);
+        model.addAttribute("today", new Date());
 
-		Student student = studentId != null ? studentService.getStudentById(studentId) : null;
+        return "Student/Home";
+    }
 
-		model.addAttribute("pageTitle", "Student Home");
-		model.addAttribute("studentProfile", student);
-		model.addAttribute("today", new Date());
+    @PostMapping("/add")
+    public String addStudent(@RequestParam(defaultValue = "1") int page, @Validated @ModelAttribute("studentDTO") StudentDTO studentDTO, BindingResult errors,
+            ModelMap model) {
 
-		return "Student/Home";
-	}
+        if (errors.hasErrors()) {
+            populateIndexPageModel(model, page);
+            return INDEX_VIEW;
+        }
 
-	@PostMapping("/add")
-	public String addStudent(@Validated @ModelAttribute("studentDTO") StudentDTO studentDTO, BindingResult errors,
-			ModelMap model) {
+        try {
+            studentService.addStudentWithAccount(studentDTO);
+            return REDIRECT_INDEX;
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("error", e.getMessage());
+            populateIndexPageModel(model, page);
+            return INDEX_VIEW;
+        }
+    }
 
-		if (errors.hasErrors()) {
+    @PostMapping("/update")
+    public String updateStudent(@RequestParam(defaultValue = "1") int page, @Validated @ModelAttribute("studentDTO") StudentDTO studentDTO, BindingResult errors,
+            ModelMap model) {
 
-			model.addAttribute("students", studentService.getAllStudents());
+        if (errors.hasErrors()) {
+            populateIndexPageModel(model, page);
+            return INDEX_VIEW;
+        }
 
-			return "Student/Index";
-		}
+        try {
+            studentService.updateStudent(studentDTO);
+            return REDIRECT_INDEX;
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("error", e.getMessage());
+            populateIndexPageModel(model, page);
+            return INDEX_VIEW;
+        }
+    }
 
-		try {
+    @PostMapping("/delete")
+    public String deleteStudent(@RequestParam(defaultValue = "1") int page, @Valid @ModelAttribute("studentDTO") StudentDTO studentDTO, BindingResult errors,
+            ModelMap model) {
 
-			studentService.addStudentWithAccount(studentDTO);
+        if (errors.hasErrors()) {
+            populateIndexPageModel(model, page);
+            return INDEX_VIEW;
+        }
 
-			return "redirect:/student";
+        try {
+            studentService.deleteStudent(studentDTO);
+            return REDIRECT_INDEX;
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("error", e.getMessage());
+            populateIndexPageModel(model, page);
+            return INDEX_VIEW;
+        }
+    }
 
-		} catch (IllegalArgumentException e) {
+    private void populateIndexPageModel(ModelMap model, int page) {
+        int pageSize = 10;
 
-			model.addAttribute("error", e.getMessage());
+        model.addAttribute("studentDTO", new StudentDTO());
+        model.addAttribute("students", studentService.getStudents(page, pageSize));
 
-			model.addAttribute("students", studentService.getAllStudents());
+        long total = studentService.countStudents();
 
-			return "Student/Index";
-		}
-	}
+        int totalPages = (int) Math.ceil((double) total / pageSize);
 
-	@PostMapping("/update")
-	public String updateStudent(@Validated @ModelAttribute("studentDTO") StudentDTO studentDTO, BindingResult errors,
-			ModelMap model) {
-
-		if (errors.hasErrors()) {
-
-			model.addAttribute("students", studentService.getAllStudents());
-
-			return "Student/Index";
-		}
-
-		try {
-
-			studentService.updateStudent(studentDTO);
-
-			return "redirect:/student";
-
-		} catch (IllegalArgumentException e) {
-
-			model.addAttribute("error", e.getMessage());
-
-			model.addAttribute("students", studentService.getAllStudents());
-
-			return "Student/Index";
-		}
-	}
-
-	@PostMapping("/delete")
-	public String deleteStudent(@Valid @ModelAttribute("studentDTO") StudentDTO studentDTO, BindingResult errors,
-			ModelMap model) {
-
-		if (errors.hasErrors()) {
-
-			model.addAttribute("students", studentService.getAllStudents());
-
-			return "Student/Index";
-		}
-
-		try {
-
-			studentService.deleteStudent(studentDTO);
-
-			return "redirect:/students";
-
-		} catch (IllegalArgumentException e) {
-
-			model.addAttribute("error", e.getMessage());
-
-			model.addAttribute("students", studentService.getAllStudents());
-
-			return "Student/Index";
-		}
-	}
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+    }
 }

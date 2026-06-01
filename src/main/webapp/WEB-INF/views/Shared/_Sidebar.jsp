@@ -28,11 +28,11 @@ if (path.length() > 1 && path.endsWith("/")) {
 String activeHome = path.equals("/") || path.equals("/home") || path.equals("/admin/home")
 		|| path.equals("/lecturer/home") || path.equals("/student/home") ? "active" : "";
 
-String activeClass = path.equals("/classRooms") || path.startsWith("/classRooms/") ? "active" : "";
+String activeClass = path.equals("/classrooms") || path.startsWith("/classrooms/") ? "active" : "";
 
 String activeStudent = path.equals("/students") || path.startsWith("/students/") ? "active" : "";
 
-String activeLecturer = path.equals("/lecturer") || path.startsWith("/lecturer/") ? "active" : "";
+String activeLecturer = path.equals("/lecturers") || path.startsWith("/lecturers/") ? "active" : "";
 
 String activeSubject = path.equals("/subjects") || path.startsWith("/subjects/") ? "active" : "";
 
@@ -92,7 +92,7 @@ String activeResult = path.equals("/result") || path.startsWith("/result/") ? "a
 
 			<li>
 				<a class="nav-link <%= activeClass %>"
-					href="${pageContext.request.contextPath}/classRooms">
+					href="${pageContext.request.contextPath}/classrooms">
 
 					<i class="bi bi-mortarboard"></i>
 					<span>Lớp học</span>

@@ -13,97 +13,117 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import com.tracnghiem.dto.ClassRoomDTO;
-import com.tracnghiem.entity.ClassRoom;
-import com.tracnghiem.service.ClassRoomService;
+import com.tracnghiem.dto.ClassroomDTO;
+import com.tracnghiem.entity.Classroom;
+import com.tracnghiem.service.ClassroomService;
 
 @Controller
-@RequestMapping("/classRooms")
-public class ClassRoomController {
+@RequestMapping("/classrooms")
+public class ClassroomController {
 
-	@Autowired
-	ClassRoomService classRoomService;
+    private static final String INDEX_VIEW = "Classroom/Index";
+    private static final String REDIRECT_INDEX = "redirect:/classrooms";
 
-	@GetMapping()
-	public String Index(ModelMap model) {
-		ClassRoomDTO classRoomDTO = new ClassRoomDTO();
-		List<ClassRoom> classRoomList = classRoomService.getAllClassRoomList();
+    @Autowired
+    private ClassroomService classroomService;
 
-		model.addAttribute("classRoomDTO", classRoomDTO);
-		model.addAttribute("classRoomList", classRoomList);
+    @GetMapping
+    public String showClassroomPage(@RequestParam(defaultValue = "1") int page, ModelMap model) {
+        prepareClassroomPage(model, page);
 
-		return "ClassRoom/Index";
-	}
+        model.addAttribute("classroomDTO", new ClassroomDTO());
 
-	@PostMapping("/add")
-	public String add(@Validated @ModelAttribute("classRoomDTO") ClassRoomDTO classRoomDTO, BindingResult errors,
-			ModelMap model) {
-		if (errors.hasErrors()) {
-			model.addAttribute("classRoomList", classRoomService.getAllClassRoomList());
+        return INDEX_VIEW;
+    }
 
-			return "ClassRoom/Index";
-		}
+    @PostMapping("/add")
+    public String add(@RequestParam(defaultValue = "1") int page,
+            @Validated @ModelAttribute("classroomDTO") ClassroomDTO classroomDTO, BindingResult validationResult,
+            ModelMap model) {
+        if (validationResult.hasErrors()) {
+            return renderClassroomPage(model, page);
+        }
 
-		try {
-			classRoomService.addClassRoom(classRoomDTO);
-			return "redirect:/classRoom";
+        try {
+            classroomService.addClassroom(classroomDTO);
 
-		} catch (IllegalArgumentException e) {
+            return REDIRECT_INDEX;
 
-			model.addAttribute("error", e.getMessage());
+        } catch (IllegalArgumentException exception) {
 
-			model.addAttribute("classRoomList", classRoomService.getAllClassRoomList());
+            model.addAttribute("errorMessage", exception.getMessage());
 
-			return "redirect:/classRoom";
-		}
-	}
+            return renderClassroomPage(model, page);
+        }
+    }
 
-	@PutMapping("/update")
-	public String update(@Validated @ModelAttribute("classRoomDTO") ClassRoomDTO classRoomDTO, BindingResult errors,
-			ModelMap model) {
-		if (errors.hasErrors()) {
-			model.addAttribute("classRoomList", classRoomService.getAllClassRoomList());
+    @PutMapping("/update")
+    public String update(@RequestParam(defaultValue = "1") int page,
+            @Validated @ModelAttribute("classroomDTO") ClassroomDTO classroomDTO, BindingResult validationResult,
+            ModelMap model) {
 
-			return "ClassRoom/Index";
+        if (validationResult.hasErrors()) {
+            model.addAttribute("classrooms", classroomService.getAllClassrooms());
 
-		}
+            return INDEX_VIEW;
 
-		try {
-			classRoomService.updateClassRoom(classRoomDTO);
-			return "redirect:/classRoom";
+        }
 
-		} catch (IllegalArgumentException e) {
+        try {
+            classroomService.updateClassroom(classroomDTO);
 
-			model.addAttribute("error", e.getMessage());
+            return REDIRECT_INDEX;
 
-			model.addAttribute("classRoomList", classRoomService.getAllClassRoomList());
+        } catch (IllegalArgumentException exception) {
 
-			return "ClassRoom/Index";
+            model.addAttribute("errorMessage", exception.getMessage());
 
-		}
-	}
+            return renderClassroomPage(model, page);
+        }
+    }
 
-	@DeleteMapping("/delete")
-	public String delete(@Validated @ModelAttribute("classRoomDTO") ClassRoomDTO classRoomDTO, BindingResult errors,
-			ModelMap model) {
-		if (errors.hasErrors()) {
-			model.addAttribute("classRoomList", classRoomService.getAllClassRoomList());
+    @DeleteMapping("/delete")
+    public String delete(@RequestParam(defaultValue = "1") int page,
+            @Validated @ModelAttribute("classroomDTO") ClassroomDTO classroomDTO, BindingResult errors,
+            ModelMap model) {
+        if (errors.hasErrors()) {
+            model.addAttribute("classrooms", classroomService.getAllClassrooms());
 
-			return "ClassRoom/Index";
-		}
+            return INDEX_VIEW;
+        }
 
-		try {
-			classRoomService.deleteClassRoom(classRoomDTO);
-			return "redirect:/classRoom";
+        try {
+            classroomService.deleteClassroom(classroomDTO);
+            return REDIRECT_INDEX;
 
-		} catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException exception) {
 
-			model.addAttribute("error", e.getMessage());
+            model.addAttribute("errorMessage", exception.getMessage());
 
-			model.addAttribute("classRoomList", classRoomService.getAllClassRoomList());
+            return renderClassroomPage(model, page);
+        }
+    }
 
-			return "redirect:/classRoom";
-		}
-	}
+    private void prepareClassroomPage(ModelMap model, int page) {
+        int pageSize = 10;
+
+        List<Classroom> classrooms = classroomService.getClassrooms(page, pageSize);
+
+        long totalQuestions = classroomService.countClassrooms();
+
+        int totalPages = (int) Math.ceil((double) totalQuestions / pageSize);
+
+        model.addAttribute("classrooms", classrooms);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+    }
+
+    private String renderClassroomPage(ModelMap model, int page) {
+
+        prepareClassroomPage(model, page);
+
+        return INDEX_VIEW;
+    }
 }

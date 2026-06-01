@@ -24,8 +24,9 @@ request.setAttribute("pageTitle", "Student Management");
 	<div class="border rounded-3 bg-white p-4 mb-4">
 
 		<form:form id="studentForm" method="post"
-			action="${pageContext.request.contextPath}/students/add"
+			action="${pageContext.request.contextPath}/student/add"
 			modelAttribute="studentDTO">
+			<input type="hidden" name="page" value="${currentPage}" />
 
 			<div class="row g-3">
 
@@ -104,13 +105,13 @@ request.setAttribute("pageTitle", "Student Management");
 			<div class="d-flex gap-2 mt-4">
 
 				<button type="submit" class="btn btn-dark px-4"
-					onclick="submitForm('add')">Add</button>
+					onclick="submitForm('/student/add')">Add</button>
 
 				<button type="submit" class="btn btn-outline-secondary px-4"
-					onclick="submitForm('update')">Update</button>
+					onclick="submitForm('/student/update')">Update</button>
 
 				<button type="submit" class="btn btn-outline-danger px-4"
-					onclick="submitForm('delete')">Delete</button>
+					onclick="submitForm('/student/delete')">Delete</button>
 
 				<button type="button" class="btn btn-outline-dark"
 					onclick="resetForm()">Reset</button>
@@ -186,6 +187,36 @@ request.setAttribute("pageTitle", "Student Management");
 
 		</div>
 
+		<div class="pagination-wrapper">
+			<c:if test="${currentPage > 1}">
+				<a class="pagination-item" href="student?page=1"> First </a>
+				<a class="pagination-item" href="student?page=${currentPage - 1}">
+					&laquo; </a>
+			</c:if>
+
+			<c:if test="${currentPage > 3}">
+				<span class="pagination-ellipsis">...</span>
+			</c:if>
+
+			<c:forEach begin="${currentPage - 2 < 1 ? 1 : currentPage - 2}"
+				end="${currentPage + 2 > totalPages ? totalPages : currentPage + 2}"
+				var="i">
+				<a href="student?page=${i}"
+					class="pagination-item ${currentPage == i ? 'active' : ''}">
+					${i} </a>
+			</c:forEach>
+
+			<c:if test="${currentPage < totalPages - 2}">
+				<span class="pagination-ellipsis">...</span>
+			</c:if>
+
+			<c:if test="${currentPage < totalPages}">
+				<a class="pagination-item" href="student?page=${currentPage + 1}">
+					&raquo; </a>
+				<a class="pagination-item" href="student?page=${totalPages}">
+					Last </a>
+			</c:if>
+		</div>
 	</div>
 
 </div>
@@ -236,7 +267,7 @@ request.setAttribute("pageTitle", "Student Management");
         const form = document.getElementById("studentForm");
 
         form.action =
-            "${pageContext.request.contextPath}/students/" + action;
+            "${pageContext.request.contextPath}" + action;
     }
 
     function resetForm() {

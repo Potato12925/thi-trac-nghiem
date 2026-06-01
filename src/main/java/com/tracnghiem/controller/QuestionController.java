@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.tracnghiem.dto.QuestionDTO;
 import com.tracnghiem.entity.Question;
@@ -20,96 +21,96 @@ import com.tracnghiem.service.QuestionService;
 @RequestMapping("/questions")
 public class QuestionController {
 
-	@Autowired
-	private QuestionService questionService;
+    private static final String INDEX_VIEW = "Question/Index";
+    private static final String REDIRECT_INDEX = "redirect:/questions";
 
-	@GetMapping
-	public String showQuestionPage(ModelMap model) {
+    @Autowired
+    private QuestionService questionService;
 
-		prepareQuestionPage(model);
+    @GetMapping
+    public String showQuestionPage(@RequestParam(defaultValue = "1") int page, ModelMap model) {
+        prepareQuestionPage(model, page);
 
-		model.addAttribute("questionDTO", new QuestionDTO());
+        model.addAttribute("questionDTO", new QuestionDTO());
 
-		return "Question/Index";
-	}
+        return INDEX_VIEW;
+    }
 
-	@PostMapping("/add")
-	public String createQuestion(@Validated @ModelAttribute("questionDTO") QuestionDTO questionForm,
-			BindingResult validationResult, ModelMap model) {
+    @PostMapping("/add")
+    public String createQuestion(@RequestParam(defaultValue = "1") int page, @Validated @ModelAttribute("questionDTO") QuestionDTO questionForm,
+            BindingResult validationResult, ModelMap model) {
 
-		if (validationResult.hasErrors()) {
-			return renderQuestionPage(model);
-		}
+        if (validationResult.hasErrors()) {
+            return renderQuestionPage(model, page);
+        }
 
-		try {
+        try {
 
-			questionService.addQuestion(questionForm);
+            questionService.addQuestion(questionForm);
+            return REDIRECT_INDEX;
 
-			return "redirect:/questions";
+        } catch (IllegalArgumentException exception) {
 
-		} catch (IllegalArgumentException exception) {
+            model.addAttribute("errorMessage", exception.getMessage());
 
-			model.addAttribute("errorMessage", exception.getMessage());
+            return renderQuestionPage(model, page);
+        }
+    }
 
-			return renderQuestionPage(model);
-		}
-	}
+    @PostMapping("/update")
+    public String editQuestion(@RequestParam(defaultValue = "1") int page, @Validated @ModelAttribute("questionDTO") QuestionDTO questionForm,
+            BindingResult validationResult, ModelMap model) {
 
-	@PostMapping("/update")
-	public String editQuestion(@Validated @ModelAttribute("questionDTO") QuestionDTO questionForm,
-			BindingResult validationResult, ModelMap model) {
+        if (validationResult.hasErrors()) {
+            return renderQuestionPage(model, page);
+        }
 
-		if (validationResult.hasErrors()) {
-			return renderQuestionPage(model);
-		}
+        try {
+            questionService.updateQuestion(questionForm);
+            return REDIRECT_INDEX;
 
-		try {
+        } catch (IllegalArgumentException exception) {
+            model.addAttribute("errorMessage", exception.getMessage());
+            return renderQuestionPage(model, page);
+        }
+    }
 
-			questionService.updateQuestion(questionForm);
+    @PostMapping("/delete")
+    public String removeQuestion(@RequestParam(defaultValue = "1") int page, @Validated @ModelAttribute("questionDTO") QuestionDTO questionForm,
+            BindingResult validationResult, ModelMap model) {
 
-			return "redirect:/questions";
+        if (validationResult.hasErrors()) {
+            return renderQuestionPage(model, page);
+        }
 
-		} catch (IllegalArgumentException exception) {
+        try {
+            questionService.deleteQuestion(questionForm);
+            return REDIRECT_INDEX;
 
-			model.addAttribute("errorMessage", exception.getMessage());
+        } catch (IllegalArgumentException exception) {
+            model.addAttribute("errorMessage", exception.getMessage());
+            return renderQuestionPage(model, page);
+        }
+    }
 
-			return renderQuestionPage(model);
-		}
-	}
+    private void prepareQuestionPage(ModelMap model, int page) {
+        int pageSize = 10;
 
-	@PostMapping("/delete")
-	public String removeQuestion(@Validated @ModelAttribute("questionDTO") QuestionDTO questionForm,
-			BindingResult validationResult, ModelMap model) {
+        List<Question> questions = questionService.getQuestions(page, pageSize);
 
-		if (validationResult.hasErrors()) {
-			return renderQuestionPage(model);
-		}
+        long totalQuestions = questionService.countQuestion();
 
-		try {
+        int totalPages = (int) Math.ceil((double) totalQuestions / pageSize);
 
-			questionService.deleteQuestion(questionForm);
+        model.addAttribute("questions", questions);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+    }
 
-			return "redirect:/questions";
+    private String renderQuestionPage(ModelMap model, int page) {
 
-		} catch (IllegalArgumentException exception) {
+        prepareQuestionPage(model, page);
 
-			model.addAttribute("errorMessage", exception.getMessage());
-
-			return renderQuestionPage(model);
-		}
-	}
-
-	private void prepareQuestionPage(ModelMap model) {
-
-		List<Question> questions = questionService.getAllQuestions();
-
-		model.addAttribute("questions", questions);
-	}
-
-	private String renderQuestionPage(ModelMap model) {
-
-		prepareQuestionPage(model);
-
-		return "Question/Index";
-	}
+        return INDEX_VIEW;
+    }
 }

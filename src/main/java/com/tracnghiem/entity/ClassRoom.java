@@ -10,7 +10,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "LOP")
-public class ClassRoom {
+public class Classroom {
 
 	@Id
 	@Column(name = "MALOP", length = 15)
@@ -22,11 +22,11 @@ public class ClassRoom {
 	@OneToMany(mappedBy = "classRoom")
 	private List<Student> students;
 
-	public ClassRoom() {
+	public Classroom() {
 		super();
 	}
 
-	public ClassRoom(String classId, String className, List<Student> students) {
+	public Classroom(String classId, String className, List<Student> students) {
 		super();
 		this.classId = classId;
 		this.className = className;

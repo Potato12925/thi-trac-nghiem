@@ -36,7 +36,7 @@ public class Student {
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "MALOP", nullable = false)
-	private ClassRoom classRoom;
+	private Classroom classRoom;
 
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "MASV", referencedColumnName = "MA", insertable = false, updatable = false)
@@ -85,11 +85,11 @@ public class Student {
 		this.address = address;
 	}
 
-	public ClassRoom getClassRoom() {
+	public Classroom getClassRoom() {
 		return classRoom;
 	}
 
-	public void setClassRoom(ClassRoom classRoom) {
+	public void setClassRoom(Classroom classRoom) {
 		this.classRoom = classRoom;
 	}
 
