@@ -32,6 +32,9 @@ public class Exam {
     @JoinColumn(name = "MAMH")
     private Subject subject;
 
+    @Column(name = "MALOP")
+    private String classId;
+
     @Column(name = "LAN")
     private Short tryNumber;
 
@@ -78,6 +81,14 @@ public class Exam {
 
     public void setSubject(Subject subject) {
         this.subject = subject;
+    }
+
+    public String getClassId() {
+        return classId;
+    }
+
+    public void setClassId(String classId) {
+        this.classId = classId;
     }
 
     public Short getAttempt() {

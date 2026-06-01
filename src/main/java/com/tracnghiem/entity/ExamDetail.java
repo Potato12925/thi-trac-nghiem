@@ -1,48 +1,46 @@
 package com.tracnghiem.entity;
 
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.MapsId;
 import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+
+import com.tracnghiem.entity.id.ExamDetailId;
 
 @Entity
-@Table(
-    name = "CHITIETBAITHI",
-    uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "BAITHI_ID", "CAUHOI" })
-    }
-)
+@Table(name = "CHITIETBAITHI")
 public class ExamDetail {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID")
-    private Integer id;
+    @EmbeddedId
+    private ExamDetailId id;
 
     @ManyToOne
+    @MapsId("examId")
     @JoinColumn(name = "BAITHI_ID")
     private Exam exam;
 
     @ManyToOne
+    @MapsId("questionId")
     @JoinColumn(name = "CAUHOI")
     private Question question;
 
     @Column(name = "DAPAN_SV")
     private String studentAnswer;
 
+    @Column(name = "THUTU")
+    private Integer questionOrder;
+
     public ExamDetail() {
     }
 
-    public Integer getId() {
+    public ExamDetailId getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(ExamDetailId id) {
         this.id = id;
     }
 
@@ -68,5 +66,13 @@ public class ExamDetail {
 
     public void setStudentAnswer(String studentAnswer) {
         this.studentAnswer = studentAnswer;
+    }
+
+    public Integer getQuestionOrder() {
+        return questionOrder;
+    }
+
+    public void setQuestionOrder(Integer questionOrder) {
+        this.questionOrder = questionOrder;
     }
 }

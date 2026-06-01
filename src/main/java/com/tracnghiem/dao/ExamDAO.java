@@ -1,5 +1,7 @@
 package com.tracnghiem.dao;
 
+import org.hibernate.Session;
+import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 
 import com.tracnghiem.entity.Exam;
@@ -7,4 +9,16 @@ import com.tracnghiem.entity.Exam;
 @Repository
 public class ExamDAO extends GenericDAO<Exam> {
 
+    public Exam findExam(String studentId, String subjectId, Short tryNumber) {
+        Session session = getSession();
+        Query<Exam> query = session.createQuery(
+                "FROM Exam e WHERE e.student.studentId = :studentId " +
+                "AND e.subject.subjectId = :subjectId " +
+                "AND e.tryNumber = :tryNumber", Exam.class);
+        query.setParameter("studentId", studentId);
+        query.setParameter("subjectId", subjectId);
+        query.setParameter("tryNumber", tryNumber);
+        
+        return query.uniqueResult();
+    }
 }

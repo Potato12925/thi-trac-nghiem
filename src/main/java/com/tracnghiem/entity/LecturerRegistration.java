@@ -26,12 +26,12 @@ public class LecturerRegistration {
     private LecturerRegistrationId id;
 
     @ManyToOne
-    @MapsId("maLop")
+    @MapsId("classId")
     @JoinColumn(name = "MALOP")
     private ClassRoom classRoom;
 
     @ManyToOne
-    @MapsId("maMH")
+    @MapsId("subjectId")
     @JoinColumn(name = "MAMH")
     private Subject subject;
 
