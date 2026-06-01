@@ -13,12 +13,21 @@ public class ExamDAO extends GenericDAO<Exam> {
         Session session = getSession();
         Query<Exam> query = session.createQuery(
                 "FROM Exam e WHERE e.student.studentId = :studentId " +
-                "AND e.subject.subjectId = :subjectId " +
-                "AND e.tryNumber = :tryNumber", Exam.class);
+                        "AND e.subject.subjectId = :subjectId " +
+                        "AND e.tryNumber = :tryNumber",
+                Exam.class);
         query.setParameter("studentId", studentId);
         query.setParameter("subjectId", subjectId);
         query.setParameter("tryNumber", tryNumber);
-        
+
         return query.uniqueResult();
+    }
+
+    public java.util.List<Exam> findByStudent(String studentId) {
+        Session session = getSession();
+        Query<Exam> query = session.createQuery(
+                "FROM Exam e WHERE e.student.studentId = :studentId ORDER BY e.examDate DESC", Exam.class);
+        query.setParameter("studentId", studentId);
+        return query.list();
     }
 }
