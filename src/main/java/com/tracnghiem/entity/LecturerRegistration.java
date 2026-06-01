@@ -28,7 +28,7 @@ public class LecturerRegistration {
     @ManyToOne
     @MapsId("maLop")
     @JoinColumn(name = "MALOP")
-    private ClassRoom classRoom;
+    private Classroom classRoom;
 
     @ManyToOne
     @MapsId("maMH")
@@ -83,11 +83,11 @@ public class LecturerRegistration {
         this.id = id;
     }
 
-    public ClassRoom getClassRoom() {
+    public Classroom getClassRoom() {
         return classRoom;
     }
 
-    public void setClassRoom(ClassRoom classRoom) {
+    public void setClassRoom(Classroom classRoom) {
         this.classRoom = classRoom;
     }
 

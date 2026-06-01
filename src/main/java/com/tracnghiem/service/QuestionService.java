@@ -50,14 +50,14 @@ public class QuestionService {
 
     public List<Question> getQuestions(int page, int pageSize) {
 
-        return questionDAO.getQuestions(page, pageSize);
+        return questionDAO.getPagination(page, pageSize);
     }
 
     public long countQuestion() {
-        return questionDAO.countQuestions();
+        return questionDAO.count();
     }
 
-    private void validateExitsQuestion(Integer questionId) {
+    private void ensureQuestionNotExists(Integer questionId) {
 
         if (questionDAO.existsById(questionId)) {
 
@@ -66,7 +66,7 @@ public class QuestionService {
     }
 
     public void addQuestion(QuestionDTO dto) {
-        validateExitsQuestion(dto.getQuestionId());
+        ensureQuestionNotExists(dto.getQuestionId());
 
         Question question = mapToEntity(dto);
 

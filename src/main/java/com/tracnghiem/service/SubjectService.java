@@ -12,61 +12,69 @@ import com.tracnghiem.entity.Subject;
 @Service
 public class SubjectService {
 
-	@Autowired
-	private SubjectDAO subjectDAO;
+    @Autowired
+    private SubjectDAO subjectDAO;
 
-	private Subject mapToEntity(SubjectDTO dto) {
-		Subject subject = new Subject();
+    private Subject mapToEntity(SubjectDTO dto) {
+        Subject subject = new Subject();
 
-		subject.setSubjectId(dto.getSubjectId());
-		subject.setSubjectName(dto.getSubjectName());
+        subject.setSubjectId(dto.getSubjectId());
+        subject.setSubjectName(dto.getSubjectName());
 
-		return subject;
-	}
+        return subject;
+    }
 
-	public List<Subject> getAllSubjects() {
-		return subjectDAO.findAll();
-	}
+    public List<Subject> getAllSubjects() {
+        return subjectDAO.findAll();
+    }
 
-	public Subject getSubjectById(String subjectId) {
-		return subjectDAO.findById(subjectId);
-	}
+    public List<Subject> getSubjects(int page, int pageSize) {
+        return subjectDAO.getPagination(page, pageSize);
+    }
 
-	private void ensureSubjectNotExists(String subjectId) {
+    public long countSubjects() {
+        return subjectDAO.count();
+    }
 
-		if (subjectDAO.existsById(subjectId)) {
-			throw new IllegalArgumentException("Mã môn học đã tồn tại");
-		}
-	}
+    public Subject getSubjectById(String subjectId) {
+        return subjectDAO.findById(subjectId);
+    }
 
-	private void ensureSubjectExists(String subjectId) {
+    private void ensureSubjectNotExists(String subjectId) {
 
-		if (!subjectDAO.existsById(subjectId)) {
-			throw new IllegalArgumentException("Môn học không tồn tại");
-		}
-	}
+        if (subjectDAO.existsById(subjectId)) {
+            throw new IllegalArgumentException("Mã môn học đã tồn tại");
+        }
+    }
 
-	public void addSubject(SubjectDTO dto) {
-		ensureSubjectNotExists(dto.getSubjectId());
+    private void ensureSubjectExists(String subjectId) {
 
-		Subject subject = mapToEntity(dto);
+        if (!subjectDAO.existsById(subjectId)) {
+            throw new IllegalArgumentException("Môn học không tồn tại");
+        }
+    }
 
-		subjectDAO.create(subject);
-	}
+    public void addSubject(SubjectDTO dto) {
+        ensureSubjectNotExists(dto.getSubjectId());
 
-	public void updateSubject(SubjectDTO dto) {
-		ensureSubjectExists(dto.getSubjectId());
+        Subject subject = mapToEntity(dto);
 
-		Subject subject = mapToEntity(dto);
+        subjectDAO.create(subject);
+    }
 
-		subjectDAO.update(subject);
-	}
+    public void updateSubject(SubjectDTO dto) {
+        ensureSubjectExists(dto.getSubjectId());
 
-	public void deleteSubject(SubjectDTO dto) {
-		ensureSubjectExists(dto.getSubjectId());
+        Subject subject = mapToEntity(dto);
 
-		Subject subject = mapToEntity(dto);
+        subjectDAO.update(subject);
+    }
 
-		subjectDAO.delete(subject);
-	}
+    public void deleteSubject(SubjectDTO dto) {
+        ensureSubjectExists(dto.getSubjectId());
+
+        Subject subject = mapToEntity(dto);
+
+        subjectDAO.delete(subject);
+    }
 }

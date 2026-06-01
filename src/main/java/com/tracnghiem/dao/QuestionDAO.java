@@ -14,20 +14,6 @@ public class QuestionDAO extends GenericDAO<Question> {
         return findById(questionId) != null;
     }
 
-    public List<Question> getQuestions(int page, int pageSize) {
-        String hql = "FROM Question";
-
-        int offset = (page - 1) * pageSize;
-
-        return getSession().createQuery(hql, Question.class).setFirstResult(offset).setMaxResults(pageSize)
-                .getResultList();
-    }
-
-    public long countQuestions() {
-        String hql = "SELECT COUNT(q) FROM Question q";
-        return getSession().createQuery(hql, Long.class).uniqueResult();
-    }
-
     public long countAvailableQuestions(String maMh, String trinhDo) {
         String hql = "SELECT COUNT(b) FROM Question b WHERE b.subject.subjectId = :maMh AND b.level = :trinhDo";
         return getSession().createQuery(hql, Long.class).setParameter("maMh", maMh).setParameter("trinhDo", trinhDo)

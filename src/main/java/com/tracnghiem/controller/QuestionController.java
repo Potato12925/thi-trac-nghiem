@@ -21,6 +21,9 @@ import com.tracnghiem.service.QuestionService;
 @RequestMapping("/questions")
 public class QuestionController {
 
+    private static final String INDEX_VIEW = "Question/Index";
+    private static final String REDIRECT_INDEX = "redirect:/questions";
+
     @Autowired
     private QuestionService questionService;
 
@@ -30,7 +33,7 @@ public class QuestionController {
 
         model.addAttribute("questionDTO", new QuestionDTO());
 
-        return "Question/Index";
+        return INDEX_VIEW;
     }
 
     @PostMapping("/add")
@@ -44,8 +47,7 @@ public class QuestionController {
         try {
 
             questionService.addQuestion(questionForm);
-
-            return "redirect:/questions";
+            return REDIRECT_INDEX;
 
         } catch (IllegalArgumentException exception) {
 
@@ -64,15 +66,11 @@ public class QuestionController {
         }
 
         try {
-
             questionService.updateQuestion(questionForm);
-
-            return "redirect:/questions";
+            return REDIRECT_INDEX;
 
         } catch (IllegalArgumentException exception) {
-
             model.addAttribute("errorMessage", exception.getMessage());
-
             return renderQuestionPage(model, page);
         }
     }
@@ -86,15 +84,11 @@ public class QuestionController {
         }
 
         try {
-
             questionService.deleteQuestion(questionForm);
-
-            return "redirect:/questions";
+            return REDIRECT_INDEX;
 
         } catch (IllegalArgumentException exception) {
-
             model.addAttribute("errorMessage", exception.getMessage());
-
             return renderQuestionPage(model, page);
         }
     }
@@ -117,6 +111,6 @@ public class QuestionController {
 
         prepareQuestionPage(model, page);
 
-        return "Question/Index";
+        return INDEX_VIEW;
     }
 }

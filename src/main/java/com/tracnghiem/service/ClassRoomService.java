@@ -2,62 +2,70 @@ package com.tracnghiem.service;
 
 import java.util.List;
 
-import javax.transaction.Transactional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.tracnghiem.dao.ClassRoomDAO;
-import com.tracnghiem.dto.ClassRoomDTO;
-import com.tracnghiem.entity.ClassRoom;
+import com.tracnghiem.dao.ClassroomDAO;
+import com.tracnghiem.dto.ClassroomDTO;
+import com.tracnghiem.entity.Classroom;
 
 @Service
-public class ClassRoomService {
-	@Autowired
-	ClassRoomDAO classRoomDAO;
+public class ClassroomService {
 
-	public ClassRoom timLopTheoMa(String maLop) {
-		return classRoomDAO.findById(maLop);
-	}
+    @Autowired
+    private ClassroomDAO classroomDAO;
 
-	private ClassRoom chuyenDoiSangEntity(ClassRoomDTO dto) {
-		ClassRoom classRoom = new ClassRoom();
+    public Classroom findClassroomById(String classId) {
+        return classroomDAO.findById(classId);
+    }
 
-		classRoom.setClassId(dto.getClassId());
-		classRoom.setClassName(dto.getClassName());
+    private Classroom convertToEntity(ClassroomDTO dto) {
+        Classroom classRoom = new Classroom();
 
-		return classRoom;
-	}
+        classRoom.setClassId(dto.getClassId());
+        classRoom.setClassName(dto.getClassName());
 
-	public List<ClassRoom> getAllClassRoomList() {
-		return classRoomDAO.findAll();
-	}
+        return classRoom;
+    }
 
-	private void validateExitsClassRoom(String maLop) {
+    public List<Classroom> getAllClassrooms() {
+        return classroomDAO.findAll();
+    }
 
-		if (classRoomDAO.existsById(maLop)) {
+    public List<Classroom> getClassrooms(int page, int pageSize) {
 
-			throw new IllegalArgumentException("Mã lớp đã tồn tại");
-		}
-	}
+        return classroomDAO.getPagination(page, pageSize);
+    }
 
-	public void addClassRoom(ClassRoomDTO dto) {
-		validateExitsClassRoom(dto.getClassId());
+    public long countClassrooms() {
+        return classroomDAO.count();
+    }
 
-		ClassRoom classRoom = chuyenDoiSangEntity(dto);
+    private void ensureClassroomNotExists(String classId) {
 
-		classRoomDAO.create(classRoom);
-	}
+        if (classroomDAO.existsById(classId)) {
 
-	public void updateClassRoom(ClassRoomDTO dto) {
-		ClassRoom classRoom = chuyenDoiSangEntity(dto);
+            throw new IllegalArgumentException("Mã lớp đã tồn tại");
+        }
+    }
 
-		classRoomDAO.update(classRoom);
-	}
+    public void addClassroom(ClassroomDTO dto) {
+        ensureClassroomNotExists(dto.getClassId());
 
-	public void deleteClassRoom(ClassRoomDTO dto) {
-		ClassRoom classRoom = chuyenDoiSangEntity(dto);
+        Classroom classRoom = convertToEntity(dto);
 
-		classRoomDAO.delete(classRoom);
-	}
+        classroomDAO.create(classRoom);
+    }
+
+    public void updateClassroom(ClassroomDTO dto) {
+        Classroom classRoom = convertToEntity(dto);
+
+        classroomDAO.update(classRoom);
+    }
+
+    public void deleteClassroom(ClassroomDTO dto) {
+        Classroom classRoom = convertToEntity(dto);
+
+        classroomDAO.delete(classRoom);
+    }
 }
