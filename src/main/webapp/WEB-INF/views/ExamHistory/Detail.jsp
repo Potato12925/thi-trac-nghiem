@@ -11,9 +11,18 @@
     <!-- Back Button & Header -->
     <div class="mb-4 d-flex justify-content-between align-items-center">
         <div>
-            <a href="${pageContext.request.contextPath}/history" class="btn btn-outline-secondary btn-sm rounded-2 px-3 mb-2 d-inline-flex align-items-center gap-1">
-                <i class="bi bi-arrow-left"></i> Quay lại lịch sử thi
-            </a>
+            <c:choose>
+                <c:when test="${sessionScope.ROLE eq 'SINHVIEN'}">
+                    <a href="${pageContext.request.contextPath}/history" class="btn btn-outline-secondary btn-sm rounded-2 px-3 mb-2 d-inline-flex align-items-center gap-1">
+                        <i class="bi bi-arrow-left"></i> Quay lại lịch sử thi
+                    </a>
+                </c:when>
+                <c:otherwise>
+                    <a href="${pageContext.request.contextPath}/scores?classId=${exam.classId}&subjectId=${exam.subject.subjectId}&tryNumber=${exam.attempt}" class="btn btn-outline-secondary btn-sm rounded-2 px-3 mb-2 d-inline-flex align-items-center gap-1">
+                        <i class="bi bi-arrow-left"></i> Quay lại bảng điểm
+                    </a>
+                </c:otherwise>
+            </c:choose>
             <h1 class="h3 mb-0 text-dark fw-bold">Chi Tiết Kết Quả Bài Thi</h1>
         </div>
     </div>

@@ -42,25 +42,23 @@ public class ExamHistoryController {
     public String detail(@RequestParam("id") Integer examId, ModelMap model, HttpSession session,
             RedirectAttributes redirectAttributes) {
         String role = (String) session.getAttribute("ROLE");
-        if (!"SINHVIEN".equals(role)) {
-            return "redirect:/auth/login";
-        }
-
-        String studentId = (String) session.getAttribute("LOGIN_USER");
-        if (studentId == null) {
+        if (role == null || (!"SINHVIEN".equals(role) && !"GIAOVIEN".equals(role) && !"PGV".equals(role))) {
             return "redirect:/auth/login";
         }
 
         Exam exam = examHistoryService.getExamDetail(examId);
         if (exam == null) {
             redirectAttributes.addFlashAttribute("error", "Không tìm thấy bài thi.");
-            return "redirect:/history";
+            return "SINHVIEN".equals(role) ? "redirect:/history" : "redirect:/scores";
         }
 
-        // Security check: Ensure this exam belongs to the logged-in student
-        if (exam.getStudent() == null || !exam.getStudent().getStudentId().trim().equals(studentId.trim())) {
-            redirectAttributes.addFlashAttribute("error", "Bạn không có quyền xem chi tiết bài thi này.");
-            return "redirect:/history";
+        // Security check: Ensure this exam belongs to the logged-in student (only for SINHVIEN role)
+        if ("SINHVIEN".equals(role)) {
+            String studentId = (String) session.getAttribute("LOGIN_USER");
+            if (studentId == null || exam.getStudent() == null || !exam.getStudent().getStudentId().trim().equals(studentId.trim())) {
+                redirectAttributes.addFlashAttribute("error", "Bạn không có quyền xem chi tiết bài thi này.");
+                return "redirect:/history";
+            }
         }
 
         // Calculate total and correct answers

@@ -10,7 +10,7 @@ import com.tracnghiem.entity.Classroom;
 public class ClassroomDAO extends GenericDAO<Classroom> {
 
 	public List<Classroom> findByKeyword(String keyword) {
-		String hql = "FROM ClassRoom c WHERE c.classRoomId LIKE :keyword OR c.className LIKE :keyword";
+		String hql = "FROM Classroom c WHERE c.classId LIKE :keyword OR c.className LIKE :keyword";
 		return getSession().createQuery(hql, Classroom.class).setParameter("keyword", '%' + keyword + '%').list();
 	}
 
