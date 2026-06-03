@@ -11,188 +11,6 @@ request.setAttribute("pageTitle", "Question Management");
 
 <%@ include file="../Shared/_LayoutStart.jsp"%>
 
-<style>
-.page-wrapper {
-	padding: 32px;
-	background-color: #f5f5f5;
-	min-height: 100vh;
-}
-
-.page-title-section {
-	margin-bottom: 24px;
-}
-
-.page-title-section h1 {
-	font-weight: 700;
-	letter-spacing: -0.5px;
-	color: #111;
-}
-
-.form-section {
-	padding: 28px;
-	border-radius: 20px;
-	border: 1px solid #e5e5e5;
-	transition: all 0.25s ease;
-}
-
-.form-section:hover {
-	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
-}
-
-.form-label {
-	font-weight: 600;
-	margin-bottom: 8px;
-	font-size: 13px;
-	letter-spacing: 0.3px;
-}
-
-.form-control, .form-select {
-	height: 48px;
-	border-radius: 12px;
-	border: 1px solid #dcdcdc;
-	padding: 0 14px;
-	font-size: 14px;
-	transition: all 0.2s ease;
-	box-shadow: none !important;
-}
-
-textarea.form-control {
-	height: auto;
-	padding-top: 12px;
-}
-
-.form-control:focus, .form-select:focus {
-	border-color: #111;
-	box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.08) !important;
-}
-
-.form-actions {
-	margin-top: 32px;
-	padding-top: 24px;
-	border-top: 1px solid #ededed;
-}
-
-.btn {
-	height: 46px;
-	padding: 0 24px;
-	border-radius: 12px;
-	font-weight: 600;
-	font-size: 14px;
-	transition: all 0.2s ease;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-}
-
-.btn:hover {
-	transform: translateY(-1px);
-}
-
-.btn-dark {
-	background-color: #111;
-	border-color: #111;
-}
-
-.btn-dark:hover {
-	background-color: #000;
-	border-color: #000;
-}
-
-.btn-outline-secondary:hover, .btn-outline-danger:hover,
-	.btn-outline-dark:hover {
-	transform: translateY(-1px);
-}
-
-.question-table-card {
-	border-radius: 20px;
-	overflow: hidden;
-	border: 1px solid #e8e8e8;
-}
-
-.question-table-wrapper {
-	max-height: 650px;
-	overflow: auto;
-}
-
-.question-table {
-	margin: 0;
-	font-size: 14px;
-}
-
-.question-table thead th {
-	position: sticky;
-	top: 0;
-	z-index: 2;
-	background: #fafafa;
-	font-size: 13px;
-	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 0.5px;
-	padding: 18px 16px;
-	border-bottom: 1px solid #e5e5e5;
-	color: #555;
-	white-space: nowrap;
-}
-
-.question-table tbody td {
-	padding: 18px 16px;
-	vertical-align: middle;
-	border-color: #f1f1f1;
-	color: #222;
-}
-
-.question-table tbody tr {
-	transition: all 0.15s ease;
-}
-
-.question-table tbody tr:hover {
-	background-color: #fafafa;
-}
-
-.btn-edit-question {
-	width: 38px;
-	height: 38px;
-	border-radius: 10px;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	transition: all 0.2s ease;
-}
-
-.btn-edit-question:hover {
-	background-color: #111;
-	color: white;
-	border-color: #111;
-	transform: scale(1.05);
-}
-
-.alert {
-	border-radius: 14px;
-	padding: 14px 18px;
-	font-size: 14px;
-	border: none;
-}
-
-.text-danger.small {
-	font-size: 12px !important;
-	margin-top: 6px !important;
-}
-
-@media ( max-width : 768px) {
-	.page-wrapper {
-		padding: 18px;
-	}
-	.form-section {
-		padding: 20px;
-	}
-	.question-table {
-		font-size: 13px;
-	}
-	.question-table thead th, .question-table tbody td {
-		padding: 14px 12px;
-	}
-}
-</style>
 
 <div class="container-fluid page-wrapper">
 
@@ -435,86 +253,43 @@ textarea.form-control {
 				</tbody>
 			</table>
 		</div>
+
+		<div class="pagination-wrapper">
+			<c:if test="${currentPage > 1}">
+				<a class="pagination-item" href="questions?page=1"> First </a>
+
+				<a class="pagination-item" href="questions?page=${currentPage - 1}">
+					&laquo; </a>
+			</c:if>
+
+			<c:if test="${currentPage > 3}">
+				<span class="pagination-ellipsis">...</span>
+			</c:if>
+
+			<c:forEach begin="${currentPage - 2 < 1 ? 1 : currentPage - 2}"
+				end="${currentPage + 2 > totalPages ? totalPages : currentPage + 2}"
+				var="i">
+				<a href="questions?page=${i}"
+					class="pagination-item ${currentPage == i ? 'active' : ''}">
+					${i} </a>
+			</c:forEach>
+
+			<c:if test="${currentPage < totalPages - 2}">
+				<span class="pagination-ellipsis">...</span>
+			</c:if>
+
+			<c:if test="${currentPage < totalPages}">
+				<a class="pagination-item" href="questions?page=${currentPage + 1}">
+					&raquo; </a>
+
+				<a class="pagination-item" href="questions?page=${totalPages}">
+					Last </a>
+			</c:if>
+		</div>
 	</div>
 </div>
 
-<script>
-
-	function populateQuestionForm(tableRow) {
-
-		const tableCells =
-			tableRow.querySelectorAll("td");
-
-		document.getElementById("questionId").value =
-			tableCells[0].innerText.trim();
-
-		document.getElementById("subjectId").value =
-			tableCells[1].innerText.trim();
-
-		document.getElementById("level").value =
-			tableCells[2].innerText.trim();
-
-		document.getElementById("content").value =
-			tableCells[3].innerText.trim();
-
-		document.getElementById("optionA").value =
-			tableCells[4].innerText.trim();
-
-		document.getElementById("optionB").value =
-			tableCells[5].innerText.trim();
-
-		document.getElementById("optionC").value =
-			tableCells[6].innerText.trim();
-
-		document.getElementById("optionD").value =
-			tableCells[7].innerText.trim();
-
-		document.getElementById("correctAnswer").value =
-			tableCells[8].innerText.trim();
-
-		document.getElementById("lecturerId").value =
-			tableCells[9].innerText.trim();
-
-		document.getElementById("questionId").readOnly =
-			true;
-	}
-
-	document
-		.querySelectorAll(".btn-edit-question")
-		.forEach(button => {
-
-			button.addEventListener("click", function () {
-
-				const selectedRow =
-					this.closest("tr");
-
-				populateQuestionForm(selectedRow);
-
-			});
-
-		});
-
-	function configureFormAction(actionPath) {
-
-		const questionForm =
-			document.getElementById("questionForm");
-
-		questionForm.action =
-			"${pageContext.request.contextPath}/questions/"
-			+ actionPath;
-	}
-
-	function clearQuestionForm() {
-
-		document
-			.getElementById("questionForm")
-			.reset();
-
-		document
-			.getElementById("questionId")
-			.readOnly = false;
-	}
-
-</script>
+<script
+	src="${pageContext.request.contextPath}/assets/js/question-management.js"></script>
 
 <%@ include file="../Shared/_LayoutEnd.jsp"%>

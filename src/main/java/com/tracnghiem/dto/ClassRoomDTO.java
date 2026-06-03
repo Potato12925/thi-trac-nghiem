@@ -2,7 +2,7 @@ package com.tracnghiem.dto;
 
 import javax.validation.constraints.NotBlank;
 
-public class ClassRoomDTO {
+public class ClassroomDTO {
 
 	@NotBlank(message = "Mã lớp không được để trống")
 	private String classId;
@@ -10,11 +10,11 @@ public class ClassRoomDTO {
 	@NotBlank(message = "Tên lớp không được để trống")
 	private String className;
 
-	public ClassRoomDTO() {
+	public ClassroomDTO() {
 		super();
 	}
 
-	public ClassRoomDTO(
+	public ClassroomDTO(
 			@NotBlank(message = "Mã lớp không được để trống") String classId,
 			@NotBlank(message = "Tên lớp không được để trống") String className) {
 		super();

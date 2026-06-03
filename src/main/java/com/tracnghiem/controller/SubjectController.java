@@ -8,6 +8,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.tracnghiem.dto.SubjectDTO;
@@ -17,60 +18,85 @@ import com.tracnghiem.service.SubjectService;
 @RequestMapping("/subjects")
 public class SubjectController {
 
-	@Autowired
-	private SubjectService subjectService;
+    private static final String INDEX_VIEW = "Subject/Index";
+    private static final String REDIRECT_INDEX = "redirect:/subjects";
 
-	private void loadPageData(ModelMap model) {
-		model.addAttribute("subjects", subjectService.getAllSubjects());
-		model.addAttribute("subjectDTO", new SubjectDTO());
-	}
+    @Autowired
+    private SubjectService subjectService;
 
-	@GetMapping
-	public String index(ModelMap model) {
+    private void loadPageData(ModelMap model, int page) {
+        int pageSize = 10;
 
-		loadPageData(model);
+        model.addAttribute("subjects", subjectService.getSubjects(page, pageSize));
+        model.addAttribute("subjectDTO", new SubjectDTO());
 
-		return "Subject/Index";
-	}
+        long total = subjectService.countSubjects();
 
-	@PostMapping("/add")
-	public String add(@Validated @ModelAttribute("subject") SubjectDTO subjectDTO, BindingResult errors,
-			ModelMap model) {
+        int totalPages = (int) Math.ceil((double) total / pageSize);
 
-		if (errors.hasErrors()) {
-			loadPageData(model);
-			return "Subject/Index";
-		}
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+    }
 
-		subjectService.addSubject(subjectDTO);
+    @GetMapping
+    public String index(@RequestParam(defaultValue = "1") int page, ModelMap model) {
+        loadPageData(model, page);
+        return INDEX_VIEW;
+    }
 
-		return "redirect:/subjects";
-	}
+    @PostMapping("/add")
+    public String add(@RequestParam(defaultValue = "1") int page, @Validated @ModelAttribute("subject") SubjectDTO subjectDTO, BindingResult errors,
+            ModelMap model) {
 
-	@PostMapping("/update")
-	public String update(@Validated @ModelAttribute("subject") SubjectDTO subjectDTO, BindingResult errors,
-			ModelMap model) {
+        if (errors.hasErrors()) {
+            loadPageData(model, page);
+            return INDEX_VIEW;
+        }
 
-		if (errors.hasErrors()) {
-			loadPageData(model);
-			return "Subject/Index";
-		}
+        try {
+            subjectService.addSubject(subjectDTO);
+            return REDIRECT_INDEX;
+        } catch (IllegalArgumentException ex) {
+            model.addAttribute("errorMessage", ex.getMessage());
+            loadPageData(model, page);
+            return INDEX_VIEW;
+        }
+    }
 
-		subjectService.updateSubject(subjectDTO);
+    @PostMapping("/update")
+    public String update(@RequestParam(defaultValue = "1") int page, @Validated @ModelAttribute("subject") SubjectDTO subjectDTO, BindingResult errors,
+            ModelMap model) {
 
-		return "redirect:/subjects";
-	}
+        if (errors.hasErrors()) {
+            loadPageData(model, page);
+            return INDEX_VIEW;
+        }
 
-	@PostMapping("/delete")
-	public String delete(@ModelAttribute("subject") SubjectDTO subjectDTO, BindingResult errors, ModelMap model) {
+        try {
+            subjectService.updateSubject(subjectDTO);
+            return REDIRECT_INDEX;
+        } catch (IllegalArgumentException ex) {
+            model.addAttribute("errorMessage", ex.getMessage());
+            loadPageData(model, page);
+            return INDEX_VIEW;
+        }
+    }
 
-		if (errors.hasErrors()) {
-			loadPageData(model);
-			return "Subject/Index";
-		}
+    @PostMapping("/delete")
+    public String delete(@RequestParam(defaultValue = "1") int page, @ModelAttribute("subject") SubjectDTO subjectDTO, BindingResult errors, ModelMap model) {
 
-		subjectService.deleteSubject(subjectDTO);
+        if (errors.hasErrors()) {
+            loadPageData(model, page);
+            return INDEX_VIEW;
+        }
 
-		return "redirect:/subjects";
-	}
+        try {
+            subjectService.deleteSubject(subjectDTO);
+            return REDIRECT_INDEX;
+        } catch (IllegalArgumentException ex) {
+            model.addAttribute("errorMessage", ex.getMessage());
+            loadPageData(model, page);
+            return INDEX_VIEW;
+        }
+    }
 }

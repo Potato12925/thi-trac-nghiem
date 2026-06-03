@@ -18,11 +18,16 @@ request.setAttribute("pageTitle", "Quản lý Môn học");
 		<div class="alert alert-danger">${error}</div>
 	</c:if>
 
+	<c:if test="${not empty errorMessage}">
+		<div class="alert alert-danger">${errorMessage}</div>
+	</c:if>
+
 	<div class="border rounded-3 bg-white p-4 mb-4">
 
 		<form:form id="subjectForm"
 			action="${pageContext.request.contextPath}/subjects/add"
 			method="post" modelAttribute="subjectDTO">
+			<input type="hidden" name="page" value="${currentPage}" />
 
 			<div class="row g-3">
 				<div class="col-md-3">
@@ -88,6 +93,37 @@ request.setAttribute("pageTitle", "Quản lý Môn học");
 					</c:forEach>
 				</tbody>
 			</table>
+		</div>
+
+		<div class="pagination-wrapper">
+			<c:if test="${currentPage > 1}">
+				<a class="pagination-item" href="subjects?page=1"> First </a>
+				<a class="pagination-item" href="subjects?page=${currentPage - 1}">
+					&laquo; </a>
+			</c:if>
+
+			<c:if test="${currentPage > 3}">
+				<span class="pagination-ellipsis">...</span>
+			</c:if>
+
+			<c:forEach begin="${currentPage - 2 < 1 ? 1 : currentPage - 2}"
+				end="${currentPage + 2 > totalPages ? totalPages : currentPage + 2}"
+				var="i">
+				<a href="subjects?page=${i}"
+					class="pagination-item ${currentPage == i ? 'active' : ''}">
+					${i} </a>
+			</c:forEach>
+
+			<c:if test="${currentPage < totalPages - 2}">
+				<span class="pagination-ellipsis">...</span>
+			</c:if>
+
+			<c:if test="${currentPage < totalPages}">
+				<a class="pagination-item" href="subjects?page=${currentPage + 1}">
+					&raquo; </a>
+				<a class="pagination-item" href="subjects?page=${totalPages}">
+					Last </a>
+			</c:if>
 		</div>
 	</div>
 </div>

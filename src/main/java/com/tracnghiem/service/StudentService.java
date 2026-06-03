@@ -9,79 +9,87 @@ import org.springframework.stereotype.Service;
 
 import com.tracnghiem.dao.StudentDAO;
 import com.tracnghiem.dto.StudentDTO;
-import com.tracnghiem.entity.ClassRoom;
+import com.tracnghiem.entity.Classroom;
 import com.tracnghiem.entity.Student;
 
 @Service
 public class StudentService {
 
-	@Autowired
-	StudentDAO studentDAO;
+    @Autowired
+    StudentDAO studentDAO;
 
-	@Autowired
-	AuthService authService;
+    @Autowired
+    AuthService authService;
 
-	@Autowired
-	ClassRoomService classRoomService;
+    @Autowired
+    private ClassroomService classroomService;
 
-	private Student changeToEntity(StudentDTO dto) {
-		ClassRoom classRoom = classRoomService.timLopTheoMa(dto.getClassId());
+    private Student convertToEntity(StudentDTO dto) {
+        Classroom classRoom = classroomService.findClassroomById(dto.getClassId());
 
-		Student student = new Student();
-		student.setStudentId(dto.getStudentId());
-		student.setLastName(dto.getLastName());
-		student.setFirstName(dto.getFirstName());
-		student.setBirthDate(dto.getBirthDate());
-		student.setAddress(dto.getAddress());
-		student.setClassRoom(classRoom);
+        Student student = new Student();
+        student.setStudentId(dto.getStudentId());
+        student.setLastName(dto.getLastName());
+        student.setFirstName(dto.getFirstName());
+        student.setBirthDate(dto.getBirthDate());
+        student.setAddress(dto.getAddress());
+        student.setClassRoom(classRoom);
 
-		return student;
-	}
+        return student;
+    }
 
-	public List<Student> getAllStudents() {
-		return studentDAO.findAll();
-	}
+    public List<Student> getAllStudents() {
+        return studentDAO.findAll();
+    }
 
-	public Student getStudentById(String studentId) {
-		return studentDAO.findById(studentId);
-	}
+    public List<Student> getStudents(int page, int pageSize) {
+        return studentDAO.getPagination(page, pageSize);
+    }
 
-	public void addStudent(StudentDTO dto) {
-		Student student = changeToEntity(dto);
-		
-		studentDAO.create(student);
-	}
+    public long countStudents() {
+        return studentDAO.count();
+    }
 
-	public void updateStudent(StudentDTO dto) {
-		Student student = changeToEntity(dto);
-		
-		studentDAO.update(student);
-	}
+    public Student getStudentById(String studentId) {
+        return studentDAO.findById(studentId);
+    }
 
-	public void deleteStudent(StudentDTO dto) {
-		Student student = changeToEntity(dto);
+    public void addStudent(StudentDTO dto) {
+        Student student = convertToEntity(dto);
 
-		studentDAO.delete(student);
+        studentDAO.create(student);
+    }
 
-		authService.deleteAccount(dto.getStudentId());
+    public void updateStudent(StudentDTO dto) {
+        Student student = convertToEntity(dto);
 
-	}
+        studentDAO.update(student);
+    }
 
-	private void validatestudentKhongTonTai(String maSV) {
+    public void deleteStudent(StudentDTO dto) {
+        Student student = convertToEntity(dto);
 
-		if (studentDAO.existsById(maSV)) {
+        studentDAO.delete(student);
 
-			throw new IllegalArgumentException("Mã sinh viên đã tồn tại");
-		}
-	}
+        authService.deleteAccount(dto.getStudentId());
 
-	@Transactional
-	public void addStudentWithAccount(StudentDTO dto) {
-		validatestudentKhongTonTai(dto.getStudentId());
+    }
 
-		authService.createAccount(dto.getStudentId());
+    private void ensureStudentNotExists(String studentId) {
 
-		addStudent(dto);
-	}
+        if (studentDAO.existsById(studentId)) {
+
+            throw new IllegalArgumentException("Mã sinh viên đã tồn tại");
+        }
+    }
+
+    @Transactional
+    public void addStudentWithAccount(StudentDTO dto) {
+        ensureStudentNotExists(dto.getStudentId());
+
+        authService.createAccount(dto.getStudentId());
+
+        addStudent(dto);
+    }
 
 }

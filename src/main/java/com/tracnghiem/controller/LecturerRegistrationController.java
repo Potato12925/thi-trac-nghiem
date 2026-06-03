@@ -1,22 +1,21 @@
 package com.tracnghiem.controller;
 
 import javax.servlet.http.HttpSession;
-import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.tracnghiem.dao.ClassroomDAO;
 import com.tracnghiem.dao.LecturerDAO;
-import com.tracnghiem.dao.ClassRoomDAO;
 import com.tracnghiem.dao.SubjectDAO;
 import com.tracnghiem.dto.LecturerRegistrationDTO;
 import com.tracnghiem.service.LecturerRegistrationService;
@@ -29,7 +28,7 @@ public class LecturerRegistrationController {
     private LecturerRegistrationService lecturerRegistrationService;
 
     @Autowired
-    private ClassRoomDAO classRoomDAO;
+    private ClassroomDAO classroomDAO;
 
     @Autowired
     private SubjectDAO subjectDAO;
@@ -38,7 +37,7 @@ public class LecturerRegistrationController {
     private LecturerDAO lecturerDAO;
 
     private void prepareFormModel(ModelMap model, HttpSession session) {
-        model.addAttribute("dsLop", classRoomDAO.findAll());
+        model.addAttribute("dsLop", classroomDAO.findAll());
         model.addAttribute("dsMonHoc", subjectDAO.findAll());
 
         String role = (String) session.getAttribute("ROLE");

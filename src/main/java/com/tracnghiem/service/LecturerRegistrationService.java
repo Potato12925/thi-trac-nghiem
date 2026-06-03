@@ -7,16 +7,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.tracnghiem.dao.QuestionDAO;
+import com.tracnghiem.dao.ClassroomDAO;
 import com.tracnghiem.dao.LecturerDAO;
 import com.tracnghiem.dao.LecturerRegistrationDAO;
-import com.tracnghiem.dao.ClassRoomDAO;
+import com.tracnghiem.dao.QuestionDAO;
 import com.tracnghiem.dao.SubjectDAO;
 import com.tracnghiem.dto.LecturerRegistrationDTO;
+import com.tracnghiem.entity.Classroom;
 import com.tracnghiem.entity.Lecturer;
 import com.tracnghiem.entity.LecturerRegistration;
 import com.tracnghiem.entity.Question;
-import com.tracnghiem.entity.ClassRoom;
 import com.tracnghiem.entity.Subject;
 import com.tracnghiem.entity.id.LecturerRegistrationId;
 
@@ -31,13 +31,13 @@ public class LecturerRegistrationService {
     private QuestionDAO questionDAO;
 
     @Autowired
-    private ClassRoomDAO classRoomDAO;
+    private ClassroomDAO classroomDAO;
 
     @Autowired
     private SubjectDAO subjectDAO;
 
     @Autowired
-    private LecturerDAO LecturerDAO;
+    private LecturerDAO lecturerDAO;
 
     public void registerExam(LecturerRegistrationDTO dto, String userMaGv, String role) throws Exception {
         // 1. Determine Lecturer ID based on role
@@ -65,9 +65,9 @@ public class LecturerRegistrationService {
         }
 
         // 4. Save entity
-        ClassRoom classRoom = classRoomDAO.findById(dto.getClassId());
+        Classroom classRoom = classroomDAO.findById(dto.getClassId());
         Subject subject = subjectDAO.findById(dto.getSubjectId());
-        Lecturer Lecturer = LecturerDAO.findById(finalMaGv);
+        Lecturer Lecturer = lecturerDAO.findById(finalMaGv);
 
         if (classRoom == null || subject == null || Lecturer == null) {
             throw new Exception("Dữ liệu Lớp, Môn Học hoặc Giáo Viên không hợp lệ trong hệ thống.");
@@ -129,7 +129,7 @@ public class LecturerRegistrationService {
 
             int takeA = (int) Math.min(totalA, soCau);
             int takeB = soCau - takeA;
-            
+
             if (takeB > totalB) {
                 throw new Exception(
                         "Không đủ câu hỏi bù mức B. Cần bù " + takeB + " câu B nhưng kho chỉ có " + totalB + " câu.");

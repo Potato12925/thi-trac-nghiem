@@ -12,53 +12,61 @@ import com.tracnghiem.entity.Lecturer;
 @Service
 public class LecturerService {
 
-	@Autowired
-	private LecturerDAO lecturerDAO;
+    @Autowired
+    private LecturerDAO lecturerDAO;
 
-	private Lecturer convertToEntity(LecturerDTO dto) {
-		Lecturer lecturer = new Lecturer();
+    private Lecturer convertToEntity(LecturerDTO dto) {
+        Lecturer lecturer = new Lecturer();
 
-		lecturer.setLecturerId(dto.getLecturerId());
-		lecturer.setLastName(dto.getLastName());
-		lecturer.setFirstName(dto.getFirstName());
-		lecturer.setPhoneNumber(dto.getPhoneNumber());
-		lecturer.setAddress(dto.getAddress());
+        lecturer.setLecturerId(dto.getLecturerId());
+        lecturer.setLastName(dto.getLastName());
+        lecturer.setFirstName(dto.getFirstName());
+        lecturer.setPhoneNumber(dto.getPhoneNumber());
+        lecturer.setAddress(dto.getAddress());
 
-		return lecturer;
-	}
+        return lecturer;
+    }
 
-	public List<Lecturer> getAllLecturers() {
+    public List<Lecturer> getAllLecturers() {
 
-		return lecturerDAO.findAll();
-	}
+        return lecturerDAO.findAll();
+    }
 
-	public Lecturer findLecturerById(String lecturerId) {
-		return lecturerDAO.findById(lecturerId);
-	}
+    public List<Lecturer> getLecturers(int page, int pageSize) {
+        return lecturerDAO.getPagination(page, pageSize);
+    }
 
-	public List<Lecturer> findLecturerByKeyword(String keyword) {
-		return lecturerDAO.findByKeyword(keyword);
-	}
+    public long countLecturers() {
+        return lecturerDAO.count();
+    }
 
-	public void addLecturer(LecturerDTO dto) {
-		validateLecturerNotExists(dto.getLecturerId());
-		Lecturer lecturer = convertToEntity(dto);
-		lecturerDAO.create(lecturer);
-	}
+    public Lecturer findLecturerById(String lecturerId) {
+        return lecturerDAO.findById(lecturerId);
+    }
 
-	public void updateLecturer(LecturerDTO dto) {
-		Lecturer lecturer = convertToEntity(dto);
-		lecturerDAO.update(lecturer);
-	}
+    public List<Lecturer> findLecturerByKeyword(String keyword) {
+        return lecturerDAO.findByKeyword(keyword);
+    }
 
-	public void deleteLecturer(LecturerDTO dto) {
-		Lecturer lecturer = convertToEntity(dto);
-		lecturerDAO.delete(lecturer);
-	}
+    public void addLecturer(LecturerDTO dto) {
+        validateLecturerNotExists(dto.getLecturerId());
+        Lecturer lecturer = convertToEntity(dto);
+        lecturerDAO.create(lecturer);
+    }
 
-	private void validateLecturerNotExists(String lecturerId) {
-		if (lecturerDAO.existsById(lecturerId)) {
-			throw new IllegalArgumentException("Lecturer ID already exists");
-		}
-	}
+    public void updateLecturer(LecturerDTO dto) {
+        Lecturer lecturer = convertToEntity(dto);
+        lecturerDAO.update(lecturer);
+    }
+
+    public void deleteLecturer(LecturerDTO dto) {
+        Lecturer lecturer = convertToEntity(dto);
+        lecturerDAO.delete(lecturer);
+    }
+
+    private void validateLecturerNotExists(String lecturerId) {
+        if (lecturerDAO.existsById(lecturerId)) {
+            throw new IllegalArgumentException("Lecturer ID already exists");
+        }
+    }
 }

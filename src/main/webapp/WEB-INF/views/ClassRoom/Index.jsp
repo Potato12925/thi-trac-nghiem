@@ -22,7 +22,7 @@ request.setAttribute("pageTitle", "Quản lý Lớp");
 
 		<form:form id="classRoomForm"
 			action="${pageContext.request.contextPath}/classRoom/add"
-			method="post" modelAttribute="classRoomDTO">
+			method="post" modelAttribute="classroomDTO">
 
 			<input type="hidden" id="_method" name="_method" value="POST" />
 
@@ -93,7 +93,7 @@ request.setAttribute("pageTitle", "Quản lý Lớp");
 				</thead>
 
 				<tbody>
-					<c:forEach var="cr" items="${classRoomList}">
+					<c:forEach var="cr" items="${classrooms}">
 
 						<tr>
 
@@ -111,6 +111,39 @@ request.setAttribute("pageTitle", "Quản lý Lớp");
 					</c:forEach>
 				</tbody>
 			</table>
+		</div>
+
+		<div class="pagination-wrapper">
+			<c:if test="${currentPage > 1}">
+				<a class="pagination-item" href="classrooms?page=1"> First </a>
+
+				<a class="pagination-item" href="classrooms?page=${currentPage - 1}">
+					&laquo; </a>
+			</c:if>
+
+			<c:if test="${currentPage > 3}">
+				<span class="pagination-ellipsis">...</span>
+			</c:if>
+
+			<c:forEach begin="${currentPage - 2 < 1 ? 1 : currentPage - 2}"
+				end="${currentPage + 2 > totalPages ? totalPages : currentPage + 2}"
+				var="i">
+				<a href="classrooms?page=${i}"
+					class="pagination-item ${currentPage == i ? 'active' : ''}">
+					${i} </a>
+			</c:forEach>
+
+			<c:if test="${currentPage < totalPages - 2}">
+				<span class="pagination-ellipsis">...</span>
+			</c:if>
+
+			<c:if test="${currentPage < totalPages}">
+				<a class="pagination-item" href="classrooms?page=${currentPage + 1}">
+					&raquo; </a>
+
+				<a class="pagination-item" href="classrooms?page=${totalPages}">
+					Last </a>
+			</c:if>
 		</div>
 	</div>
 </div>
