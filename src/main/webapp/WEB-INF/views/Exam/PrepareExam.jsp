@@ -33,9 +33,7 @@
 							<c:otherwise>
 								<form:select path="classId" class="form-select" required="required">
 									<option value="">-- Chọn Lớp --</option>
-									<c:forEach var="lop" items="${dsLop}">
-										<form:option value="${lop.classId}">${lop.classId} - ${lop.className}</form:option>
-									</c:forEach>
+									<form:options items="${dsLop}" itemValue="classId" itemLabel="classDisplayName" />
 								</form:select>
 							</c:otherwise>
 						</c:choose>
@@ -45,9 +43,7 @@
 						<label for="subjectId" class="form-label">Chọn môn học:</label>
 						<form:select path="subjectId" class="form-select" required="required">
 							<option value="">-- Chọn Môn Học --</option>
-							<c:forEach var="mh" items="${dsMonHoc}">
-								<form:option value="${mh.subjectId}">${mh.subjectId} - ${mh.subjectName}</form:option>
-							</c:forEach>
+							<form:options items="${dsMonHoc}" itemValue="subjectId" itemLabel="subjectDisplayName" />
 						</form:select>
 					</div>
 

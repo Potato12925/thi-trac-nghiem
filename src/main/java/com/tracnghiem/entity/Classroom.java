@@ -57,4 +57,8 @@ public class Classroom {
 		this.students = students;
 	}
 
+	public String getClassDisplayName() {
+		return this.classId + " - " + this.className;
+	}
+
 }

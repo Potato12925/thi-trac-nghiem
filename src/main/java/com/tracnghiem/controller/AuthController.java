@@ -52,7 +52,7 @@ public class AuthController {
 
 		switch (role) {
 			case "SINHVIEN":
-				return "redirect:/student/home";
+				return "redirect:/students/home";
 
 			case "GIAOVIEN":
 				return "redirect:/lecturer/home";

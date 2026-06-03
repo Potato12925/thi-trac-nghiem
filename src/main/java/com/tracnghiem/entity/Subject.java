@@ -35,4 +35,8 @@ public class Subject {
 	public void setSubjectName(String subjectName) {
 		this.subjectName = subjectName;
 	}
+
+	public String getSubjectDisplayName() {
+		return this.subjectId + " - " + this.subjectName;
+	}
 }
