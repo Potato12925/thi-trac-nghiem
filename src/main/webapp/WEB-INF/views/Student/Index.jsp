@@ -7,11 +7,13 @@
 
 <%
 request.setAttribute("pageTitle", "Student Management");
+request.setAttribute("customCss", "management.css");
+request.setAttribute("customJs", "student-management.js");
 %>
 
 <%@ include file="../Shared/_LayoutStart.jsp"%>
 
-<div class="container-fluid">
+<div class="container-fluid page-wrapper">
 
 	<div class="d-flex justify-content-between align-items-center mb-4">
 		<h1 class="h3 mb-0">Student Management</h1>
@@ -21,12 +23,36 @@ request.setAttribute("pageTitle", "Student Management");
 		<div class="alert alert-danger">${error}</div>
 	</c:if>
 
-	<div class="border rounded-3 bg-white p-4 mb-4">
+	<div class="border rounded-3 bg-white p-4 mb-4 form-section">
+
+		<form method="get" action="${pageContext.request.contextPath}/students" class="row g-3 mb-4">
+			<div class="col-md-6">
+				<label class="form-label small text-secondary"> Search keyword </label>
+				<input type="text" name="keyword" class="form-control"
+					value="${keyword}" placeholder="ID, last name, first name" />
+			</div>
+			<div class="col-md-4">
+				<label class="form-label small text-secondary"> Class Filter </label>
+				<select name="filterClassId" class="form-select">
+					<option value="">All classes</option>
+					<c:forEach var="classroom" items="${classrooms}">
+						<option value="${classroom.classId}" ${classroom.classId == classId ? 'selected' : ''}>
+							${classroom.classId}
+						</option>
+					</c:forEach>
+				</select>
+			</div>
+			<div class="col-md-2 d-flex align-items-end">
+				<button type="submit" class="btn btn-outline-secondary w-100">Search</button>
+			</div>
+		</form>
 
 		<form:form id="studentForm" method="post"
-			action="${pageContext.request.contextPath}/student/add"
+			action="${pageContext.request.contextPath}/students/add"
 			modelAttribute="studentDTO">
 			<input type="hidden" name="page" value="${currentPage}" />
+			<input type="hidden" name="keyword" value="${keyword}" />
+			<input type="hidden" name="filterClassId" value="${classId}" />
 
 			<div class="row g-3">
 
@@ -93,7 +119,14 @@ request.setAttribute("pageTitle", "Student Management");
 
 					<label class="form-label small text-secondary"> Class ID </label>
 
-					<form:input path="classId" id="classId" cssClass="form-control" />
+					<select id="classId" name="classId" class="form-select">
+						<option value="">Choose class</option>
+						<c:forEach var="classroom" items="${classrooms}">
+							<option value="${classroom.classId}" ${classroom.classId == studentDTO.classId ? 'selected' : ''}>
+								${classroom.classId}
+							</option>
+						</c:forEach>
+					</select>
 
 					<form:errors path="classId"
 						cssClass="text-danger small mt-1 d-block" />
@@ -105,13 +138,13 @@ request.setAttribute("pageTitle", "Student Management");
 			<div class="d-flex gap-2 mt-4">
 
 				<button type="submit" class="btn btn-dark px-4"
-					onclick="submitForm('/student/add')">Add</button>
+					onclick="submitForm('/students/add')">Add</button>
 
 				<button type="submit" class="btn btn-outline-secondary px-4"
-					onclick="submitForm('/student/update')">Update</button>
+					onclick="submitForm('/students/update')">Update</button>
 
 				<button type="submit" class="btn btn-outline-danger px-4"
-					onclick="submitForm('/student/delete')">Delete</button>
+					onclick="submitForm('/students/delete')">Delete</button>
 
 				<button type="button" class="btn btn-outline-dark"
 					onclick="resetForm()">Reset</button>
@@ -122,11 +155,11 @@ request.setAttribute("pageTitle", "Student Management");
 
 	</div>
 
-	<div class="card border-0 shadow-sm">
+	<div class="card border-0 shadow-sm management-card">
 
-		<div class="table-responsive p-3">
+		<div class="table-responsive p-3 management-table-wrapper">
 
-			<table class="table table-hover align-middle mb-0">
+			<table class="table table-hover align-middle mb-0 management-table">
 
 				<thead class="table-light">
 
@@ -189,8 +222,8 @@ request.setAttribute("pageTitle", "Student Management");
 
 		<div class="pagination-wrapper">
 			<c:if test="${currentPage > 1}">
-				<a class="pagination-item" href="student?page=1"> First </a>
-				<a class="pagination-item" href="student?page=${currentPage - 1}">
+				<a class="pagination-item" href="students?page=1&keyword=${keyword}&filterClassId=${classId}"> First </a>
+				<a class="pagination-item" href="students?page=${currentPage - 1}&keyword=${keyword}&filterClassId=${classId}">
 					&laquo; </a>
 			</c:if>
 
@@ -201,7 +234,7 @@ request.setAttribute("pageTitle", "Student Management");
 			<c:forEach begin="${currentPage - 2 < 1 ? 1 : currentPage - 2}"
 				end="${currentPage + 2 > totalPages ? totalPages : currentPage + 2}"
 				var="i">
-				<a href="student?page=${i}"
+				<a href="students?page=${i}&keyword=${keyword}&filterClassId=${classId}"
 					class="pagination-item ${currentPage == i ? 'active' : ''}">
 					${i} </a>
 			</c:forEach>
@@ -211,73 +244,14 @@ request.setAttribute("pageTitle", "Student Management");
 			</c:if>
 
 			<c:if test="${currentPage < totalPages}">
-				<a class="pagination-item" href="student?page=${currentPage + 1}">
+				<a class="pagination-item" href="students?page=${currentPage + 1}&keyword=${keyword}&filterClassId=${classId}">
 					&raquo; </a>
-				<a class="pagination-item" href="student?page=${totalPages}">
+				<a class="pagination-item" href="students?page=${totalPages}&keyword=${keyword}&filterClassId=${classId}">
 					Last </a>
 			</c:if>
 		</div>
 	</div>
 
 </div>
-
-<script>
-
-	function fillFormFromRow(row) {
-
-		const cells = row.querySelectorAll("td");
-
-		document.getElementById("studentId").value =
-			cells[0].innerText.trim();
-
-		document.getElementById("lastName").value =
-			cells[1].innerText.trim();
-
-		document.getElementById("firstName").value =
-			cells[2].innerText.trim();
-
-		document.getElementById("birthDate").value =
-			cells[3].innerText.trim();
-
-		document.getElementById("address").value =
-			cells[4].innerText.trim();
-
-		document.getElementById("classId").value =
-			cells[5].innerText.trim();
-
-		document.getElementById("studentId").readOnly = true;
-	}
-
-	document
-		.querySelectorAll(".btn-edit")
-		.forEach(button => {
-
-			button.addEventListener("click", function () {
-
-				const row = this.closest("tr");
-
-				fillFormFromRow(row);
-
-			});
-
-		});
-
-    function submitForm(action) {
-
-        const form = document.getElementById("studentForm");
-
-        form.action =
-            "${pageContext.request.contextPath}" + action;
-    }
-
-    function resetForm() {
-
-        document.getElementById("studentForm").reset();
-
-        document.getElementById("studentId").readOnly = false;
-    }
-
-
-</script>
 
 <%@ include file="../Shared/_LayoutEnd.jsp"%>

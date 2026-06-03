@@ -5,29 +5,50 @@
 
 <%
 request.setAttribute("pageTitle", "Quản lý Môn học");
+request.setAttribute("customCss", "management.css");
+request.setAttribute("customJs", "subject-management.js");
 %>
 
 <%@ include file="../Shared/_LayoutStart.jsp"%>
 
-<div class="container-fluid">
+<div class="container-fluid page-wrapper">
 	<div class="d-flex justify-content-between align-items-center mb-4">
 		<h1 class="h3 mb-0">Danh mục Môn học</h1>
+	</div>
+
+	<div class="row mb-4">
+		<div class="col-md-8">
+			<form action="${pageContext.request.contextPath}/subjects"
+				method="get" class="d-flex">
+				<input type="hidden" name="page" value="1" /> <input type="search"
+					name="search" value="${search}" class="form-control me-2"
+					placeholder="Tìm mã hoặc tên môn học" />
+				<button type="submit" class="btn btn-primary px-4">Tìm kiếm</button>
+				<a href="${pageContext.request.contextPath}/subjects"
+					class="btn btn-outline-secondary ms-2 px-4">Xóa</a>
+			</form>
+		</div>
 	</div>
 
 	<c:if test="${not empty error}">
 		<div class="alert alert-danger">${error}</div>
 	</c:if>
 
+	<c:if test="${not empty successMessage}">
+		<div class="alert alert-success">${successMessage}</div>
+	</c:if>
+
 	<c:if test="${not empty errorMessage}">
 		<div class="alert alert-danger">${errorMessage}</div>
 	</c:if>
 
-	<div class="border rounded-3 bg-white p-4 mb-4">
+	<div class="border rounded-3 bg-white p-4 mb-4 form-section">
 
 		<form:form id="subjectForm"
 			action="${pageContext.request.contextPath}/subjects/add"
 			method="post" modelAttribute="subjectDTO">
 			<input type="hidden" name="page" value="${currentPage}" />
+			<input type="hidden" name="search" value="${search}" />
 
 			<div class="row g-3">
 				<div class="col-md-3">
@@ -60,13 +81,15 @@ request.setAttribute("pageTitle", "Quản lý Môn học");
 
 				<button type="submit" class="btn btn-outline-danger px-4"
 					onclick="submitForm('delete')">Xóa</button>
+				<button type="button" class="btn btn-outline-secondary px-4"
+					onclick="resetForm()">Xóa dữ liệu</button>
 			</div>
 		</form:form>
 	</div>
 
-	<div class="card border-0 shadow-sm">
-		<div class="table-responsive p-3">
-			<table class="table table-hover align-middle mb-0">
+	<div class="card border-0 shadow-sm management-card">
+		<div class="table-responsive p-3 management-table-wrapper">
+			<table class="table table-hover align-middle mb-0 management-table">
 				<thead class="table-light">
 					<tr>
 						<th scope="col">Mã MH</th>
@@ -85,8 +108,13 @@ request.setAttribute("pageTitle", "Quản lý Môn học");
 							<td>${item.subjectName}</td>
 
 							<td class="text-end pe-4">
-								<button class="btn btn-sm btn-outline-secondary me-2 btn-edit">
-									<i class="bi bi-pencil"></i>
+								<button type="button"
+									class="btn btn-sm btn-outline-secondary me-2 btn-edit">
+									<i class="bi bi-pencil p-2"></i> Chỉnh sửa
+								</button>
+								<button type="button"
+									class="btn btn-sm btn-outline-danger btn-delete">
+									<i class="bi bi-trash p-2"></i> Xóa
 								</button>
 							</td>
 						</tr>
@@ -97,8 +125,10 @@ request.setAttribute("pageTitle", "Quản lý Môn học");
 
 		<div class="pagination-wrapper">
 			<c:if test="${currentPage > 1}">
-				<a class="pagination-item" href="subjects?page=1"> First </a>
-				<a class="pagination-item" href="subjects?page=${currentPage - 1}">
+				<a class="pagination-item" href="subjects?page=1&search=${search}">
+					First </a>
+				<a class="pagination-item"
+					href="subjects?page=${currentPage - 1}&search=${search}">
 					&laquo; </a>
 			</c:if>
 
@@ -109,7 +139,7 @@ request.setAttribute("pageTitle", "Quản lý Môn học");
 			<c:forEach begin="${currentPage - 2 < 1 ? 1 : currentPage - 2}"
 				end="${currentPage + 2 > totalPages ? totalPages : currentPage + 2}"
 				var="i">
-				<a href="subjects?page=${i}"
+				<a href="subjects?page=${i}&search=${search}"
 					class="pagination-item ${currentPage == i ? 'active' : ''}">
 					${i} </a>
 			</c:forEach>
@@ -119,57 +149,36 @@ request.setAttribute("pageTitle", "Quản lý Môn học");
 			</c:if>
 
 			<c:if test="${currentPage < totalPages}">
-				<a class="pagination-item" href="subjects?page=${currentPage + 1}">
+				<a class="pagination-item"
+					href="subjects?page=${currentPage + 1}&search=${search}">
 					&raquo; </a>
-				<a class="pagination-item" href="subjects?page=${totalPages}">
-					Last </a>
+				<a class="pagination-item"
+					href="subjects?page=${totalPages}&search=${search}"> Last </a>
 			</c:if>
 		</div>
 	</div>
-</div>
 
-<script>
+	<div class="modal fade" id="subjectDeleteModal" tabindex="-1"
+		aria-labelledby="subjectDeleteModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content border-0 shadow">
+				<div class="modal-header bg-danger text-white">
+					<h5 class="modal-title fw-semibold" id="subjectDeleteModalLabel">
+						<i class="bi bi-exclamation-triangle-fill me-2"></i> Xác nhận xóa
+					</h5>
+					<button type="button" class="btn-close btn-close-white"
+						data-bs-dismiss="modal" aria-label="Đóng"></button>
+				</div>
+				<div class="modal-body" id="subjectDeleteModalBody">Bạn có
+					chắc muốn xóa môn học này?</div>
+				<div class="modal-footer bg-light">
+					<button type="button" class="btn btn-secondary"
+						data-bs-dismiss="modal">Hủy</button>
+					<button type="button" class="btn btn-danger"
+						id="confirmDeleteButton">Xóa</button>
+				</div>
+			</div>
+		</div>
+	</div>
 
-    function fillFormFromRow(row) {
-
-        const cells = row.querySelectorAll("td");
-
-        const subjectId = cells[0].innerText.trim();
-        const subjectName = cells[1].innerText.trim();
-
-        document.getElementById("subjectId").value = subjectId;
-        document.getElementById("subjectName").value = subjectName;
-
-        document.getElementById("subjectId").readOnly = true;
-    }
-
-    const editButtons = document.querySelectorAll(".btn-edit");
-
-    editButtons.forEach(button => {
-
-        button.addEventListener("click", function () {
-
-            const row = this.closest("tr");
-
-            fillFormFromRow(row);
-        });
-    });
-
-    function submitForm(action) {
-
-        const form = document.getElementById("subjectForm");
-
-        form.action =
-            "${pageContext.request.contextPath}/subjects/" + action;
-    }
-
-    function resetForm() {
-
-        document.getElementById("subjectForm").reset();
-
-        document.getElementById("subjectId").readOnly = false;
-    }
-
-</script>
-
-<%@ include file="../Shared/_LayoutEnd.jsp"%>
+	<%@ include file="../Shared/_LayoutEnd.jsp"%>

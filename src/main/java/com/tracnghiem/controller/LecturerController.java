@@ -1,5 +1,7 @@
 package com.tracnghiem.controller;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 import javax.servlet.http.HttpSession;
@@ -24,28 +26,28 @@ import com.tracnghiem.service.LecturerService;
 public class LecturerController {
 
     private static final String INDEX_VIEW = "Lecturer/Index";
-    private static final String REDIRECT_INDEX = "redirect:/lecturer";
+    private static final String REDIRECT_INDEX = "redirect:/lecturers";
 
     @Autowired
     private LecturerService lecturerService;
 
-    private void prepareLecturerPage(ModelMap model, int page) {
+    private void prepareLecturerPage(ModelMap model, int page, String keyword) {
         int pageSize = 10;
 
-        model.addAttribute("lecturers", lecturerService.getLecturers(page, pageSize));
-
-        long total = lecturerService.countLecturers();
-
-        int totalPages = (int) Math.ceil((double) total / pageSize);
-
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", totalPages);
-    }
-
-    private String renderLecturerPage(ModelMap model, int page) {
-        prepareLecturerPage(model, page);
-        model.addAttribute("lecturerDTO", new LecturerDTO());
-        return INDEX_VIEW;
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            model.addAttribute("lecturers", lecturerService.getLecturers(page, pageSize, keyword));
+            model.addAttribute("keyword", keyword);
+            long total = lecturerService.countLecturers(keyword);
+            int totalPages = (int) Math.ceil((double) total / pageSize);
+            model.addAttribute("currentPage", page);
+            model.addAttribute("totalPages", totalPages);
+        } else {
+            model.addAttribute("lecturers", lecturerService.getLecturers(page, pageSize));
+            long total = lecturerService.countLecturers();
+            int totalPages = (int) Math.ceil((double) total / pageSize);
+            model.addAttribute("currentPage", page);
+            model.addAttribute("totalPages", totalPages);
+        }
     }
 
     @GetMapping("/home")
@@ -61,58 +63,89 @@ public class LecturerController {
     }
 
     @GetMapping
-    public String index(@RequestParam(defaultValue = "1") int page, ModelMap model) {
-        prepareLecturerPage(model, page);
+    public String index(@RequestParam(defaultValue = "1") int page,
+            @RequestParam(required = false) String keyword,
+            ModelMap model) {
+        prepareLecturerPage(model, page, keyword);
         model.addAttribute("lecturerDTO", new LecturerDTO());
         return INDEX_VIEW;
     }
 
     @PostMapping("/add")
-    public String add(@RequestParam(defaultValue = "1") int page, @Validated @ModelAttribute("lecturerDTO") LecturerDTO lecturerDTO, BindingResult errors,
+    public String add(@RequestParam(defaultValue = "1") int page,
+            @RequestParam(required = false) String keyword,
+            @Validated @ModelAttribute("lecturerDTO") LecturerDTO lecturerDTO,
+            BindingResult errors,
             ModelMap model) {
 
         if (errors.hasErrors()) {
-            return renderLecturerPage(model, page);
+            prepareLecturerPage(model, page, keyword);
+            model.addAttribute("lecturerDTO", lecturerDTO);
+            return INDEX_VIEW;
         }
 
         try {
             lecturerService.addLecturer(lecturerDTO);
-            return REDIRECT_INDEX;
+            return REDIRECT_INDEX + buildQuery(page, keyword);
         } catch (IllegalArgumentException ex) {
             model.addAttribute("errorMessage", ex.getMessage());
-            return renderLecturerPage(model, page);
+            prepareLecturerPage(model, page, keyword);
+            model.addAttribute("lecturerDTO", lecturerDTO);
+            return INDEX_VIEW;
         }
     }
 
     @PostMapping("/update")
-    public String update(@RequestParam(defaultValue = "1") int page, @Validated @ModelAttribute("lecturerDTO") LecturerDTO lecturerDTO, BindingResult errors,
+    public String update(@RequestParam(defaultValue = "1") int page,
+            @RequestParam(required = false) String keyword,
+            @Validated @ModelAttribute("lecturerDTO") LecturerDTO lecturerDTO,
+            BindingResult errors,
             ModelMap model) {
         if (errors.hasErrors()) {
-            return renderLecturerPage(model, page);
+            prepareLecturerPage(model, page, keyword);
+            model.addAttribute("lecturerDTO", lecturerDTO);
+            return INDEX_VIEW;
         }
 
         try {
             lecturerService.updateLecturer(lecturerDTO);
-            return REDIRECT_INDEX;
+            return REDIRECT_INDEX + buildQuery(page, keyword);
         } catch (IllegalArgumentException ex) {
             model.addAttribute("errorMessage", ex.getMessage());
-            return renderLecturerPage(model, page);
+            prepareLecturerPage(model, page, keyword);
+            model.addAttribute("lecturerDTO", lecturerDTO);
+            return INDEX_VIEW;
         }
     }
 
     @PostMapping("/delete")
-    public String delete(@RequestParam(defaultValue = "1") int page, @Validated @ModelAttribute("lecturerDTO") LecturerDTO lecturerDTO, BindingResult errors,
+    public String delete(@RequestParam(defaultValue = "1") int page,
+            @RequestParam(required = false) String keyword,
+            @Validated @ModelAttribute("lecturerDTO") LecturerDTO lecturerDTO,
+            BindingResult errors,
             ModelMap model) {
         if (errors.hasErrors()) {
-            return renderLecturerPage(model, page);
+            prepareLecturerPage(model, page, keyword);
+            model.addAttribute("lecturerDTO", lecturerDTO);
+            return INDEX_VIEW;
         }
 
         try {
             lecturerService.deleteLecturer(lecturerDTO);
-            return REDIRECT_INDEX;
+            return REDIRECT_INDEX + buildQuery(page, keyword);
         } catch (IllegalArgumentException ex) {
             model.addAttribute("errorMessage", ex.getMessage());
-            return renderLecturerPage(model, page);
+            prepareLecturerPage(model, page, keyword);
+            model.addAttribute("lecturerDTO", lecturerDTO);
+            return INDEX_VIEW;
         }
+    }
+
+    private String buildQuery(int page, String keyword) {
+        StringBuilder query = new StringBuilder("?page=").append(page);
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            query.append("&keyword=").append(URLEncoder.encode(keyword.trim(), StandardCharsets.UTF_8));
+        }
+        return query.toString();
     }
 }

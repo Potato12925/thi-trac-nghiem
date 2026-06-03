@@ -1,21 +1,97 @@
 package com.tracnghiem.dao;
 
 import java.util.List;
+
+import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 
 import com.tracnghiem.entity.Student;
 
 @Repository
 public class StudentDAO extends GenericDAO<Student> {
-	public boolean existsById(String studentId) {
-	    return findById(studentId) != null;
-	}
 
-	public List<Student> findByClassId(String classId) {
-		String hql = "FROM Student s WHERE s.classRoom.classId = :classId ORDER BY s.firstName, s.lastName";
-		return getSession().createQuery(hql, Student.class)
-				.setParameter("classId", classId)
-				.list();
-	}
+    public boolean existsById(String studentId) {
+        return findById(studentId) != null;
+    }
+
+    public List<Student> findByClassId(String classId) {
+        String hql = "FROM Student s WHERE s.classRoom.classId = :classId ORDER BY s.lastName, s.firstName";
+        return getSession().createQuery(hql, Student.class)
+                .setParameter("classId", classId)
+                .list();
+    }
+
+    public List<Student> findPage(int page, int pageSize, String keyword, String classId) {
+        String trimmedKeyword = keyword == null ? "" : keyword.trim().toLowerCase();
+        String trimmedClassId = classId == null ? "" : classId.trim();
+        boolean hasKeyword = !trimmedKeyword.isEmpty();
+        boolean hasClass = !trimmedClassId.isEmpty();
+
+        String hql = "FROM Student s";
+        if (hasKeyword || hasClass) {
+            hql += " WHERE ";
+        }
+
+        if (hasKeyword) {
+            hql += "(lower(s.studentId) LIKE :keyword OR lower(s.lastName) LIKE :keyword OR lower(s.firstName) LIKE :keyword)";
+        }
+
+        if (hasClass) {
+            if (hasKeyword) {
+                hql += " AND ";
+            }
+            hql += "s.classRoom.classId = :classId";
+        }
+
+        hql += " ORDER BY s.lastName, s.firstName";
+
+        Query<Student> query = getSession().createQuery(hql, Student.class);
+
+        if (hasKeyword) {
+            query.setParameter("keyword", "%" + trimmedKeyword + "%");
+        }
+
+        if (hasClass) {
+            query.setParameter("classId", trimmedClassId);
+        }
+
+        int offset = (page - 1) * pageSize;
+        return query.setFirstResult(offset).setMaxResults(pageSize).list();
+    }
+
+    public long countAll(String keyword, String classId) {
+        String trimmedKeyword = keyword == null ? "" : keyword.trim().toLowerCase();
+        String trimmedClassId = classId == null ? "" : classId.trim();
+        boolean hasKeyword = !trimmedKeyword.isEmpty();
+        boolean hasClass = !trimmedClassId.isEmpty();
+
+        String hql = "SELECT COUNT(*) FROM Student s";
+
+        if (hasKeyword || hasClass) {
+            hql += " WHERE ";
+        }
+
+        if (hasKeyword) {
+            hql += "(lower(s.studentId) LIKE :keyword OR lower(s.lastName) LIKE :keyword OR lower(s.firstName) LIKE :keyword)";
+        }
+
+        if (hasClass) {
+            if (hasKeyword) {
+                hql += " AND ";
+            }
+            hql += "s.classRoom.classId = :classId";
+        }
+
+        Query<Long> query = getSession().createQuery(hql, Long.class);
+
+        if (hasKeyword) {
+            query.setParameter("keyword", "%" + trimmedKeyword + "%");
+        }
+
+        if (hasClass) {
+            query.setParameter("classId", trimmedClassId);
+        }
+
+        return query.uniqueResult();
+    }
 }
-

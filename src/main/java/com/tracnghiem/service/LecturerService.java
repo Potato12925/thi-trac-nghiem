@@ -36,8 +36,16 @@ public class LecturerService {
         return lecturerDAO.findPage(page, pageSize);
     }
 
+    public List<Lecturer> getLecturers(int page, int pageSize, String keyword) {
+        return lecturerDAO.findPage(page, pageSize, keyword);
+    }
+
     public long countLecturers() {
         return lecturerDAO.countAll();
+    }
+
+    public long countLecturers(String keyword) {
+        return lecturerDAO.countAll(keyword);
     }
 
     public Lecturer findLecturerById(String lecturerId) {

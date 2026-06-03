@@ -32,8 +32,22 @@ public class SubjectService {
         return subjectDAO.findPage(page, pageSize);
     }
 
+    public List<Subject> getSubjects(int page, int pageSize, String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return getSubjects(page, pageSize);
+        }
+        return subjectDAO.findPage(page, pageSize, keyword.trim());
+    }
+
     public long countSubjects() {
         return subjectDAO.countAll();
+    }
+
+    public long countSubjects(String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return countSubjects();
+        }
+        return subjectDAO.countAll(keyword);
     }
 
     public Subject getSubjectById(String subjectId) {

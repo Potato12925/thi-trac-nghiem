@@ -46,8 +46,16 @@ public class StudentService {
         return studentDAO.findPage(page, pageSize);
     }
 
+    public List<Student> getStudents(int page, int pageSize, String keyword, String classId) {
+        return studentDAO.findPage(page, pageSize, keyword, classId);
+    }
+
     public long countStudents() {
         return studentDAO.countAll();
+    }
+
+    public long countStudents(String keyword, String classId) {
+        return studentDAO.countAll(keyword, classId);
     }
 
     public Student getStudentById(String studentId) {

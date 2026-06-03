@@ -1,5 +1,7 @@
 package com.tracnghiem.controller;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 import javax.servlet.http.HttpSession;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.tracnghiem.dto.StudentDTO;
 import com.tracnghiem.entity.Student;
+import com.tracnghiem.service.ClassroomService;
 import com.tracnghiem.service.StudentService;
 
 @Controller
@@ -25,23 +28,27 @@ import com.tracnghiem.service.StudentService;
 public class StudentController {
 
     private static final String INDEX_VIEW = "Student/Index";
-    private static final String REDIRECT_INDEX = "redirect:/student";
+    private static final String REDIRECT_INDEX = "redirect:/students";
 
     @Autowired
     private StudentService studentService;
 
+    @Autowired
+    private ClassroomService classroomService;
+
     @GetMapping
-    public String index(@RequestParam(defaultValue = "1") int page, ModelMap model) {
-        populateIndexPageModel(model, page);
+    public String index(@RequestParam(defaultValue = "1") int page,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false, name = "filterClassId") String filterClassId,
+            ModelMap model) {
+        populateIndexPageModel(model, page, keyword, filterClassId);
         model.addAttribute("studentDTO", new StudentDTO());
         return INDEX_VIEW;
     }
 
     @GetMapping("/home")
     public String home(ModelMap model, HttpSession session) {
-
         String studentId = (String) session.getAttribute("LOGIN_USER");
-
         Student student = studentId != null ? studentService.getStudentById(studentId) : null;
 
         model.addAttribute("pageTitle", "Student Home");
@@ -52,73 +59,98 @@ public class StudentController {
     }
 
     @PostMapping("/add")
-    public String addStudent(@RequestParam(defaultValue = "1") int page, @Validated @ModelAttribute("studentDTO") StudentDTO studentDTO, BindingResult errors,
+    public String addStudent(@RequestParam(defaultValue = "1") int page,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false, name = "filterClassId") String filterClassId,
+            @Validated @ModelAttribute("studentDTO") StudentDTO studentDTO,
+            BindingResult errors,
             ModelMap model) {
 
         if (errors.hasErrors()) {
-            populateIndexPageModel(model, page);
+            populateIndexPageModel(model, page, keyword, filterClassId);
             return INDEX_VIEW;
         }
 
         try {
             studentService.addStudentWithAccount(studentDTO);
-            return REDIRECT_INDEX;
+            return REDIRECT_INDEX + buildQuery(page, keyword, filterClassId);
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
-            populateIndexPageModel(model, page);
+            populateIndexPageModel(model, page, keyword, filterClassId);
             return INDEX_VIEW;
         }
     }
 
     @PostMapping("/update")
-    public String updateStudent(@RequestParam(defaultValue = "1") int page, @Validated @ModelAttribute("studentDTO") StudentDTO studentDTO, BindingResult errors,
+    public String updateStudent(@RequestParam(defaultValue = "1") int page,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false, name = "filterClassId") String filterClassId,
+            @Validated @ModelAttribute("studentDTO") StudentDTO studentDTO,
+            BindingResult errors,
             ModelMap model) {
 
         if (errors.hasErrors()) {
-            populateIndexPageModel(model, page);
+            populateIndexPageModel(model, page, keyword, filterClassId);
             return INDEX_VIEW;
         }
 
         try {
             studentService.updateStudent(studentDTO);
-            return REDIRECT_INDEX;
+            return REDIRECT_INDEX + buildQuery(page, keyword, filterClassId);
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
-            populateIndexPageModel(model, page);
+            populateIndexPageModel(model, page, keyword, filterClassId);
             return INDEX_VIEW;
         }
     }
 
     @PostMapping("/delete")
-    public String deleteStudent(@RequestParam(defaultValue = "1") int page, @Valid @ModelAttribute("studentDTO") StudentDTO studentDTO, BindingResult errors,
+    public String deleteStudent(@RequestParam(defaultValue = "1") int page,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false, name = "filterClassId") String filterClassId,
+            @Valid @ModelAttribute("studentDTO") StudentDTO studentDTO,
+            BindingResult errors,
             ModelMap model) {
 
         if (errors.hasErrors()) {
-            populateIndexPageModel(model, page);
+            populateIndexPageModel(model, page, keyword, filterClassId);
             return INDEX_VIEW;
         }
 
         try {
             studentService.deleteStudent(studentDTO);
-            return REDIRECT_INDEX;
+            return REDIRECT_INDEX + buildQuery(page, keyword, filterClassId);
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
-            populateIndexPageModel(model, page);
+            populateIndexPageModel(model, page, keyword, filterClassId);
             return INDEX_VIEW;
         }
     }
 
-    private void populateIndexPageModel(ModelMap model, int page) {
+    private void populateIndexPageModel(ModelMap model, int page, String keyword, String filterClassId) {
         int pageSize = 10;
 
         model.addAttribute("studentDTO", new StudentDTO());
-        model.addAttribute("students", studentService.getStudents(page, pageSize));
+        model.addAttribute("students", studentService.getStudents(page, pageSize, keyword, filterClassId));
+        model.addAttribute("classrooms", classroomService.getAllClassrooms());
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("classId", filterClassId);
 
-        long total = studentService.countStudents();
-
+        long total = studentService.countStudents(keyword, filterClassId);
         int totalPages = (int) Math.ceil((double) total / pageSize);
 
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
+    }
+
+    private String buildQuery(int page, String keyword, String filterClassId) {
+        StringBuilder query = new StringBuilder("?page=").append(page);
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            query.append("&keyword=").append(URLEncoder.encode(keyword.trim(), StandardCharsets.UTF_8));
+        }
+        if (filterClassId != null && !filterClassId.trim().isEmpty()) {
+            query.append("&filterClassId=").append(URLEncoder.encode(filterClassId.trim(), StandardCharsets.UTF_8));
+        }
+        return query.toString();
     }
 }

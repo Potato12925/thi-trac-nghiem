@@ -7,6 +7,8 @@
 
 <%
 request.setAttribute("pageTitle", "Question Management");
+request.setAttribute("customCss", "question-management.css");
+request.setAttribute("customJs", "question-management.js");
 %>
 
 <%@ include file="../Shared/_LayoutStart.jsp"%>
@@ -29,9 +31,22 @@ request.setAttribute("pageTitle", "Question Management");
 
 	<div class="border bg-white mb-4 shadow-sm form-section">
 
+		<form method="get" action="${pageContext.request.contextPath}/questions" class="row g-3 mb-4">
+			<div class="col-md-9">
+				<label class="form-label small text-secondary"> Search keyword </label>
+				<input type="text" name="keyword" class="form-control"
+					value="${keyword}" placeholder="Search content, level, subject, lecturer" />
+			</div>
+			<div class="col-md-3 d-flex align-items-end">
+				<button type="submit" class="btn btn-outline-secondary w-100">Search</button>
+			</div>
+		</form>
+
 		<form:form id="questionForm" method="post"
 			modelAttribute="questionDTO"
 			action="${pageContext.request.contextPath}/questions/add">
+			<input type="hidden" name="page" value="${currentPage}" />
+			<input type="hidden" name="keyword" value="${keyword}" />
 
 			<div class="row g-4">
 				<div class="col-lg-3 col-md-6">
@@ -256,9 +271,9 @@ request.setAttribute("pageTitle", "Question Management");
 
 		<div class="pagination-wrapper">
 			<c:if test="${currentPage > 1}">
-				<a class="pagination-item" href="questions?page=1"> First </a>
+				<a class="pagination-item" href="questions?page=1&keyword=${keyword}"> First </a>
 
-				<a class="pagination-item" href="questions?page=${currentPage - 1}">
+				<a class="pagination-item" href="questions?page=${currentPage - 1}&keyword=${keyword}">
 					&laquo; </a>
 			</c:if>
 
@@ -269,7 +284,7 @@ request.setAttribute("pageTitle", "Question Management");
 			<c:forEach begin="${currentPage - 2 < 1 ? 1 : currentPage - 2}"
 				end="${currentPage + 2 > totalPages ? totalPages : currentPage + 2}"
 				var="i">
-				<a href="questions?page=${i}"
+				<a href="questions?page=${i}&keyword=${keyword}"
 					class="pagination-item ${currentPage == i ? 'active' : ''}">
 					${i} </a>
 			</c:forEach>
@@ -279,17 +294,14 @@ request.setAttribute("pageTitle", "Question Management");
 			</c:if>
 
 			<c:if test="${currentPage < totalPages}">
-				<a class="pagination-item" href="questions?page=${currentPage + 1}">
+				<a class="pagination-item" href="questions?page=${currentPage + 1}&keyword=${keyword}">
 					&raquo; </a>
 
-				<a class="pagination-item" href="questions?page=${totalPages}">
+				<a class="pagination-item" href="questions?page=${totalPages}&keyword=${keyword}">
 					Last </a>
 			</c:if>
 		</div>
 	</div>
 </div>
-
-<script
-	src="${pageContext.request.contextPath}/assets/js/question-management.js"></script>
 
 <%@ include file="../Shared/_LayoutEnd.jsp"%>

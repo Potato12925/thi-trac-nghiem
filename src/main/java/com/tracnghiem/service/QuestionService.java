@@ -53,8 +53,16 @@ public class QuestionService {
         return questionDAO.findPage(page, pageSize);
     }
 
+    public List<Question> getQuestions(int page, int pageSize, String keyword) {
+        return questionDAO.findPage(page, pageSize, keyword);
+    }
+
     public long countQuestion() {
         return questionDAO.countAll();
+    }
+
+    public long countQuestion(String keyword) {
+        return questionDAO.countAll(keyword);
     }
 
     private void ensureQuestionNotExists(Integer questionId) {

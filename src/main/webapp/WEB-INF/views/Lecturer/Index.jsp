@@ -7,11 +7,13 @@
 
 <%
 request.setAttribute("pageTitle", "Lecturer Management");
+request.setAttribute("customCss", "management.css");
+request.setAttribute("customJs", "lecturer-management.js");
 %>
 
 <%@ include file="../Shared/_LayoutStart.jsp"%>
 
-<div class="container-fluid">
+<div class="container-fluid page-wrapper">
 	<div class="d-flex justify-content-between align-items-center mb-4">
 		<h1 class="h3 mb-0">Lecturer Management</h1>
 	</div>
@@ -24,11 +26,22 @@ request.setAttribute("pageTitle", "Lecturer Management");
 		<div class="alert alert-danger">${errorMessage}</div>
 	</c:if>
 
-	<div class="border rounded-3 bg-white p-4 mb-4">
+	<div class="border rounded-3 bg-white p-4 mb-4 form-section">
+		<form method="get" action="${pageContext.request.contextPath}/lecturers" class="row g-3 mb-4">
+			<div class="col-md-8">
+				<label class="form-label small text-secondary"> Search keyword </label>
+				<input type="text" name="keyword" class="form-control" value="${keyword}" placeholder="ID, last name, first name" />
+			</div>
+			<div class="col-md-4 d-flex align-items-end">
+				<button type="submit" class="btn btn-outline-secondary w-100">Search</button>
+			</div>
+		</form>
+
 		<form:form id="lecturerForm" method="post"
-			action="${pageContext.request.contextPath}/lecturer/add"
+			action="${pageContext.request.contextPath}/lecturers/add"
 			modelAttribute="lecturerDTO">
 			<input type="hidden" name="page" value="${currentPage}" />
+			<input type="hidden" name="keyword" value="${keyword}" />
 
 			<div class="row g-3">
 				<div class="col-md-2">
@@ -84,15 +97,15 @@ request.setAttribute("pageTitle", "Lecturer Management");
 
 			<div class="d-flex gap-2 mt-4">
 				<button type="submit"
-					formaction="${pageContext.request.contextPath}/lecturer/add"
+					formaction="${pageContext.request.contextPath}/lecturers/add"
 					class="btn btn-dark px-4">Add</button>
 
 				<button type="submit" disabled id="btnUpdate"
-					formaction="${pageContext.request.contextPath}/lecturer/update"
+					formaction="${pageContext.request.contextPath}/lecturers/update"
 					class="btn btn-outline-secondary px-4">Update</button>
 
 				<button type="submit"
-					formaction="${pageContext.request.contextPath}/lecturer/delete"
+					formaction="${pageContext.request.contextPath}/lecturers/delete"
 					disabled id="btnDelete" class="btn btn-outline-danger px-4"
 					onclick="return confirm('Delete this lecturer?')">Delete</button>
 
@@ -104,9 +117,9 @@ request.setAttribute("pageTitle", "Lecturer Management");
 
 	</div>
 
-	<div class="card border-0 shadow-sm">
-		<div class="table-responsive p-3">
-			<table class="table table-hover align-middle mb-0">
+	<div class="card border-0 shadow-sm management-card">
+		<div class="table-responsive p-3 management-table-wrapper">
+			<table class="table table-hover align-middle mb-0 management-table">
 				<thead class="table-light">
 					<tr>
 						<th>Lecturer ID</th>
@@ -163,8 +176,8 @@ request.setAttribute("pageTitle", "Lecturer Management");
 
 		<div class="pagination-wrapper">
 			<c:if test="${currentPage > 1}">
-				<a class="pagination-item" href="lecturer?page=1"> First </a>
-				<a class="pagination-item" href="lecturer?page=${currentPage - 1}">
+				<a class="pagination-item" href="lecturers?page=1&keyword=${keyword}"> First </a>
+				<a class="pagination-item" href="lecturers?page=${currentPage - 1}&keyword=${keyword}">
 					&laquo; </a>
 			</c:if>
 
@@ -175,7 +188,7 @@ request.setAttribute("pageTitle", "Lecturer Management");
 			<c:forEach begin="${currentPage - 2 < 1 ? 1 : currentPage - 2}"
 				end="${currentPage + 2 > totalPages ? totalPages : currentPage + 2}"
 				var="i">
-				<a href="lecturer?page=${i}"
+				<a href="lecturers?page=${i}&keyword=${keyword}"
 					class="pagination-item ${currentPage == i ? 'active' : ''}">
 					${i} </a>
 			</c:forEach>
@@ -185,72 +198,13 @@ request.setAttribute("pageTitle", "Lecturer Management");
 			</c:if>
 
 			<c:if test="${currentPage < totalPages}">
-				<a class="pagination-item" href="lecturer?page=${currentPage + 1}">
+				<a class="pagination-item" href="lecturers?page=${currentPage + 1}&keyword=${keyword}">
 					&raquo; </a>
-				<a class="pagination-item" href="lecturer?page=${totalPages}">
+				<a class="pagination-item" href="lecturers?page=${totalPages}&keyword=${keyword}">
 					Last </a>
 			</c:if>
 		</div>
 	</div>
 </div>
-
-<script>
-
-function fillFormFromRow(row) {
-
-	document.getElementById("lecturerId").value =
-		row.dataset.id.trim();
-
-	document.getElementById("lastName").value =
-		row.dataset.lastname;
-
-	document.getElementById("firstName").value =
-		row.dataset.firstname;
-
-	document.getElementById("phoneNumber").value =
-		row.dataset.phone;
-
-	document.getElementById("address").value =
-		row.dataset.address;
-
-	document.getElementById("lecturerId").readOnly = true;
-}
-
-	document
-		.querySelectorAll(".btn-edit")
-		.forEach(button => {
-
-			button.addEventListener("click", function () {
-				const row =
-					this.closest("tr");
-
-				fillFormFromRow(row);
-
-				document.getElementById("btnUpdate").disabled = false;
-				document.getElementById("btnDelete").disabled = false;
-			});
-
-		});
-
-	function resetForm() {
-
-		document
-			.getElementById("lecturerForm")
-			.reset();
-
-		document
-			.getElementById("lecturerId")
-			.readOnly = false;
-		
-		document
-		.getElementById("btnUpdate")
-		.disabled = true;
-
-	document
-		.getElementById("btnDelete")
-		.disabled = true;
-	}
-
-</script>
 
 <%@ include file="../Shared/_LayoutEnd.jsp"%>
