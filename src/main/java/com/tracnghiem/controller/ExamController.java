@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.tracnghiem.dao.ClassRoomDAO;
+import com.tracnghiem.dao.ClassroomDAO;
 import com.tracnghiem.dao.SubjectDAO;
 import com.tracnghiem.dto.PrepareExamDTO;
 import com.tracnghiem.entity.Exam;
@@ -32,7 +32,7 @@ public class ExamController {
     private ExamService examService;
 
     @Autowired
-    private ClassRoomDAO classRoomDAO;
+    private ClassroomDAO classRoomDAO;
 
     @Autowired
     private SubjectDAO subjectDAO;

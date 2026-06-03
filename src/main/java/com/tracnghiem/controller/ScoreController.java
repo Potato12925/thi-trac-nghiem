@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.tracnghiem.service.ClassRoomService;
+import com.tracnghiem.service.ClassroomService;
 import com.tracnghiem.service.SubjectService;
 import com.tracnghiem.service.ScoreService;
-import com.tracnghiem.entity.ClassRoom;
+import com.tracnghiem.entity.Classroom;
 import com.tracnghiem.entity.Subject;
 
 @Controller
@@ -23,7 +23,7 @@ public class ScoreController {
     private ScoreService scoreService;
 
     @Autowired
-    private ClassRoomService classRoomService;
+    private ClassroomService classroomService;
 
     @Autowired
     private SubjectService subjectService;
@@ -45,7 +45,7 @@ public class ScoreController {
             return "redirect:/auth/login";
         }
 
-        model.addAttribute("dsLop", classRoomService.getAllClassRoomList());
+        model.addAttribute("dsLop", classroomService.getAllClassrooms());
         model.addAttribute("dsMonHoc", subjectService.getAllSubjects());
 
         // Pass selected parameters back to form
@@ -57,7 +57,7 @@ public class ScoreController {
                 && subjectId != null && !subjectId.trim().isEmpty() 
                 && tryNumber != null) {
             
-            ClassRoom classRoom = classRoomService.timLopTheoMa(classId);
+            Classroom classRoom = classroomService.findClassroomById(classId);
             Subject subject = subjectService.getSubjectById(subjectId);
 
             model.addAttribute("selectedClassName", classRoom != null ? classRoom.getClassName() : classId);
