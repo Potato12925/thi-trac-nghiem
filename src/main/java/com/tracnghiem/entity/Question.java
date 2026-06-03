@@ -13,121 +13,132 @@ import javax.persistence.Table;
 @Table(name = "BODE")
 public class Question {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "CAUHOI")
-	private Integer questionId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "CAUHOI")
+    private Integer questionId;
 
-	@ManyToOne
-	@JoinColumn(name = "MAMH")
-	private Subject subject;
+    @ManyToOne
+    @JoinColumn(name = "MAMH")
+    private Subject subject;
 
-	@Column(name = "TRINHDO")
-	private String level;
+    @Column(name = "TRINHDO")
+    private String level;
 
-	@Column(name = "NOIDUNG")
-	private String content;
+    @Column(name = "NOIDUNG")
+    private String content;
 
-	@Column(name = "A")
-	private String optionA;
+    @Column(name = "A")
+    private String optionA;
 
-	@Column(name = "B")
-	private String optionB;
+    @Column(name = "B")
+    private String optionB;
 
-	@Column(name = "C")
-	private String optionC;
+    @Column(name = "C")
+    private String optionC;
 
-	@Column(name = "D")
-	private String optionD;
+    @Column(name = "D")
+    private String optionD;
 
-	@Column(name = "DAP_AN")
-	private String correctAnswer;
+    @Column(name = "DAP_AN")
+    private String correctAnswer;
 
-	@ManyToOne
-	@JoinColumn(name = "MAGV")
-	private Lecturer lecturer;
+    @ManyToOne
+    @JoinColumn(name = "MAGV")
+    private Lecturer lecturer;
 
-	public Question() {
-	}
+    @Column(name = "IS_DELETED", nullable = false)
+    private boolean deleted = false;
 
-	public Integer getQuestionId() {
-		return questionId;
-	}
+    public Question() {
+    }
 
-	public void setQuestionId(Integer questionId) {
-		this.questionId = questionId;
-	}
+    public Integer getQuestionId() {
+        return questionId;
+    }
 
-	public Subject getSubject() {
-		return subject;
-	}
+    public void setQuestionId(Integer questionId) {
+        this.questionId = questionId;
+    }
 
-	public void setSubject(Subject subject) {
-		this.subject = subject;
-	}
+    public Subject getSubject() {
+        return subject;
+    }
 
-	public String getLevel() {
-		return level;
-	}
+    public void setSubject(Subject subject) {
+        this.subject = subject;
+    }
 
-	public void setLevel(String level) {
-		this.level = level;
-	}
+    public String getLevel() {
+        return level;
+    }
 
-	public String getContent() {
-		return content;
-	}
+    public void setLevel(String level) {
+        this.level = level;
+    }
 
-	public void setContent(String content) {
-		this.content = content;
-	}
+    public String getContent() {
+        return content;
+    }
 
-	public String getOptionA() {
-		return optionA;
-	}
+    public void setContent(String content) {
+        this.content = content;
+    }
 
-	public void setOptionA(String optionA) {
-		this.optionA = optionA;
-	}
+    public String getOptionA() {
+        return optionA;
+    }
 
-	public String getOptionB() {
-		return optionB;
-	}
+    public void setOptionA(String optionA) {
+        this.optionA = optionA;
+    }
 
-	public void setOptionB(String optionB) {
-		this.optionB = optionB;
-	}
+    public String getOptionB() {
+        return optionB;
+    }
 
-	public String getOptionC() {
-		return optionC;
-	}
+    public void setOptionB(String optionB) {
+        this.optionB = optionB;
+    }
 
-	public void setOptionC(String optionC) {
-		this.optionC = optionC;
-	}
+    public String getOptionC() {
+        return optionC;
+    }
 
-	public String getOptionD() {
-		return optionD;
-	}
+    public void setOptionC(String optionC) {
+        this.optionC = optionC;
+    }
 
-	public void setOptionD(String optionD) {
-		this.optionD = optionD;
-	}
+    public String getOptionD() {
+        return optionD;
+    }
 
-	public String getCorrectAnswer() {
-		return correctAnswer;
-	}
+    public void setOptionD(String optionD) {
+        this.optionD = optionD;
+    }
 
-	public void setCorrectAnswer(String correctAnswer) {
-		this.correctAnswer = correctAnswer;
-	}
+    public String getCorrectAnswer() {
+        return correctAnswer;
+    }
 
-	public Lecturer getLecturer() {
-		return lecturer;
-	}
+    public void setCorrectAnswer(String correctAnswer) {
+        this.correctAnswer = correctAnswer;
+    }
 
-	public void setLecturer(Lecturer lecturer) {
-		this.lecturer = lecturer;
-	}
+    public Lecturer getLecturer() {
+        return lecturer;
+    }
+
+    public void setLecturer(Lecturer lecturer) {
+        this.lecturer = lecturer;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
 
 }

@@ -17,88 +17,99 @@ import javax.persistence.TemporalType;
 @Table(name = "SINHVIEN")
 public class Student {
 
-	@Id
-	@Column(name = "MASV", length = 8)
-	private String studentId;
+    @Id
+    @Column(name = "MASV", length = 8)
+    private String studentId;
 
-	@Column(name = "HO", length = 40)
-	private String lastName;
+    @Column(name = "HO", length = 40)
+    private String lastName;
 
-	@Column(name = "TEN", length = 10)
-	private String firstName;
+    @Column(name = "TEN", length = 10)
+    private String firstName;
 
-	@Temporal(TemporalType.DATE)
-	@Column(name = "NGAYSINH")
-	private Date birthDate;
+    @Temporal(TemporalType.DATE)
+    @Column(name = "NGAYSINH")
+    private Date birthDate;
 
-	@Column(name = "DIACHI", length = 100)
-	private String address;
+    @Column(name = "DIACHI", length = 100)
+    private String address;
 
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "MALOP", nullable = false)
-	private Classroom classRoom;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "MALOP", nullable = false)
+    private Classroom classRoom;
 
-	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "MASV", referencedColumnName = "MA", insertable = false, updatable = false)
-	private Account account;
+    @Column(name = "IS_DELETED", nullable = false)
+    private boolean deleted = false;
 
-	public Student() {
-	}
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "MASV", referencedColumnName = "MA", insertable = false, updatable = false)
+    private Account account;
 
-	public String getStudentId() {
-		return studentId;
-	}
+    public Student() {
+    }
 
-	public void setStudentId(String studentId) {
-		this.studentId = studentId;
-	}
+    public String getStudentId() {
+        return studentId;
+    }
 
-	public String getLastName() {
-		return lastName;
-	}
+    public void setStudentId(String studentId) {
+        this.studentId = studentId;
+    }
 
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
+    public String getLastName() {
+        return lastName;
+    }
 
-	public String getFirstName() {
-		return firstName;
-	}
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
+    public String getFirstName() {
+        return firstName;
+    }
 
-	public Date getBirthDate() {
-		return birthDate;
-	}
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
 
-	public void setBirthDate(Date birthDate) {
-		this.birthDate = birthDate;
-	}
+    public Date getBirthDate() {
+        return birthDate;
+    }
 
-	public String getAddress() {
-		return address;
-	}
+    public void setBirthDate(Date birthDate) {
+        this.birthDate = birthDate;
+    }
 
-	public void setAddress(String address) {
-		this.address = address;
-	}
+    public String getAddress() {
+        return address;
+    }
 
-	public Classroom getClassRoom() {
-		return classRoom;
-	}
+    public void setAddress(String address) {
+        this.address = address;
+    }
 
-	public void setClassRoom(Classroom classRoom) {
-		this.classRoom = classRoom;
-	}
+    public Classroom getClassRoom() {
+        return classRoom;
+    }
 
-	public Account getAccount() {
-		return account;
-	}
+    public void setClassRoom(Classroom classRoom) {
+        this.classRoom = classRoom;
+    }
 
-	public void setAccount(Account account) {
-		this.account = account;
-	}
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
+    public Account getAccount() {
+        return account;
+    }
+
+    public void setAccount(Account account) {
+        this.account = account;
+    }
 
 }

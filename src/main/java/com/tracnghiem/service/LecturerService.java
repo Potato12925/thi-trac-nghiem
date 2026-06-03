@@ -68,8 +68,12 @@ public class LecturerService {
     }
 
     public void deleteLecturer(LecturerDTO dto) {
-        Lecturer lecturer = convertToEntity(dto);
-        lecturerDAO.delete(lecturer);
+        Lecturer lecturer = lecturerDAO.findById(dto.getLecturerId());
+        if (lecturer == null) {
+            throw new IllegalArgumentException("Giảng viên không tồn tại");
+        }
+        lecturer.setDeleted(true);
+        lecturerDAO.update(lecturer);
     }
 
     private void validateLecturerNotExists(String lecturerId) {

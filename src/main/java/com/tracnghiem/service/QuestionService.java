@@ -124,8 +124,7 @@ public class QuestionService {
             throw new IllegalArgumentException("Câu hỏi không tồn tại");
         }
 
-        Question question = mapToEntity(dto);
-
-        questionDAO.delete(question);
+        existing.setDeleted(true);
+        questionDAO.update(existing);
     }
 }

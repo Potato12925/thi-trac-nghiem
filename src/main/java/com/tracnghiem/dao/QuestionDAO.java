@@ -16,13 +16,13 @@ public class QuestionDAO extends GenericDAO<Question> {
     }
 
     public long countAvailableQuestions(String maMh, String trinhDo) {
-        String hql = "SELECT COUNT(b) FROM Question b WHERE b.subject.subjectId = :maMh AND b.level = :trinhDo";
+        String hql = "SELECT COUNT(b) FROM Question b WHERE b.deleted = false AND b.subject.subjectId = :maMh AND b.level = :trinhDo";
         return getSession().createQuery(hql, Long.class).setParameter("maMh", maMh).setParameter("trinhDo", trinhDo)
                 .uniqueResult();
     }
 
     public List<Question> getRandomQuestions(String maMh, String trinhDo, int limit) {
-        String hql = "FROM Question b WHERE b.subject.subjectId = :maMh AND b.level = :trinhDo";
+        String hql = "FROM Question b WHERE b.deleted = false AND b.subject.subjectId = :maMh AND b.level = :trinhDo";
         List<Question> list = getSession().createQuery(hql, Question.class).setParameter("maMh", maMh)
                 .setParameter("trinhDo", trinhDo).getResultList();
         Collections.shuffle(list);
@@ -33,30 +33,33 @@ public class QuestionDAO extends GenericDAO<Question> {
         return findPage(page, pageSize, keyword, null);
     }
 
+    @Override
+    public List<Question> findPage(int page, int pageSize) {
+        String hql = "FROM Question q WHERE q.deleted = false ORDER BY q.questionId";
+        int offset = (page - 1) * pageSize;
+        return getSession().createQuery(hql, Question.class)
+                .setFirstResult(offset)
+                .setMaxResults(pageSize)
+                .list();
+    }
+
     public List<Question> findPage(int page, int pageSize, String keyword, String lecturerId) {
-        String hql = "FROM Question q";
+        String hql = "FROM Question q WHERE q.deleted = false";
         String trimmedKeyword = keyword == null ? "" : keyword.trim().toLowerCase();
         boolean hasKeyword = !trimmedKeyword.isEmpty();
         boolean hasLecturerFilter = lecturerId != null && !lecturerId.trim().isEmpty();
 
-        if (hasKeyword || hasLecturerFilter) {
-            hql += " WHERE ";
-        }
-
         if (hasKeyword) {
-            hql += "(" +
-                    "lower(q.content) LIKE :keyword OR " +
-                    "lower(q.level) LIKE :keyword OR " +
-                    "lower(q.subject.subjectId) LIKE :keyword OR " +
-                    "lower(q.lecturer.lecturerId) LIKE :keyword" +
-                    ")";
+            hql += " AND ("
+                    + "lower(q.content) LIKE :keyword OR "
+                    + "lower(q.level) LIKE :keyword OR "
+                    + "lower(q.subject.subjectId) LIKE :keyword OR "
+                    + "lower(q.lecturer.lecturerId) LIKE :keyword"
+                    + ")";
         }
 
         if (hasLecturerFilter) {
-            if (hasKeyword) {
-                hql += " AND ";
-            }
-            hql += "q.lecturer.lecturerId = :lecturerId";
+            hql += " AND q.lecturer.lecturerId = :lecturerId";
         }
 
         hql += " ORDER BY q.questionId";
@@ -73,34 +76,33 @@ public class QuestionDAO extends GenericDAO<Question> {
         return query.setFirstResult(offset).setMaxResults(pageSize).list();
     }
 
+    @Override
+    public long countAll() {
+        String hql = "SELECT COUNT(q) FROM Question q WHERE q.deleted = false";
+        return getSession().createQuery(hql, Long.class).uniqueResult();
+    }
+
     public long countAll(String keyword) {
         return countAll(keyword, null);
     }
 
     public long countAll(String keyword, String lecturerId) {
-        String hql = "SELECT COUNT(q) FROM Question q";
+        String hql = "SELECT COUNT(q) FROM Question q WHERE q.deleted = false";
         String trimmedKeyword = keyword == null ? "" : keyword.trim().toLowerCase();
         boolean hasKeyword = !trimmedKeyword.isEmpty();
         boolean hasLecturerFilter = lecturerId != null && !lecturerId.trim().isEmpty();
 
-        if (hasKeyword || hasLecturerFilter) {
-            hql += " WHERE ";
-        }
-
         if (hasKeyword) {
-            hql += "(" +
-                    "lower(q.content) LIKE :keyword OR " +
-                    "lower(q.level) LIKE :keyword OR " +
-                    "lower(q.subject.subjectId) LIKE :keyword OR " +
-                    "lower(q.lecturer.lecturerId) LIKE :keyword" +
-                    ")";
+            hql += " AND ("
+                    + "lower(q.content) LIKE :keyword OR "
+                    + "lower(q.level) LIKE :keyword OR "
+                    + "lower(q.subject.subjectId) LIKE :keyword OR "
+                    + "lower(q.lecturer.lecturerId) LIKE :keyword"
+                    + ")";
         }
 
         if (hasLecturerFilter) {
-            if (hasKeyword) {
-                hql += " AND ";
-            }
-            hql += "q.lecturer.lecturerId = :lecturerId";
+            hql += " AND q.lecturer.lecturerId = :lecturerId";
         }
 
         Query<Long> query = getSession().createQuery(hql, Long.class);

@@ -75,12 +75,14 @@ public class StudentService {
     }
 
     public void deleteStudent(StudentDTO dto) {
-        Student student = convertToEntity(dto);
-
-        studentDAO.delete(student);
+        Student student = studentDAO.findById(dto.getStudentId());
+        if (student == null) {
+            throw new IllegalArgumentException("Sinh viên không tồn tại");
+        }
+        student.setDeleted(true);
+        studentDAO.update(student);
 
         authService.deleteAccount(dto.getStudentId());
-
     }
 
     private void ensureStudentNotExists(String studentId) {

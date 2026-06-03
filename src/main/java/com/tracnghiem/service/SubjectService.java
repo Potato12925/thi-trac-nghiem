@@ -85,10 +85,11 @@ public class SubjectService {
     }
 
     public void deleteSubject(SubjectDTO dto) {
-        ensureSubjectExists(dto.getSubjectId());
-
-        Subject subject = mapToEntity(dto);
-
-        subjectDAO.delete(subject);
+        Subject subject = getSubjectById(dto.getSubjectId());
+        if (subject == null) {
+            throw new IllegalArgumentException("Môn học không tồn tại");
+        }
+        subject.setDeleted(true);
+        subjectDAO.update(subject);
     }
 }

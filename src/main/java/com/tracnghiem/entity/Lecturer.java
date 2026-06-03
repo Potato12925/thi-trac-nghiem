@@ -9,68 +9,79 @@ import javax.persistence.Table;
 @Table(name = "GIAOVIEN")
 public class Lecturer {
 
-	@Id
-	@Column(name = "MAGV", length = 8)
-	private String lecturerId;
+    @Id
+    @Column(name = "MAGV", length = 8)
+    private String lecturerId;
 
-	@Column(name = "HO")
-	private String lastName;
+    @Column(name = "HO")
+    private String lastName;
 
-	@Column(name = "TEN")
-	private String firstName;
+    @Column(name = "TEN")
+    private String firstName;
 
-	@Column(name = "SODTLL")
-	private String phoneNumber;
+    @Column(name = "SODTLL")
+    private String phoneNumber;
 
-	@Column(name = "DIACHI")
-	private String address;
+    @Column(name = "DIACHI")
+    private String address;
 
-	public Lecturer() {
-	}
+    @Column(name = "IS_DELETED", nullable = false)
+    private boolean deleted = false;
 
-	public String getLecturerId() {
-		return lecturerId;
-	}
+    public Lecturer() {
+    }
 
-	public void setLecturerId(String lecturerId) {
-		this.lecturerId = lecturerId;
-	}
+    public String getLecturerId() {
+        return lecturerId;
+    }
 
-	public String getLastName() {
-		return lastName;
-	}
+    public void setLecturerId(String lecturerId) {
+        this.lecturerId = lecturerId;
+    }
 
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
+    public String getLastName() {
+        return lastName;
+    }
 
-	public String getFirstName() {
-		return firstName;
-	}
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
+    public String getFirstName() {
+        return firstName;
+    }
 
-	public String getPhoneNumber() {
-		return phoneNumber;
-	}
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
 
-	public void setPhoneNumber(String phoneNumber) {
-		this.phoneNumber = phoneNumber;
-	}
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
 
-	public String getAddress() {
-		return address;
-	}
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
 
-	public void setAddress(String address) {
-		this.address = address;
-	}
+    public String getAddress() {
+        return address;
+    }
 
-	@Override
-	public String toString() {
-		return "Lecturer{" + "lecturerId='" + lecturerId + '\'' + ", lastName='" + lastName + '\'' + ", firstName='"
-				+ firstName + '\'' + ", phoneNumber='" + phoneNumber + '\'' + ", address='" + address + '\'' + '}';
-	}
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
+    @Override
+    public String toString() {
+        return "Lecturer{" + "lecturerId='" + lecturerId + '\'' + ", lastName='" + lastName + '\'' + ", firstName='"
+                + firstName + '\'' + ", phoneNumber='" + phoneNumber + '\'' + ", address='" + address + '\'' + '}';
+    }
 }
