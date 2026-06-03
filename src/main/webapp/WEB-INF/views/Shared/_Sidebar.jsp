@@ -42,7 +42,7 @@ String activeLecturerRegistration = path.equals("/lecturer-registration") || pat
 		? "active"
 		: "";
 
-String activeScore = path.equals("/score") || path.startsWith("/score/") ? "active" : "";
+String activeScore = path.equals("/score") || path.startsWith("/score/") || path.equals("/scores") || path.startsWith("/scores/") ? "active" : "";
 
 String activeAccount = path.equals("/account") || path.startsWith("/account/") ? "active" : "";
 
