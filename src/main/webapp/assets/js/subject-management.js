@@ -6,6 +6,10 @@ document.addEventListener("DOMContentLoaded", function () {
   editButtons.forEach((button) => {
     button.addEventListener("click", function () {
       const row = this.closest("tr");
+      // save state for undo
+      _lastSubjectState = getSubjectState();
+      const b = document.getElementById("btnUndo");
+      if (b) b.disabled = false;
       fillFormFromRow(row);
       setActiveRow(row);
     });
@@ -82,4 +86,40 @@ function resetForm() {
     activeRow.classList.remove("table-primary");
     activeRow = null;
   }
+}
+
+// Undo support
+let _lastSubjectState = null;
+
+function getSubjectState() {
+  return {
+    subjectId: document.getElementById("subjectId")?.value || "",
+    subjectName: document.getElementById("subjectName")?.value || "",
+    readOnly: document.getElementById("subjectId")?.readOnly || false,
+  };
+}
+
+function restoreSubjectState(state) {
+  if (!state) return;
+  document.getElementById("subjectId").value = state.subjectId;
+  document.getElementById("subjectName").value = state.subjectName;
+  document.getElementById("subjectId").readOnly = state.readOnly;
+}
+
+const _btnUndoSubject = document.getElementById("btnUndo");
+if (_btnUndoSubject) {
+  _btnUndoSubject.addEventListener("click", function () {
+    restoreSubjectState(_lastSubjectState);
+    _lastSubjectState = null;
+    this.disabled = true;
+  });
+}
+
+const _subjectForm = document.getElementById("subjectForm");
+if (_subjectForm) {
+  _subjectForm.addEventListener("submit", function () {
+    _lastSubjectState = null;
+    const b = document.getElementById("btnUndo");
+    if (b) b.disabled = true;
+  });
 }

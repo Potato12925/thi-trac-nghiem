@@ -52,24 +52,26 @@ request.setAttribute("pageTitle", "Quản lý Lớp");
 
 				<button type="submit" class="btn btn-dark px-4"
 					onclick="submitForm(
-                        'add',
-                    )">
+	                        'add',
+	                    )">
 
 					Add</button>
 
 				<button type="submit" class="btn btn-outline-secondary px-4"
 					onclick="submitForm(
-                        'update',
-                    )">
+	                        'update',
+	                    )">
 
 					Update</button>
 
 				<button type="submit" class="btn btn-outline-danger px-4"
 					onclick="submitForm(
-                        'delete',
-                    )">
+	                        'delete',
+	                    )">
 
 					Xóa</button>
+
+				<button type="button" class="btn btn-outline-secondary" id="btnUndo" disabled>Undo</button>
 
 				<button type="button" class="btn btn-outline-dark"
 					onclick="resetForm()">Reset</button>
@@ -162,11 +164,13 @@ request.setAttribute("pageTitle", "Quản lý Lớp");
 	}
 
 	const editButtons = document.querySelectorAll(".btn-edit");
-	
+
 	editButtons.forEach(button => {
 		button.addEventListener("click", function () {
 			const row = this.closest("tr");
-			
+			// save current form state for undo
+			_lastClassroomState = getClassroomState();
+			const b = document.getElementById('btnUndo'); if (b) b.disabled = false;
 			fillFormFromRow(row);
 		});
 	});
@@ -184,6 +188,44 @@ request.setAttribute("pageTitle", "Quản lý Lớp");
 	    document.getElementById("classRoomForm").reset();
 
 	    document.getElementById("classId").readOnly = false;
+	}
+
+	// Undo support: save previous form state before filling from a row
+	let _lastClassroomState = null;
+
+	function getClassroomState() {
+		return {
+			classId: document.getElementById("classId").value,
+			className: document.getElementById("className").value,
+			readOnly: document.getElementById("classId").readOnly
+		};
+	}
+
+	function restoreClassroomState(state) {
+		if (!state) return;
+		document.getElementById("classId").value = state.classId;
+		document.getElementById("className").value = state.className;
+		document.getElementById("classId").readOnly = state.readOnly;
+	}
+
+	// (undo capture handled in the main edit button listener above)
+
+	const _btnUndo = document.getElementById('btnUndo');
+	if (_btnUndo) {
+		_btnUndo.addEventListener('click', function () {
+			restoreClassroomState(_lastClassroomState);
+			_lastClassroomState = null;
+			this.disabled = true;
+		});
+	}
+
+	// clear undo state when form is submitted (so can't undo after save)
+	const _classForm = document.getElementById('classRoomForm');
+	if (_classForm) {
+		_classForm.addEventListener('submit', function () {
+			_lastClassroomState = null;
+			const b = document.getElementById('btnUndo'); if (b) b.disabled = true;
+		});
 	}
 </script>
 

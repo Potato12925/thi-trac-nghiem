@@ -109,8 +109,10 @@ request.setAttribute("customJs", "lecturer-management.js");
 					disabled id="btnDelete" class="btn btn-outline-danger px-4"
 					onclick="return confirm('Delete this lecturer?')">Delete</button>
 
-				<button type="button" class="btn btn-outline-dark"
-					onclick="resetForm()">Reset</button>
+			<button type="button" class="btn btn-outline-secondary" id="btnUndo" disabled>Undo</button>
+
+			<button type="button" class="btn btn-outline-dark"
+				onclick="resetForm()">Reset</button>
 			</div>
 
 		</form:form>

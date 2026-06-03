@@ -12,7 +12,7 @@ public class LecturerDAO extends GenericDAO<Lecturer> {
 
     public List<Lecturer> findByKeyword(String keyword) {
 
-        String hql = "FROM Lecturer t WHERE t.deleted = false AND (lower(t.maGV) LIKE :keyword OR lower(t.ho) LIKE :keyword OR lower(t.ten) LIKE :keyword)";
+        String hql = "FROM Lecturer t WHERE t.deleted = false AND (lower(t.lecturerId) LIKE :keyword OR lower(t.lastName) LIKE :keyword OR lower(t.firstName) LIKE :keyword)";
 
         return getSession()
                 .createQuery(hql, Lecturer.class)
@@ -22,13 +22,13 @@ public class LecturerDAO extends GenericDAO<Lecturer> {
 
     @Override
     public List<Lecturer> findAll() {
-        String hql = "FROM Lecturer t WHERE t.deleted = false ORDER BY t.ho, t.ten";
+        String hql = "FROM Lecturer t WHERE t.deleted = false ORDER BY t.lastName, t.firstName";
         return getSession().createQuery(hql, Lecturer.class).list();
     }
 
     @Override
     public List<Lecturer> findPage(int page, int pageSize) {
-        String hql = "FROM Lecturer t WHERE t.deleted = false ORDER BY t.ho, t.ten";
+        String hql = "FROM Lecturer t WHERE t.deleted = false ORDER BY t.lastName, t.firstName";
         int offset = (page - 1) * pageSize;
         return getSession().createQuery(hql, Lecturer.class)
                 .setFirstResult(offset)
@@ -41,9 +41,9 @@ public class LecturerDAO extends GenericDAO<Lecturer> {
         String trimmedKeyword = keyword == null ? "" : keyword.trim().toLowerCase();
         boolean hasKeyword = !trimmedKeyword.isEmpty();
         if (hasKeyword) {
-            hql += " AND (lower(t.maGV) LIKE :keyword OR lower(t.ho) LIKE :keyword OR lower(t.ten) LIKE :keyword)";
+            hql += " AND (lower(t.lecturerId) LIKE :keyword OR lower(t.lastName) LIKE :keyword OR lower(t.firstName) LIKE :keyword)";
         }
-        hql += " ORDER BY t.ho, t.ten";
+        hql += " ORDER BY t.lastName, t.firstName";
 
         Query<Lecturer> query = getSession().createQuery(hql, Lecturer.class);
         if (hasKeyword) {
@@ -65,7 +65,7 @@ public class LecturerDAO extends GenericDAO<Lecturer> {
         String trimmedKeyword = keyword == null ? "" : keyword.trim().toLowerCase();
         boolean hasKeyword = !trimmedKeyword.isEmpty();
         if (hasKeyword) {
-            hql += " AND (lower(t.maGV) LIKE :keyword OR lower(t.ho) LIKE :keyword OR lower(t.ten) LIKE :keyword)";
+            hql += " AND (lower(t.lecturerId) LIKE :keyword OR lower(t.lastName) LIKE :keyword OR lower(t.firstName) LIKE :keyword)";
         }
 
         Query<Long> query = getSession().createQuery(hql, Long.class);

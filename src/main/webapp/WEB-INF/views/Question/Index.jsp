@@ -206,6 +206,8 @@ request.setAttribute("customJs", "question-management.js");
 
 				<button type="button" class="btn btn-outline-dark"
 					onclick="clearQuestionForm()">Reset</button>
+
+				<button type="button" class="btn btn-outline-secondary" id="btnUndo" disabled>Undo</button>
 			</div>
 		</form:form>
 	</div>

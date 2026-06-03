@@ -81,6 +81,8 @@ request.setAttribute("customJs", "subject-management.js");
 
 				<button type="submit" class="btn btn-outline-danger px-4"
 					onclick="submitForm('delete')">Xóa</button>
+				<button type="button" class="btn btn-outline-secondary" id="btnUndo" disabled>Undo</button>
+
 				<button type="button" class="btn btn-outline-secondary px-4"
 					onclick="resetForm()">Xóa dữ liệu</button>
 			</div>

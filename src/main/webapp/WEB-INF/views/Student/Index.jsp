@@ -146,8 +146,10 @@ request.setAttribute("customJs", "student-management.js");
 				<button type="submit" class="btn btn-outline-danger px-4"
 					onclick="submitForm('/students/delete')">Delete</button>
 
-				<button type="button" class="btn btn-outline-dark"
-					onclick="resetForm()">Reset</button>
+			<button type="button" class="btn btn-outline-secondary" id="btnUndo" disabled>Undo</button>
+
+			<button type="button" class="btn btn-outline-dark"
+				onclick="resetForm()">Reset</button>
 
 			</div>
 
