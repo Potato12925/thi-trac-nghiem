@@ -50,11 +50,11 @@ public class QuestionService {
 
     public List<Question> getQuestions(int page, int pageSize) {
 
-        return questionDAO.getPagination(page, pageSize);
+        return questionDAO.findPage(page, pageSize);
     }
 
     public long countQuestion() {
-        return questionDAO.count();
+        return questionDAO.countAll();
     }
 
     private void ensureQuestionNotExists(Integer questionId) {

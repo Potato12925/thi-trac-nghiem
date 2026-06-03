@@ -29,11 +29,11 @@ public class SubjectService {
     }
 
     public List<Subject> getSubjects(int page, int pageSize) {
-        return subjectDAO.getPagination(page, pageSize);
+        return subjectDAO.findPage(page, pageSize);
     }
 
     public long countSubjects() {
-        return subjectDAO.count();
+        return subjectDAO.countAll();
     }
 
     public Subject getSubjectById(String subjectId) {

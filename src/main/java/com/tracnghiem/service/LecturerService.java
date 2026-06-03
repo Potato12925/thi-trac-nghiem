@@ -33,11 +33,11 @@ public class LecturerService {
     }
 
     public List<Lecturer> getLecturers(int page, int pageSize) {
-        return lecturerDAO.getPagination(page, pageSize);
+        return lecturerDAO.findPage(page, pageSize);
     }
 
     public long countLecturers() {
-        return lecturerDAO.count();
+        return lecturerDAO.countAll();
     }
 
     public Lecturer findLecturerById(String lecturerId) {

@@ -43,11 +43,11 @@ public class StudentService {
     }
 
     public List<Student> getStudents(int page, int pageSize) {
-        return studentDAO.getPagination(page, pageSize);
+        return studentDAO.findPage(page, pageSize);
     }
 
     public long countStudents() {
-        return studentDAO.count();
+        return studentDAO.countAll();
     }
 
     public Student getStudentById(String studentId) {

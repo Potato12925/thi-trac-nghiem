@@ -34,11 +34,11 @@ public class ClassroomService {
 
     public List<Classroom> getClassrooms(int page, int pageSize) {
 
-        return classroomDAO.getPagination(page, pageSize);
+        return classroomDAO.findPage(page, pageSize);
     }
 
     public long countClassrooms() {
-        return classroomDAO.count();
+        return classroomDAO.countAll();
     }
 
     private void ensureClassroomNotExists(String classId) {
