@@ -4,6 +4,8 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -32,11 +34,22 @@ public class QuestionController {
     @GetMapping
     public String showQuestionPage(@RequestParam(defaultValue = "1") int page,
             @RequestParam(required = false) String keyword,
-            ModelMap model) {
-        prepareQuestionPage(model, page, keyword);
+            ModelMap model,
+            HttpSession session) {
+        String role = (String) session.getAttribute("ROLE");
+        String loggedUser = (String) session.getAttribute("LOGIN_USER");
+        boolean isLecturer = "GIAOVIEN".equals(role);
 
-        model.addAttribute("questionDTO", new QuestionDTO());
+        prepareQuestionPage(model, page, keyword, role, loggedUser);
+
+        QuestionDTO questionDTO = new QuestionDTO();
+        if (isLecturer) {
+            questionDTO.setLecturerId(loggedUser);
+        }
+        model.addAttribute("questionDTO", questionDTO);
         model.addAttribute("keyword", keyword);
+        model.addAttribute("isLecturer", isLecturer);
+        model.addAttribute("loggedLecturerId", loggedUser);
 
         return INDEX_VIEW;
     }
@@ -46,18 +59,21 @@ public class QuestionController {
             @RequestParam(required = false) String keyword,
             @Validated @ModelAttribute("questionDTO") QuestionDTO questionForm,
             BindingResult validationResult,
-            ModelMap model) {
+            ModelMap model,
+            HttpSession session) {
 
         if (validationResult.hasErrors()) {
-            return renderQuestionPage(model, page, keyword);
+            return renderQuestionPage(model, page, keyword, session);
         }
 
         try {
-            questionService.addQuestion(questionForm);
+            String role = (String) session.getAttribute("ROLE");
+            String loggedUser = (String) session.getAttribute("LOGIN_USER");
+            questionService.addQuestion(questionForm, role, loggedUser);
             return REDIRECT_INDEX + buildQuery(page, keyword);
         } catch (IllegalArgumentException exception) {
             model.addAttribute("errorMessage", exception.getMessage());
-            return renderQuestionPage(model, page, keyword);
+            return renderQuestionPage(model, page, keyword, session);
         }
     }
 
@@ -66,18 +82,21 @@ public class QuestionController {
             @RequestParam(required = false) String keyword,
             @Validated @ModelAttribute("questionDTO") QuestionDTO questionForm,
             BindingResult validationResult,
-            ModelMap model) {
+            ModelMap model,
+            HttpSession session) {
 
         if (validationResult.hasErrors()) {
-            return renderQuestionPage(model, page, keyword);
+            return renderQuestionPage(model, page, keyword, session);
         }
 
         try {
-            questionService.updateQuestion(questionForm);
+            String role = (String) session.getAttribute("ROLE");
+            String loggedUser = (String) session.getAttribute("LOGIN_USER");
+            questionService.updateQuestion(questionForm, role, loggedUser);
             return REDIRECT_INDEX + buildQuery(page, keyword);
         } catch (IllegalArgumentException exception) {
             model.addAttribute("errorMessage", exception.getMessage());
-            return renderQuestionPage(model, page, keyword);
+            return renderQuestionPage(model, page, keyword, session);
         }
     }
 
@@ -86,27 +105,30 @@ public class QuestionController {
             @RequestParam(required = false) String keyword,
             @Validated @ModelAttribute("questionDTO") QuestionDTO questionForm,
             BindingResult validationResult,
-            ModelMap model) {
+            ModelMap model,
+            HttpSession session) {
 
         if (validationResult.hasErrors()) {
-            return renderQuestionPage(model, page, keyword);
+            return renderQuestionPage(model, page, keyword, session);
         }
 
         try {
-            questionService.deleteQuestion(questionForm);
+            String role = (String) session.getAttribute("ROLE");
+            String loggedUser = (String) session.getAttribute("LOGIN_USER");
+            questionService.deleteQuestion(questionForm, role, loggedUser);
             return REDIRECT_INDEX + buildQuery(page, keyword);
         } catch (IllegalArgumentException exception) {
             model.addAttribute("errorMessage", exception.getMessage());
-            return renderQuestionPage(model, page, keyword);
+            return renderQuestionPage(model, page, keyword, session);
         }
     }
 
-    private void prepareQuestionPage(ModelMap model, int page, String keyword) {
+    private void prepareQuestionPage(ModelMap model, int page, String keyword, String role, String loggedUser) {
         int pageSize = 10;
 
-        List<Question> questions = questionService.getQuestions(page, pageSize, keyword);
+        List<Question> questions = questionService.getQuestions(page, pageSize, keyword, role, loggedUser);
 
-        long totalQuestions = questionService.countQuestion(keyword);
+        long totalQuestions = questionService.countQuestion(keyword, role, loggedUser);
 
         int totalPages = (int) Math.ceil((double) totalQuestions / pageSize);
 
@@ -115,9 +137,14 @@ public class QuestionController {
         model.addAttribute("totalPages", totalPages);
     }
 
-    private String renderQuestionPage(ModelMap model, int page, String keyword) {
-        prepareQuestionPage(model, page, keyword);
+    private String renderQuestionPage(ModelMap model, int page, String keyword, HttpSession session) {
+        String role = (String) session.getAttribute("ROLE");
+        String loggedUser = (String) session.getAttribute("LOGIN_USER");
+        prepareQuestionPage(model, page, keyword, role, loggedUser);
+        boolean isLecturer = "GIAOVIEN".equals(role);
         model.addAttribute("keyword", keyword);
+        model.addAttribute("isLecturer", isLecturer);
+        model.addAttribute("loggedLecturerId", loggedUser);
         return INDEX_VIEW;
     }
 

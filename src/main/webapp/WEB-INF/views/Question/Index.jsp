@@ -5,6 +5,8 @@
 
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 
+<c:set var="isLecturer" value="${sessionScope.ROLE eq 'GIAOVIEN'}" />
+
 <%
 request.setAttribute("pageTitle", "Question Management");
 request.setAttribute("customCss", "question-management.css");
@@ -27,6 +29,10 @@ request.setAttribute("customJs", "question-management.js");
 
 		<div class="alert alert-danger">${errorMessage}</div>
 
+	</c:if>
+
+	<c:if test="${isLecturer}">
+		<div class="alert alert-info">Giáo viên chỉ được xem và cập nhật câu hỏi do mình soạn.</div>
 	</c:if>
 
 	<div class="border bg-white mb-4 shadow-sm form-section">

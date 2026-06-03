@@ -30,18 +30,43 @@ public class QuestionDAO extends GenericDAO<Question> {
     }
 
     public List<Question> findPage(int page, int pageSize, String keyword) {
+        return findPage(page, pageSize, keyword, null);
+    }
+
+    public List<Question> findPage(int page, int pageSize, String keyword, String lecturerId) {
         String hql = "FROM Question q";
         String trimmedKeyword = keyword == null ? "" : keyword.trim().toLowerCase();
         boolean hasKeyword = !trimmedKeyword.isEmpty();
+        boolean hasLecturerFilter = lecturerId != null && !lecturerId.trim().isEmpty();
+
+        if (hasKeyword || hasLecturerFilter) {
+            hql += " WHERE ";
+        }
 
         if (hasKeyword) {
-            hql += " WHERE lower(q.content) LIKE :keyword OR lower(q.level) LIKE :keyword OR lower(q.subject.subjectId) LIKE :keyword OR lower(q.lecturer.lecturerId) LIKE :keyword";
+            hql += "(" +
+                    "lower(q.content) LIKE :keyword OR " +
+                    "lower(q.level) LIKE :keyword OR " +
+                    "lower(q.subject.subjectId) LIKE :keyword OR " +
+                    "lower(q.lecturer.lecturerId) LIKE :keyword" +
+                    ")";
         }
+
+        if (hasLecturerFilter) {
+            if (hasKeyword) {
+                hql += " AND ";
+            }
+            hql += "q.lecturer.lecturerId = :lecturerId";
+        }
+
         hql += " ORDER BY q.questionId";
 
         Query<Question> query = getSession().createQuery(hql, Question.class);
         if (hasKeyword) {
             query.setParameter("keyword", "%" + trimmedKeyword + "%");
+        }
+        if (hasLecturerFilter) {
+            query.setParameter("lecturerId", lecturerId);
         }
 
         int offset = (page - 1) * pageSize;
@@ -49,17 +74,41 @@ public class QuestionDAO extends GenericDAO<Question> {
     }
 
     public long countAll(String keyword) {
+        return countAll(keyword, null);
+    }
+
+    public long countAll(String keyword, String lecturerId) {
         String hql = "SELECT COUNT(q) FROM Question q";
         String trimmedKeyword = keyword == null ? "" : keyword.trim().toLowerCase();
         boolean hasKeyword = !trimmedKeyword.isEmpty();
+        boolean hasLecturerFilter = lecturerId != null && !lecturerId.trim().isEmpty();
+
+        if (hasKeyword || hasLecturerFilter) {
+            hql += " WHERE ";
+        }
 
         if (hasKeyword) {
-            hql += " WHERE lower(q.content) LIKE :keyword OR lower(q.level) LIKE :keyword OR lower(q.subject.subjectId) LIKE :keyword OR lower(q.lecturer.lecturerId) LIKE :keyword";
+            hql += "(" +
+                    "lower(q.content) LIKE :keyword OR " +
+                    "lower(q.level) LIKE :keyword OR " +
+                    "lower(q.subject.subjectId) LIKE :keyword OR " +
+                    "lower(q.lecturer.lecturerId) LIKE :keyword" +
+                    ")";
+        }
+
+        if (hasLecturerFilter) {
+            if (hasKeyword) {
+                hql += " AND ";
+            }
+            hql += "q.lecturer.lecturerId = :lecturerId";
         }
 
         Query<Long> query = getSession().createQuery(hql, Long.class);
         if (hasKeyword) {
             query.setParameter("keyword", "%" + trimmedKeyword + "%");
+        }
+        if (hasLecturerFilter) {
+            query.setParameter("lecturerId", lecturerId);
         }
         return query.uniqueResult();
     }
