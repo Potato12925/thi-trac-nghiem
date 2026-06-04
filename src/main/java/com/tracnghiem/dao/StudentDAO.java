@@ -42,5 +42,18 @@ public class StudentDAO extends GenericDAO<Student> {
 				.setParameter("classId", classId)
 				.list();
 	}
+
+	public Student findDashboardProfileByStudentId(String studentId) {
+		String hql = "SELECT s FROM Student s "
+				+ "JOIN FETCH s.classRoom c "
+				+ "WHERE function('ltrim', function('rtrim', s.studentId)) = :studentId";
+
+		List<Student> students = getSession()
+				.createQuery(hql, Student.class)
+				.setParameter("studentId", studentId)
+				.list();
+
+		return students.isEmpty() ? null : students.get(0);
+	}
 }
 

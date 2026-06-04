@@ -20,6 +20,8 @@ import com.tracnghiem.dto.ChangeEmailDTO;
 import com.tracnghiem.dto.ChangePasswordDTO;
 import com.tracnghiem.dto.ConfirmEmailChangeDTO;
 import com.tracnghiem.dto.StudentDTO;
+import com.tracnghiem.dto.StudentDashboardDTO;
+import com.tracnghiem.dto.UpcomingExamDTO;
 import com.tracnghiem.entity.Student;
 import com.tracnghiem.service.AccountSettingsService;
 import com.tracnghiem.service.StudentService;
@@ -47,13 +49,22 @@ public class StudentController {
     @GetMapping("/home")
     public String home(ModelMap model, HttpSession session) {
 
-        String studentId = (String) session.getAttribute("LOGIN_USER");
+        String redirect = validateStudentAccess(session);
+        if (redirect != null) {
+            return redirect;
+        }
 
-        Student student = studentId != null ? studentService.getStudentById(studentId) : null;
+        String studentId = normalize((String) session.getAttribute("LOGIN_USER"));
+        Date today = new Date();
+        Student student = studentService.getDashboardStudentProfile(studentId);
+        StudentDashboardDTO dashboard = studentService.getStudentDashboardStats(student, today);
+        java.util.List<UpcomingExamDTO> upcomingExams = studentService.getUpcomingExams(student, today);
 
         model.addAttribute("pageTitle", "Student Home");
         model.addAttribute("studentProfile", student);
-        model.addAttribute("today", new Date());
+        model.addAttribute("dashboard", dashboard);
+        model.addAttribute("upcomingExams", upcomingExams);
+        model.addAttribute("today", today);
 
         return "Student/Home";
     }
@@ -244,5 +255,14 @@ public class StudentController {
         }
 
         return "redirect:/hello";
+    }
+
+    private String normalize(String value) {
+        if (value == null) {
+            return null;
+        }
+
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
     }
 }
