@@ -144,43 +144,6 @@ public class LecturerController {
         }
     }
 
-    @PostMapping("/settings/password")
-    public String changePassword(
-            @Validated @ModelAttribute("changePasswordDTO") ChangePasswordDTO changePasswordDTO,
-            BindingResult errors,
-            ModelMap model,
-            HttpSession session,
-            RedirectAttributes redirectAttributes) {
-
-        String redirect = validateLecturerAccess(session);
-        if (redirect != null) {
-            return redirect;
-        }
-
-        if (!errors.hasFieldErrors("confirmPassword")
-                && changePasswordDTO.getNewPassword() != null
-                && !changePasswordDTO.getNewPassword().equals(changePasswordDTO.getConfirmPassword())) {
-            errors.rejectValue("confirmPassword", "confirmPassword.mismatch", "Xác nhận mật khẩu không khớp");
-        }
-
-        if (errors.hasErrors()) {
-            populateSettingsPageModel(model, session, null, null);
-            return "Lecturer/Settings";
-        }
-
-        try {
-            String lecturerId = (String) session.getAttribute("LOGIN_USER");
-            accountSettingsService.changePassword(lecturerId, changePasswordDTO.getCurrentPassword(),
-                    changePasswordDTO.getNewPassword());
-            redirectAttributes.addFlashAttribute("successMessage", "Đổi mật khẩu thành công");
-            return "redirect:/lecturers/settings";
-        } catch (IllegalArgumentException ex) {
-            populateSettingsPageModel(model, session, null, null);
-            model.addAttribute("errorMessage", ex.getMessage());
-            return "Lecturer/Settings";
-        }
-    }
-
     @GetMapping
     public String index(@RequestParam(defaultValue = "1") int page, ModelMap model) {
         prepareLecturerPage(model, page);

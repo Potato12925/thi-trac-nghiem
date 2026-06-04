@@ -93,11 +93,13 @@ CREATE TABLE GIAOVIEN (
     DIACHI NVARCHAR(50),
     EMAIL NVARCHAR(150)
 )
+INSERT [dbo].[GIAOVIEN] ([MAGV], [HO], [TEN], [SODTLL], [DIACHI], [EMAIL]) VALUES (N'TH101   ', N'KIEU DAC', N'THIEN', N'0901234567', N'9,3A, Q.BINH TAN', N'th101@teacher.edu.vn');
 
-INSERT [dbo].[GIAOVIEN] ([MAGV], [HO], [TEN], [DIACHI], [EMAIL]) VALUES (N'TH101   ', N'KIEU DAC', N'THIEN', N'9,3A, Q.BINH TAN', N'th101@teacher.edu.vn')
-INSERT [dbo].[GIAOVIEN] ([MAGV], [HO], [TEN], [DIACHI], [EMAIL]) VALUES (N'TH123   ', N'PHAN VAN ', N'HAI', N'15/72 LE VAN THO F8 GO VAP', N'th123@teacher.edu.vn')
-INSERT [dbo].[GIAOVIEN] ([MAGV], [HO], [TEN], [DIACHI], [EMAIL]) VALUES (N'TH234   ', N'DAO VAN ', N'TUYET', N'14/7 BUI DINH TUY TAN BINH', N'th234@teacher.edu.vn')
-INSERT [dbo].[GIAOVIEN] ([MAGV], [HO], [TEN], [DIACHI], [EMAIL]) VALUES (N'TH657   ', N'PHAN HONG', N'NGOC', N'', N'th657@teacher.edu.vn')
+INSERT [dbo].[GIAOVIEN] ([MAGV], [HO], [TEN], [SODTLL], [DIACHI], [EMAIL]) VALUES (N'TH123   ', N'PHAN VAN ', N'HAI', N'0912345678', N'15/72 LE VAN THO F8 GO VAP', N'th123@teacher.edu.vn');
+
+INSERT [dbo].[GIAOVIEN] ([MAGV], [HO], [TEN], [SODTLL], [DIACHI], [EMAIL]) VALUES (N'TH234   ', N'DAO VAN ', N'TUYET', N'0923456789', N'14/7 BUI DINH TUY TAN BINH', N'th234@teacher.edu.vn');
+
+INSERT [dbo].[GIAOVIEN] ([MAGV], [HO], [TEN], [SODTLL], [DIACHI], [EMAIL]) VALUES (N'TH657   ', N'PHAN HONG', N'NGOC', N'0934567890', N'', N'th657@teacher.edu.vn');
 /* =========================================
             TABLE TAIKHOAN
 ========================================= */

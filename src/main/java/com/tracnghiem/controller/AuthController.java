@@ -12,12 +12,21 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.tracnghiem.dto.ChangeEmailDTO;
+import com.tracnghiem.dto.ChangePasswordDTO;
+import com.tracnghiem.dto.ConfirmEmailChangeDTO;
 import com.tracnghiem.dto.ForgotPasswordRequestDTO;
 import com.tracnghiem.dto.LoginDTO;
 import com.tracnghiem.dto.ResetPasswordDTO;
+import com.tracnghiem.entity.Lecturer;
+import com.tracnghiem.entity.Student;
+import com.tracnghiem.service.AccountSettingsService;
 import com.tracnghiem.service.AuthService;
+import com.tracnghiem.service.LecturerService;
 import com.tracnghiem.service.PasswordResetService;
+import com.tracnghiem.service.StudentService;
 
 @Controller
 @RequestMapping("/auth")
@@ -28,6 +37,15 @@ public class AuthController {
 
 	@Autowired
 	private PasswordResetService passwordResetService;
+
+	@Autowired
+	private AccountSettingsService accountSettingsService;
+
+	@Autowired
+	private StudentService studentService;
+
+	@Autowired
+	private LecturerService lecturerService;
 
 	@GetMapping("/login")
 	public String loginForm(
@@ -146,5 +164,91 @@ public class AuthController {
 			model.addAttribute("error", ex.getMessage());
 			return "Account/ResetPassword";
 		}
+	}
+
+	@PostMapping("/change-password")
+	public String changePassword(
+			@Valid @ModelAttribute("changePasswordDTO") ChangePasswordDTO dto,
+			BindingResult result,
+			HttpSession session,
+			Model model,
+			RedirectAttributes redirectAttributes) {
+
+		String role = (String) session.getAttribute("ROLE");
+		String username = (String) session.getAttribute("LOGIN_USER");
+
+		if (username == null || role == null) {
+			return "redirect:/auth/login";
+		}
+
+		if (!result.hasFieldErrors("confirmPassword")
+				&& dto.getNewPassword() != null
+				&& !dto.getNewPassword().equals(dto.getConfirmPassword())) {
+			result.rejectValue("confirmPassword", "confirmPassword.mismatch", "Xác nhận mật khẩu không khớp");
+		}
+
+		if (result.hasErrors()) {
+			populateSettingsPageModel(model, session, dto);
+			return resolveSettingsView(role);
+		}
+
+		try {
+			accountSettingsService.changePassword(username, dto.getCurrentPassword(), dto.getNewPassword());
+			redirectAttributes.addFlashAttribute("successMessage", "Đổi mật khẩu thành công");
+			return "redirect:" + resolveSettingsPath(role);
+		} catch (IllegalArgumentException ex) {
+			model.addAttribute("errorMessage", ex.getMessage());
+			populateSettingsPageModel(model, session, dto);
+			return resolveSettingsView(role);
+		}
+	}
+
+	private void populateSettingsPageModel(Model model, HttpSession session, ChangePasswordDTO changePasswordDTO) {
+		String role = (String) session.getAttribute("ROLE");
+		String username = (String) session.getAttribute("LOGIN_USER");
+
+		if ("SINHVIEN".equals(role)) {
+			Student student = studentService.getStudentById(username);
+			model.addAttribute("pageTitle", "Cài đặt sinh viên");
+			model.addAttribute("studentProfile", student);
+		} else if ("GIAOVIEN".equals(role)) {
+			Lecturer lecturer = lecturerService.findLecturerById(username);
+			model.addAttribute("pageTitle", "Cài đặt giảng viên");
+			model.addAttribute("lecturerProfile", lecturer);
+		}
+
+		if (!model.containsAttribute("changeEmailDTO")) {
+			model.addAttribute("changeEmailDTO", new ChangeEmailDTO());
+		}
+
+		if (!model.containsAttribute("confirmEmailChangeDTO")) {
+			model.addAttribute("confirmEmailChangeDTO", new ConfirmEmailChangeDTO());
+		}
+
+		model.addAttribute("changePasswordDTO", changePasswordDTO);
+	}
+
+	private String resolveSettingsView(String role) {
+		if ("SINHVIEN".equals(role)) {
+			return "Student/Settings";
+		}
+
+		if ("GIAOVIEN".equals(role)) {
+			return "Lecturer/Settings";
+		}
+
+		return "redirect:/auth/login";
+	}
+
+	private String resolveSettingsPath(String role) {
+		if ("SINHVIEN".equals(role)) {
+			return "/students/settings";
+		}
+
+		if ("GIAOVIEN".equals(role)) {
+			return "/lecturers/settings";
+		}
+
+		return "/auth/login";
 	}
 }

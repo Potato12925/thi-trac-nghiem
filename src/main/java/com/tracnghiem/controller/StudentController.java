@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import com.tracnghiem.dto.ChangeEmailDTO;
 import com.tracnghiem.dto.ChangePasswordDTO;
 import com.tracnghiem.dto.ConfirmEmailChangeDTO;
@@ -130,43 +129,6 @@ public class StudentController {
             return "redirect:/students/settings";
         } catch (IllegalArgumentException ex) {
             populateSettingsPageModel(model, session, confirmEmailChangeDTO.getNewEmail(), confirmEmailChangeDTO.getNewEmail());
-            model.addAttribute("errorMessage", ex.getMessage());
-            return "Student/Settings";
-        }
-    }
-
-    @PostMapping("/settings/password")
-    public String changePassword(
-            @Validated @ModelAttribute("changePasswordDTO") ChangePasswordDTO changePasswordDTO,
-            BindingResult errors,
-            ModelMap model,
-            HttpSession session,
-            RedirectAttributes redirectAttributes) {
-
-        String redirect = validateStudentAccess(session);
-        if (redirect != null) {
-            return redirect;
-        }
-
-        if (!errors.hasFieldErrors("confirmPassword")
-                && changePasswordDTO.getNewPassword() != null
-                && !changePasswordDTO.getNewPassword().equals(changePasswordDTO.getConfirmPassword())) {
-            errors.rejectValue("confirmPassword", "confirmPassword.mismatch", "Xác nhận mật khẩu không khớp");
-        }
-
-        if (errors.hasErrors()) {
-            populateSettingsPageModel(model, session, null, null);
-            return "Student/Settings";
-        }
-
-        try {
-            String studentId = (String) session.getAttribute("LOGIN_USER");
-            accountSettingsService.changePassword(studentId, changePasswordDTO.getCurrentPassword(),
-                    changePasswordDTO.getNewPassword());
-            redirectAttributes.addFlashAttribute("successMessage", "Đổi mật khẩu thành công");
-            return "redirect:/students/settings";
-        } catch (IllegalArgumentException ex) {
-            populateSettingsPageModel(model, session, null, null);
             model.addAttribute("errorMessage", ex.getMessage());
             return "Student/Settings";
         }
