@@ -186,11 +186,103 @@ public class QuestionService {
 		}
 	}
 
+	@Transactional
+	public void importQuestions(List<QuestionDTO> dtos, String role, String loggedUser) {
+		for (QuestionDTO dto : dtos) {
+			String subjectId = dto.getSubjectId();
+			String level = dto.getLevel();
+			String content = dto.getContent();
+			String optionA = dto.getOptionA();
+			String optionB = dto.getOptionB();
+			String optionC = dto.getOptionC();
+			String optionD = dto.getOptionD();
+			String correctAnswer = dto.getCorrectAnswer();
+			String lecturerId = dto.getLecturerId();
+
+			if (subjectId == null || subjectId.trim().isEmpty()) {
+				throw new IllegalArgumentException("Mã môn học không được để trống.");
+			}
+			subjectId = subjectId.trim();
+			if (subjectService.getSubjectById(subjectId) == null) {
+				throw new IllegalArgumentException("Mã môn học '" + subjectId + "' không tồn tại.");
+			}
+
+			if (level == null || level.trim().isEmpty()) {
+				throw new IllegalArgumentException("Trình độ không được để trống.");
+			}
+			level = level.trim();
+			if (!"A".equals(level) && !"B".equals(level) && !"C".equals(level)) {
+				throw new IllegalArgumentException("Trình độ phải là A, B hoặc C: " + level);
+			}
+
+			if (content == null || content.trim().isEmpty()) {
+				throw new IllegalArgumentException("Nội dung câu hỏi không được để trống.");
+			}
+			content = content.trim();
+
+			if (optionA == null || optionA.trim().isEmpty()) {
+				throw new IllegalArgumentException("Đáp án A không được để trống.");
+			}
+			optionA = optionA.trim();
+
+			if (optionB == null || optionB.trim().isEmpty()) {
+				throw new IllegalArgumentException("Đáp án B không được để trống.");
+			}
+			optionB = optionB.trim();
+
+			if (optionC == null || optionC.trim().isEmpty()) {
+				throw new IllegalArgumentException("Đáp án C không được để trống.");
+			}
+			optionC = optionC.trim();
+
+			if (optionD == null || optionD.trim().isEmpty()) {
+				throw new IllegalArgumentException("Đáp án D không được để trống.");
+			}
+			optionD = optionD.trim();
+
+			if (correctAnswer == null || correctAnswer.trim().isEmpty()) {
+				throw new IllegalArgumentException("Đáp án đúng không được để trống.");
+			}
+			correctAnswer = correctAnswer.trim();
+			if (!"A".equals(correctAnswer) && !"B".equals(correctAnswer) && !"C".equals(correctAnswer) && !"D".equals(correctAnswer)) {
+				throw new IllegalArgumentException("Đáp án đúng phải là A, B, C hoặc D: " + correctAnswer);
+			}
+
+			if (lecturerId == null || lecturerId.trim().isEmpty()) {
+				throw new IllegalArgumentException("Mã giảng viên không được để trống.");
+			}
+			lecturerId = lecturerId.trim();
+			if (lecturerService.findLecturerById(lecturerId) == null) {
+				throw new IllegalArgumentException("Mã giảng viên '" + lecturerId + "' không tồn tại.");
+			}
+
+			QuestionDTO cleanDto = new QuestionDTO();
+			cleanDto.setSubjectId(subjectId);
+			cleanDto.setLevel(level);
+			cleanDto.setContent(content);
+			cleanDto.setOptionA(optionA);
+			cleanDto.setOptionB(optionB);
+			cleanDto.setOptionC(optionC);
+			cleanDto.setOptionD(optionD);
+			cleanDto.setCorrectAnswer(correctAnswer);
+			cleanDto.setLecturerId(lecturerId);
+
+			addQuestion(cleanDto, role, loggedUser);
+		}
+	}
+
 	private Integer parseQuestionId(String idStr) {
 		try {
 			return Integer.parseInt(idStr);
 		} catch (NumberFormatException e) {
 			return null;
 		}
+	}
+
+	public List<Question> getAllQuestions(String role, String loggedUser) {
+		if ("GIAOVIEN".equals(role)) {
+			return questionDAO.findAllQuestions(loggedUser);
+		}
+		return questionDAO.findAllQuestions(null);
 	}
 }

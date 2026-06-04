@@ -1,7 +1,22 @@
 package com.tracnghiem.controller;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -14,6 +29,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.tracnghiem.dto.ClassroomDTO;
@@ -149,4 +165,124 @@ public class ClassroomController {
 
         return INDEX_VIEW;
     }
+
+	@GetMapping("/export")
+	public void exportToExcel(HttpServletResponse response) throws IOException {
+		response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+		response.setHeader("Content-Disposition", "attachment; filename=\"danh-sach-lop-hoc.xlsx\"");
+
+		List<Classroom> classrooms = classroomService.getAllClassrooms();
+
+		try (Workbook workbook = new XSSFWorkbook(); OutputStream out = response.getOutputStream()) {
+			Sheet sheet = workbook.createSheet("Lớp học");
+
+			// Header
+			Row header = sheet.createRow(0);
+			Cell cell0 = header.createCell(0);
+			cell0.setCellValue("Mã lớp");
+			Cell cell1 = header.createCell(1);
+			cell1.setCellValue("Tên lớp");
+
+			CellStyle headerStyle = workbook.createCellStyle();
+			Font font = workbook.createFont();
+			font.setBold(true);
+			headerStyle.setFont(font);
+			cell0.setCellStyle(headerStyle);
+			cell1.setCellStyle(headerStyle);
+
+			int rowIdx = 1;
+			for (Classroom cr : classrooms) {
+				Row row = sheet.createRow(rowIdx++);
+				row.createCell(0).setCellValue(cr.getClassId());
+				row.createCell(1).setCellValue(cr.getClassName());
+			}
+
+			sheet.autoSizeColumn(0);
+			sheet.autoSizeColumn(1);
+
+			workbook.write(out);
+		}
+	}
+
+	@PostMapping("/import")
+	public String importFromExcel(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
+		if (file.isEmpty()) {
+			redirectAttributes.addFlashAttribute("errorMessage", "Vui lòng chọn một tệp Excel để nhập.");
+			return REDIRECT_INDEX;
+		}
+
+		try (InputStream is = file.getInputStream(); Workbook workbook = WorkbookFactory.create(is)) {
+			Sheet sheet = workbook.getSheetAt(0);
+			List<ClassroomDTO> dtos = new ArrayList<>();
+
+			for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+				Row row = sheet.getRow(i);
+				if (row == null) {
+					continue;
+				}
+
+				Cell idCell = row.getCell(0);
+				Cell nameCell = row.getCell(1);
+
+				if (idCell == null && nameCell == null) {
+					continue;
+				}
+
+				String classId = getCellValueAsString(idCell);
+				String className = getCellValueAsString(nameCell);
+
+				if (classId.trim().isEmpty() && className.trim().isEmpty()) {
+					continue;
+				}
+
+				ClassroomDTO dto = new ClassroomDTO();
+				dto.setClassId(classId.trim());
+				dto.setClassName(className.trim());
+				dtos.add(dto);
+			}
+
+			if (dtos.isEmpty()) {
+				redirectAttributes.addFlashAttribute("errorMessage", "Không tìm thấy dữ liệu lớp học hợp lệ trong tệp Excel.");
+			} else {
+				classroomService.importClassrooms(dtos);
+				redirectAttributes.addFlashAttribute("successMessage", "Nhập danh sách lớp từ Excel thành công (Đã nhập " + dtos.size() + " lớp).");
+			}
+
+		} catch (IllegalArgumentException e) {
+			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+		} catch (Exception e) {
+			redirectAttributes.addFlashAttribute("errorMessage", "Lỗi xử lý tệp Excel: " + e.getMessage());
+		}
+
+		return REDIRECT_INDEX;
+	}
+
+	private String getCellValueAsString(Cell cell) {
+		if (cell == null) {
+			return "";
+		}
+		switch (cell.getCellType()) {
+		case STRING:
+			return cell.getStringCellValue();
+		case NUMERIC:
+			if (DateUtil.isCellDateFormatted(cell)) {
+				return cell.getDateCellValue().toString();
+			}
+			double numericVal = cell.getNumericCellValue();
+			if (numericVal == (long) numericVal) {
+				return String.valueOf((long) numericVal);
+			}
+			return String.valueOf(numericVal);
+		case BOOLEAN:
+			return String.valueOf(cell.getBooleanCellValue());
+		case FORMULA:
+			try {
+				return cell.getStringCellValue();
+			} catch (Exception e) {
+				return String.valueOf(cell.getNumericCellValue());
+			}
+		default:
+			return "";
+		}
+	}
 }

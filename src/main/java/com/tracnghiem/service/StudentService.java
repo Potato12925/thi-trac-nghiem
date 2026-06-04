@@ -163,4 +163,79 @@ public class StudentService {
 		}
 	}
 
+	@Transactional
+	public void importStudents(List<StudentDTO> dtos) {
+		for (StudentDTO dto : dtos) {
+			String studentId = dto.getStudentId();
+			String lastName = dto.getLastName();
+			String firstName = dto.getFirstName();
+			Date birthDate = dto.getBirthDate();
+			String address = dto.getAddress();
+			String classId = dto.getClassId();
+
+			if (studentId == null || studentId.trim().isEmpty()) {
+				throw new IllegalArgumentException("Mã sinh viên không được để trống.");
+			}
+			studentId = studentId.trim();
+			if (studentId.length() != 8) {
+				throw new IllegalArgumentException("Mã sinh viên phải chứa đúng 8 ký tự: " + studentId);
+			}
+			if (!studentId.matches("^[A-Z0-9]+$")) {
+				throw new IllegalArgumentException("Mã sinh viên chỉ được chứa chữ in hoa và số: " + studentId);
+			}
+
+			if (lastName == null || lastName.trim().isEmpty()) {
+				throw new IllegalArgumentException("Họ sinh viên không được để trống cho mã: " + studentId);
+			}
+			lastName = lastName.trim();
+			if (lastName.length() > 50) {
+				throw new IllegalArgumentException("Họ sinh viên không được vượt quá 50 ký tự cho mã: " + studentId);
+			}
+
+			if (firstName == null || firstName.trim().isEmpty()) {
+				throw new IllegalArgumentException("Tên sinh viên không được để trống cho mã: " + studentId);
+			}
+			firstName = firstName.trim();
+			if (firstName.length() > 10) {
+				throw new IllegalArgumentException("Tên sinh viên không được vượt quá 10 ký tự cho mã: " + studentId);
+			}
+
+			if (birthDate == null) {
+				throw new IllegalArgumentException("Ngày sinh không được để trống cho mã: " + studentId);
+			}
+			if (birthDate.after(new Date())) {
+				throw new IllegalArgumentException("Ngày sinh phải ở trong quá khứ cho mã: " + studentId);
+			}
+
+			if (address == null || address.trim().isEmpty()) {
+				throw new IllegalArgumentException("Địa chỉ không được để trống cho mã: " + studentId);
+			}
+			address = address.trim();
+			if (address.length() > 100) {
+				throw new IllegalArgumentException("Địa chỉ không được vượt quá 100 ký tự cho mã: " + studentId);
+			}
+
+			if (classId == null || classId.trim().isEmpty()) {
+				throw new IllegalArgumentException("Mã lớp không được để trống cho mã: " + studentId);
+			}
+			classId = classId.trim();
+			if (classroomService.findClassroomById(classId) == null) {
+				throw new IllegalArgumentException("Mã lớp '" + classId + "' không tồn tại trong hệ thống (Mã SV: " + studentId + ").");
+			}
+
+			if (studentDAO.existsById(studentId)) {
+				throw new IllegalArgumentException("Mã sinh viên '" + studentId + "' đã tồn tại trong hệ thống.");
+			}
+
+			StudentDTO cleanDto = new StudentDTO();
+			cleanDto.setStudentId(studentId);
+			cleanDto.setLastName(lastName);
+			cleanDto.setFirstName(firstName);
+			cleanDto.setBirthDate(birthDate);
+			cleanDto.setAddress(address);
+			cleanDto.setClassId(classId);
+
+			addStudentWithAccount(cleanDto);
+		}
+	}
 }

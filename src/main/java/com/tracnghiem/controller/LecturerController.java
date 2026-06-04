@@ -1,11 +1,26 @@
 package com.tracnghiem.controller;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -16,6 +31,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.tracnghiem.dto.LecturerDTO;
@@ -172,4 +188,136 @@ public class LecturerController {
         }
         return query.toString();
     }
+
+	@GetMapping("/export")
+	public void exportToExcel(HttpServletResponse response) throws IOException {
+		response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+		response.setHeader("Content-Disposition", "attachment; filename=\"danh-sach-giang-vien.xlsx\"");
+
+		List<Lecturer> lecturers = lecturerService.getAllLecturers();
+
+		try (Workbook workbook = new XSSFWorkbook(); OutputStream out = response.getOutputStream()) {
+			Sheet sheet = workbook.createSheet("Giảng viên");
+
+			// Header
+			Row header = sheet.createRow(0);
+			String[] headers = {"Mã giảng viên", "Họ", "Tên", "Số điện thoại", "Địa chỉ"};
+			for (int j = 0; j < headers.length; j++) {
+				Cell cell = header.createCell(j);
+				cell.setCellValue(headers[j]);
+				CellStyle headerStyle = workbook.createCellStyle();
+				Font font = workbook.createFont();
+				font.setBold(true);
+				headerStyle.setFont(font);
+				cell.setCellStyle(headerStyle);
+			}
+
+			int rowIdx = 1;
+			for (Lecturer lecturer : lecturers) {
+				Row row = sheet.createRow(rowIdx++);
+				row.createCell(0).setCellValue(lecturer.getLecturerId());
+				row.createCell(1).setCellValue(lecturer.getLastName());
+				row.createCell(2).setCellValue(lecturer.getFirstName());
+				row.createCell(3).setCellValue(lecturer.getPhoneNumber());
+				row.createCell(4).setCellValue(lecturer.getAddress());
+			}
+
+			for (int j = 0; j < headers.length; j++) {
+				sheet.autoSizeColumn(j);
+			}
+
+			workbook.write(out);
+		}
+	}
+
+	@PostMapping("/import")
+	public String importFromExcel(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
+		if (file.isEmpty()) {
+			redirectAttributes.addFlashAttribute("errorMessage", "Vui lòng chọn một tệp Excel để nhập.");
+			return REDIRECT_INDEX;
+		}
+
+		try (InputStream is = file.getInputStream(); Workbook workbook = WorkbookFactory.create(is)) {
+			Sheet sheet = workbook.getSheetAt(0);
+			List<LecturerDTO> dtos = new ArrayList<>();
+
+			for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+				Row row = sheet.getRow(i);
+				if (row == null) {
+					continue;
+				}
+
+				Cell idCell = row.getCell(0);
+				Cell lastCell = row.getCell(1);
+				Cell firstCell = row.getCell(2);
+				Cell phoneCell = row.getCell(3);
+				Cell addrCell = row.getCell(4);
+
+				if (idCell == null && lastCell == null && firstCell == null) {
+					continue;
+				}
+
+				String lecturerId = getCellValueAsString(idCell).trim();
+				String lastName = getCellValueAsString(lastCell).trim();
+				String firstName = getCellValueAsString(firstCell).trim();
+				String phoneNumber = getCellValueAsString(phoneCell).trim();
+				String address = getCellValueAsString(addrCell).trim();
+
+				if (lecturerId.isEmpty() && lastName.isEmpty() && firstName.isEmpty()) {
+					continue;
+				}
+
+				LecturerDTO dto = new LecturerDTO();
+				dto.setLecturerId(lecturerId);
+				dto.setLastName(lastName);
+				dto.setFirstName(firstName);
+				dto.setPhoneNumber(phoneNumber);
+				dto.setAddress(address);
+				dtos.add(dto);
+			}
+
+			if (dtos.isEmpty()) {
+				redirectAttributes.addFlashAttribute("errorMessage", "Không tìm thấy dữ liệu giảng viên hợp lệ trong tệp Excel.");
+			} else {
+				lecturerService.importLecturers(dtos);
+				redirectAttributes.addFlashAttribute("successMessage", "Nhập danh sách giảng viên từ Excel thành công (Đã nhập " + dtos.size() + " giảng viên).");
+			}
+
+		} catch (IllegalArgumentException e) {
+			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+		} catch (Exception e) {
+			redirectAttributes.addFlashAttribute("errorMessage", "Lỗi xử lý tệp Excel: " + e.getMessage());
+		}
+
+		return REDIRECT_INDEX;
+	}
+
+	private String getCellValueAsString(Cell cell) {
+		if (cell == null) {
+			return "";
+		}
+		switch (cell.getCellType()) {
+		case STRING:
+			return cell.getStringCellValue();
+		case NUMERIC:
+			if (DateUtil.isCellDateFormatted(cell)) {
+				return cell.getDateCellValue().toString();
+			}
+			double numericVal = cell.getNumericCellValue();
+			if (numericVal == (long) numericVal) {
+				return String.valueOf((long) numericVal);
+			}
+			return String.valueOf(numericVal);
+		case BOOLEAN:
+			return String.valueOf(cell.getBooleanCellValue());
+		case FORMULA:
+			try {
+				return cell.getStringCellValue();
+			} catch (Exception e) {
+				return String.valueOf(cell.getNumericCellValue());
+			}
+		default:
+			return "";
+		}
+	}
 }

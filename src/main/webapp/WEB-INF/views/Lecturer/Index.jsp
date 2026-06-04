@@ -16,6 +16,17 @@ request.setAttribute("customJs", "lecturer-management.js");
 <div class="container-fluid page-wrapper">
 	<div class="d-flex justify-content-between align-items-center mb-4">
 		<h1 class="h3 mb-0">Lecturer Management</h1>
+		<div class="d-flex gap-2">
+			<a href="${pageContext.request.contextPath}/lecturers/export"
+				class="btn btn-outline-success d-flex align-items-center gap-2">
+				<i class="bi bi-file-earmark-excel"></i> Xuất Excel
+			</a>
+			<button type="button"
+				class="btn btn-success d-flex align-items-center gap-2"
+				data-bs-toggle="modal" data-bs-target="#lecturerImportModal">
+				<i class="bi bi-file-earmark-arrow-up"></i> Nhập Excel
+			</button>
+		</div>
 	</div>
 
 	<c:if test="${not empty error}">
@@ -218,6 +229,46 @@ request.setAttribute("customJs", "lecturer-management.js");
 			</c:if>
 		</div>
 	</div>
+	<!-- Import Excel Modal -->
+	<div class="modal fade" id="lecturerImportModal" tabindex="-1"
+		aria-labelledby="lecturerImportModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content border-0 shadow">
+				<form action="${pageContext.request.contextPath}/lecturers/import"
+					method="post" enctype="multipart/form-data">
+					<div class="modal-header bg-success text-white">
+						<h5 class="modal-title fw-semibold" id="lecturerImportModalLabel">
+							<i class="bi bi-file-earmark-excel me-2"></i> Nhập dữ liệu từ Excel
+						</h5>
+						<button type="button" class="btn-close btn-close-white"
+							data-bs-dismiss="modal" aria-label="Đóng"></button>
+					</div>
+					<div class="modal-body">
+						<div class="mb-3">
+							<label for="excelFile"
+								class="form-label fw-medium text-secondary">Chọn tệp Excel (.xlsx, .xls)</label>
+							<input class="form-control" type="file"
+								id="excelFile" name="file" accept=".xlsx, .xls" required />
+						</div>
+						<div class="alert alert-info py-2 px-3 mb-0 small">
+							<i class="bi bi-info-circle-fill me-1"></i> Tệp Excel nên có tiêu đề ở dòng đầu tiên.
+							<br/>Cột 1: Mã giảng viên (tối đa 8 ký tự)
+							<br/>Cột 2: Họ giảng viên (tối đa 40 ký tự)
+							<br/>Cột 3: Tên giảng viên (tối đa 10 ký tự)
+							<br/>Cột 4: Số điện thoại (tối đa 15 ký tự)
+							<br/>Cột 5: Địa chỉ (tối đa 50 ký tự)
+						</div>
+					</div>
+					<div class="modal-footer bg-light">
+						<button type="button" class="btn btn-secondary"
+							data-bs-dismiss="modal">Hủy</button>
+						<button type="submit" class="btn btn-success">Nhập dữ liệu</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
 </div>
 
 <%@ include file="../Shared/_LayoutEnd.jsp"%>

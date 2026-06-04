@@ -109,4 +109,40 @@ public class ClassroomService {
 			}
 		}
 	}
+
+	@Transactional
+	public void importClassrooms(List<ClassroomDTO> dtos) {
+		for (ClassroomDTO dto : dtos) {
+			String classId = dto.getClassId();
+			String className = dto.getClassName();
+
+			if (classId == null || classId.trim().isEmpty()) {
+				throw new IllegalArgumentException("Mã lớp không được để trống.");
+			}
+			classId = classId.trim();
+
+			if (classId.length() > 15) {
+				throw new IllegalArgumentException("Mã lớp không được vượt quá 15 ký tự: " + classId);
+			}
+
+			if (className == null || className.trim().isEmpty()) {
+				throw new IllegalArgumentException("Tên lớp không được để trống cho mã: " + classId);
+			}
+			className = className.trim();
+
+			if (className.length() > 50) {
+				throw new IllegalArgumentException("Tên lớp không được vượt quá 50 ký tự cho mã: " + classId);
+			}
+
+			if (classroomDAO.existsById(classId)) {
+				throw new IllegalArgumentException("Mã lớp '" + classId + "' đã tồn tại trong hệ thống.");
+			}
+
+			Classroom classroom = new Classroom();
+			classroom.setClassId(classId);
+			classroom.setClassName(className);
+
+			classroomDAO.create(classroom);
+		}
+	}
 }
