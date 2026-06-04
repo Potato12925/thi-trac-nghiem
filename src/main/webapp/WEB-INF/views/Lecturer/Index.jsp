@@ -38,7 +38,7 @@ request.setAttribute("customJs", "lecturer-management.js");
 		</form>
 
 		<form:form id="lecturerForm" method="post"
-			action="${pageContext.request.contextPath}/lecturers/add"
+			action="${pageContext.request.contextPath}/lecturerss/add"
 			modelAttribute="lecturerDTO">
 			<input type="hidden" name="page" value="${currentPage}" />
 			<input type="hidden" name="keyword" value="${keyword}" />
@@ -93,19 +93,28 @@ request.setAttribute("customJs", "lecturer-management.js");
 					<form:errors path="address"
 						cssClass="text-danger small mt-1 d-block" />
 				</div>
+
+				<div class="col-md-3">
+					<label class="form-label small text-secondary"> Email </label>
+
+					<form:input path="email" id="email" cssClass="form-control" />
+
+					<form:errors path="email"
+						cssClass="text-danger small mt-1 d-block" />
+				</div>
 			</div>
 
 			<div class="d-flex gap-2 mt-4">
 				<button type="submit"
-					formaction="${pageContext.request.contextPath}/lecturers/add"
+					formaction="${pageContext.request.contextPath}/lecturerss/add"
 					class="btn btn-dark px-4">Add</button>
 
 				<button type="submit" disabled id="btnUpdate"
-					formaction="${pageContext.request.contextPath}/lecturers/update"
+					formaction="${pageContext.request.contextPath}/lecturerss/update"
 					class="btn btn-outline-secondary px-4">Update</button>
 
 				<button type="submit"
-					formaction="${pageContext.request.contextPath}/lecturers/delete"
+					formaction="${pageContext.request.contextPath}/lecturerss/delete"
 					disabled id="btnDelete" class="btn btn-outline-danger px-4"
 					onclick="return confirm('Delete this lecturer?')">Delete</button>
 
@@ -134,6 +143,8 @@ request.setAttribute("customJs", "lecturer-management.js");
 
 						<th>Address</th>
 
+						<th>Email</th>
+
 						<th class="text-end">Actions</th>
 					</tr>
 				</thead>
@@ -144,7 +155,8 @@ request.setAttribute("customJs", "lecturer-management.js");
 							data-lastname="${lecturer.lastName}"
 							data-firstname="${lecturer.firstName}"
 							data-phone="${lecturer.phoneNumber}"
-							data-address="${lecturer.address}">
+							data-address="${lecturer.address}"
+							data-email="${lecturer.email}">
 
 							<td class="fw-medium text-success">${lecturer.lecturerId}</td>
 
@@ -155,6 +167,8 @@ request.setAttribute("customJs", "lecturer-management.js");
 							<td>${lecturer.phoneNumber}</td>
 
 							<td>${lecturer.address}</td>
+
+							<td>${lecturer.email}</td>
 
 							<td class="text-end">
 								<button type="button"
@@ -178,8 +192,8 @@ request.setAttribute("customJs", "lecturer-management.js");
 
 		<div class="pagination-wrapper">
 			<c:if test="${currentPage > 1}">
-				<a class="pagination-item" href="lecturers?page=1&keyword=${keyword}"> First </a>
-				<a class="pagination-item" href="lecturers?page=${currentPage - 1}&keyword=${keyword}">
+				<a class="pagination-item" href="lecturerss?page=1&keyword=${keyword}"> First </a>
+				<a class="pagination-item" href="lecturerss?page=${currentPage - 1}&keyword=${keyword}">
 					&laquo; </a>
 			</c:if>
 
@@ -190,7 +204,7 @@ request.setAttribute("customJs", "lecturer-management.js");
 			<c:forEach begin="${currentPage - 2 < 1 ? 1 : currentPage - 2}"
 				end="${currentPage + 2 > totalPages ? totalPages : currentPage + 2}"
 				var="i">
-				<a href="lecturers?page=${i}&keyword=${keyword}"
+				<a href="lecturerss?page=${i}&keyword=${keyword}"
 					class="pagination-item ${currentPage == i ? 'active' : ''}">
 					${i} </a>
 			</c:forEach>
@@ -200,9 +214,9 @@ request.setAttribute("customJs", "lecturer-management.js");
 			</c:if>
 
 			<c:if test="${currentPage < totalPages}">
-				<a class="pagination-item" href="lecturers?page=${currentPage + 1}&keyword=${keyword}">
+				<a class="pagination-item" href="lecturerss?page=${currentPage + 1}&keyword=${keyword}">
 					&raquo; </a>
-				<a class="pagination-item" href="lecturers?page=${totalPages}&keyword=${keyword}">
+				<a class="pagination-item" href="lecturerss?page=${totalPages}&keyword=${keyword}">
 					Last </a>
 			</c:if>
 		</div>

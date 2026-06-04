@@ -21,10 +21,14 @@ public class ExamHistoryController {
     @Autowired
     private ExamHistoryService examHistoryService;
 
+    private boolean isAuthorized(HttpSession session) {
+        String role = (String) session.getAttribute("ROLE");
+        return role != null && (role.equals("SINHVIEN") || role.equals("GIAOVIEN") || role.equals("PGV"));
+    }
+
     @GetMapping
     public String index(ModelMap model, HttpSession session) {
-        String role = (String) session.getAttribute("ROLE");
-        if (!"SINHVIEN".equals(role)) {
+        if (!isAuthorized(session)) {
             return "redirect:/auth/login";
         }
 
@@ -52,7 +56,6 @@ public class ExamHistoryController {
             return "SINHVIEN".equals(role) ? "redirect:/history" : "redirect:/scores";
         }
 
-        // Security check: Ensure this exam belongs to the logged-in student (only for SINHVIEN role)
         if ("SINHVIEN".equals(role)) {
             String studentId = (String) session.getAttribute("LOGIN_USER");
             if (studentId == null || exam.getStudent() == null || !exam.getStudent().getStudentId().trim().equals(studentId.trim())) {
@@ -61,7 +64,6 @@ public class ExamHistoryController {
             }
         }
 
-        // Calculate total and correct answers
         int totalQuestions = 0;
         int correctCount = 0;
         if (exam.getExamDetails() != null) {

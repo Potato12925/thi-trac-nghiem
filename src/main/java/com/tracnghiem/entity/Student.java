@@ -34,6 +34,9 @@ public class Student {
     @Column(name = "DIACHI", length = 100)
     private String address;
 
+	@Column(name = "EMAIL", length = 150)
+	private String email;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "MALOP", nullable = false)
     private Classroom classRoom;
@@ -87,6 +90,14 @@ public class Student {
     public void setAddress(String address) {
         this.address = address;
     }
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
 
     public Classroom getClassRoom() {
         return classRoom;

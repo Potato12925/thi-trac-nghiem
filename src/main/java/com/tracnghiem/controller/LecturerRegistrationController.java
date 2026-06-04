@@ -78,7 +78,7 @@ public class LecturerRegistrationController {
         String role = (String) session.getAttribute("ROLE");
         String userMaGv = (String) session.getAttribute("LOGIN_USER");
 
-        if (role == null || (!role.equals("PGV") && !role.equals("GIAOVIEN"))) {
+        if (!isAuthorized(session)) {
             return "redirect:/auth/login";
         }
 

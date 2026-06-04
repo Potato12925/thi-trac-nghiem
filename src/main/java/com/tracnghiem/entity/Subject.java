@@ -39,6 +39,10 @@ public class Subject {
         this.subjectName = subjectName;
     }
 
+	public String getSubjectDisplayName() {
+		return this.subjectId + " - " + this.subjectName;
+	}
+
     public boolean isDeleted() {
         return deleted;
     }

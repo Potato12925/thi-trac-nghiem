@@ -1,10 +1,17 @@
-
-USE master
+﻿USE master;
 GO
 
 IF DB_ID('THITRACNGHIEM') IS NOT NULL
 BEGIN
-    DROP DATABASE THITRACNGHIEM
+    ALTER DATABASE THITRACNGHIEM
+    SET SINGLE_USER
+    WITH ROLLBACK IMMEDIATE;
+END
+GO
+
+IF DB_ID('THITRACNGHIEM') IS NOT NULL
+BEGIN
+    DROP DATABASE THITRACNGHIEM;
 END
 GO
 
@@ -60,21 +67,45 @@ CREATE TABLE SINHVIEN (
     TEN NVARCHAR(10),
     NGAYSINH DATE,
     DIACHI NVARCHAR(100),
-    IS_DELETED BIT NOT NULL DEFAULT 0,
+    IS_DELETED BIT NOT NULL DEFAULT 0,    EMAIL NVARCHAR(150),
     MALOP NCHAR(15) NOT NULL
-)
+);
 
-INSERT [dbo].[SINHVIEN] ([MASV], [HO], [TEN], [NGAYSINH], [DIACHI], [MALOP]) VALUES (N'001     ', N'LÊ VĂN ', N'THÀNH', CAST(N'1985-03-06' AS Date), N'23/5 PHUNG KHAC KHOAN F3 Q3', N'TH04           ')
-INSERT [dbo].[SINHVIEN] ([MASV], [HO], [TEN], [NGAYSINH], [DIACHI], [MALOP]) VALUES (N'002     ', N'DAO TRONG', N'KHAI', CAST(N'1979-08-19' AS Date), N'15/72 LE VAN THO F8 GOVAP', N'TH04           ')
-INSERT [dbo].[SINHVIEN] ([MASV], [HO], [TEN], [NGAYSINH], [DIACHI], [MALOP]) VALUES (N'003     ', N'CAO TUAN', N'KHA', CAST(N'1985-12-06' AS Date), N'12/5 LE QUANG DINH F5 GO VAP', N'TH04           ')
-INSERT [dbo].[SINHVIEN] ([MASV], [HO], [TEN], [NGAYSINH], [DIACHI], [MALOP]) VALUES (N'004     ', N'HA THANH ', N'BINH', CAST(N'1984-03-24' AS Date), N'23/4 HOANG HOA THAM', N'TH04           ')
-INSERT [dbo].[SINHVIEN] ([MASV], [HO], [TEN], [NGAYSINH], [DIACHI], [MALOP]) VALUES (N'005     ', N'NGUYEN THÚY ', N'VÂN', CAST(N'1987-11-06' AS Date), N'7 HUYNH THUC KHANG', N'TH05           ')
-INSERT [dbo].[SINHVIEN] ([MASV], [HO], [TEN], [NGAYSINH], [DIACHI], [MALOP]) VALUES (N'006     ', N'NGUYEN NGOC ', N'YEN', CAST(N'1980-11-23' AS Date), N'3/5 AN DUONG VUONG', N'TH05           ')
-INSERT [dbo].[SINHVIEN] ([MASV], [HO], [TEN], [NGAYSINH], [DIACHI], [MALOP]) VALUES (N'007     ', N'NGUYEN THUY ', N'DUNG', CAST(N'1988-05-23' AS Date), N'8 HUYNH VAN BANH f1 q binh thanh', N'TH05           ')
-INSERT [dbo].[SINHVIEN] ([MASV], [HO], [TEN], [NGAYSINH], [DIACHI], [MALOP]) VALUES (N'008     ', N'TRINH', N'PHONG', CAST(N'1985-12-10' AS Date), N'', N'TH06           ')
-INSERT [dbo].[SINHVIEN] ([MASV], [HO], [TEN], [NGAYSINH], [DIACHI], [MALOP]) VALUES (N'009     ', N'TRAN THANH', N'HUNG', CAST(N'1985-03-28' AS Date), N'', N'TH05           ')
-INSERT [dbo].[SINHVIEN] ([MASV], [HO], [TEN], [NGAYSINH], [DIACHI], [MALOP]) VALUES (N'011     ', N'PHAN HONG', N'NGOC', CAST(N'1986-01-17' AS Date), N'PHAN VAN HAN BINH THANH', N'TH05           ')
-
+INSERT INTO SINHVIEN (MASV, HO, TEN, NGAYSINH, DIACHI, EMAIL, MALOP) VALUES (N'001     ', N'LÊ VĂN ', N'THÀNH', '1985-03-06', N'23/5 PHUNG KHAC KHOAN F3 Q3', N'bao0908235279@gmail.com', N'TH04           ');
+INSERT INTO SINHVIEN (MASV, HO, TEN, NGAYSINH, DIACHI, EMAIL, MALOP) VALUES (N'002     ', N'DAO TRONG', N'KHAI', '1979-08-19', N'15/72 LE VAN THO F8 GOVAP', N'002@student.edu.vn', N'TH04           ');
+INSERT INTO SINHVIEN (MASV, HO, TEN, NGAYSINH, DIACHI, EMAIL, MALOP) VALUES (N'003     ', N'CAO TUAN', N'KHA', '1985-12-06', N'12/5 LE QUANG DINH F5 GO VAP', N'003@student.edu.vn', N'TH04           ');
+INSERT INTO SINHVIEN (MASV, HO, TEN, NGAYSINH, DIACHI, EMAIL, MALOP) VALUES (N'004     ', N'HA THANH ', N'BINH', '1984-03-24', N'23/4 HOANG HOA THAM', N'004@student.edu.vn', N'TH04           ');
+INSERT INTO SINHVIEN (MASV, HO, TEN, NGAYSINH, DIACHI, EMAIL, MALOP) VALUES (N'005     ', N'NGUYEN THÚY ', N'VÂN', '1987-11-06', N'7 HUYNH THUC KHANG', N'005@student.edu.vn', N'TH05           ');
+INSERT INTO SINHVIEN (MASV, HO, TEN, NGAYSINH, DIACHI, EMAIL, MALOP) VALUES (N'006     ', N'NGUYEN NGOC ', N'YEN', '1980-11-23', N'3/5 AN DUONG VUONG', N'006@student.edu.vn', N'TH05           ');
+INSERT INTO SINHVIEN (MASV, HO, TEN, NGAYSINH, DIACHI, EMAIL, MALOP) VALUES (N'007     ', N'NGUYEN THUY ', N'DUNG', '1988-05-23', N'8 HUYNH VAN BANH F1 Q BINH THANH', N'007@student.edu.vn', N'TH05           ');
+INSERT INTO SINHVIEN (MASV, HO, TEN, NGAYSINH, DIACHI, EMAIL, MALOP) VALUES (N'008     ', N'TRINH', N'PHONG', '1985-12-10', N'', N'008@student.edu.vn', N'TH06           ');
+INSERT INTO SINHVIEN (MASV, HO, TEN, NGAYSINH, DIACHI, EMAIL, MALOP) VALUES (N'009     ', N'TRAN THANH', N'HUNG', '1985-03-28', N'', N'009@student.edu.vn', N'TH05           ');
+INSERT INTO SINHVIEN (MASV, HO, TEN, NGAYSINH, DIACHI, EMAIL, MALOP) VALUES (N'011     ', N'PHAN HONG', N'NGOC', '1986-01-17', N'PHAN VAN HAN BINH THANH', N'011@student.edu.vn', N'TH05           ');
+INSERT INTO SINHVIEN (MASV, HO, TEN, NGAYSINH, DIACHI, EMAIL, MALOP) VALUES (N'012     ', N'NGUYEN DUC', N'MINH', '2001-02-14', N'12 Le Loi, Thu Duc', N'012@student.edu.vn', N'TH04           ');
+INSERT INTO SINHVIEN (MASV, HO, TEN, NGAYSINH, DIACHI, EMAIL, MALOP) VALUES (N'013     ', N'TRAN NGOC', N'ANH', '2001-06-18', N'45 Pham Van Dong, Thu Duc', N'013@student.edu.vn', N'TH06           ');
+INSERT INTO SINHVIEN (MASV, HO, TEN, NGAYSINH, DIACHI, EMAIL, MALOP) VALUES (N'014     ', N'LE HOANG', N'LONG', '2001-09-03', N'77 Dang Van Bi, Thu Duc', N'014@student.edu.vn', N'TH06           ');
+INSERT INTO SINHVIEN (MASV, HO, TEN, NGAYSINH, DIACHI, EMAIL, MALOP) VALUES (N'015     ', N'PHAM THU', N'TRANG', '2001-12-21', N'18 Vo Van Ngan, Thu Duc', N'015@student.edu.vn', N'TH06           ');
+INSERT INTO SINHVIEN (MASV, HO, TEN, NGAYSINH, DIACHI, EMAIL, MALOP) VALUES (N'016     ', N'BUI GIA', N'HUY', '2001-04-11', N'22 Kha Van Can, Thu Duc', N'016@student.edu.vn', N'TH06           ');
+INSERT INTO SINHVIEN (MASV, HO, TEN, NGAYSINH, DIACHI, EMAIL, MALOP) VALUES (N'017     ', N'VO MINH', N'KHOA', '2002-01-15', N'99 Nguyen Oanh, Go Vap', N'017@student.edu.vn', N'TH07           ');
+INSERT INTO SINHVIEN (MASV, HO, TEN, NGAYSINH, DIACHI, EMAIL, MALOP) VALUES (N'018     ', N'DANG THI', N'MY', '2002-03-09', N'15 Quang Trung, Go Vap', N'018@student.edu.vn', N'TH07           ');
+INSERT INTO SINHVIEN (MASV, HO, TEN, NGAYSINH, DIACHI, EMAIL, MALOP) VALUES (N'019     ', N'NGO TUAN', N'KIET', '2002-05-30', N'201 Le Duc Tho, Go Vap', N'019@student.edu.vn', N'TH07           ');
+INSERT INTO SINHVIEN (MASV, HO, TEN, NGAYSINH, DIACHI, EMAIL, MALOP) VALUES (N'020     ', N'PHAN GIA', N'BAO', '2002-07-17', N'61 Duong Quang Ham, Go Vap', N'020@student.edu.vn', N'TH07           ');
+INSERT INTO SINHVIEN (MASV, HO, TEN, NGAYSINH, DIACHI, EMAIL, MALOP) VALUES (N'021     ', N'HOANG NGOC', N'HA', '2002-11-02', N'88 Nguyen Kiem, Go Vap', N'021@student.edu.vn', N'TH07           ');
+INSERT INTO SINHVIEN (MASV, HO, TEN, NGAYSINH, DIACHI, EMAIL, MALOP) VALUES (N'022     ', N'LY KHANH', N'CHI', '2002-02-05', N'13 Nguyen Son, Tan Phu', N'022@student.edu.vn', N'TH08           ');
+INSERT INTO SINHVIEN (MASV, HO, TEN, NGAYSINH, DIACHI, EMAIL, MALOP) VALUES (N'023     ', N'TRINH QUOC', N'DAT', '2002-04-28', N'52 Au Co, Tan Phu', N'023@student.edu.vn', N'TH08           ');
+INSERT INTO SINHVIEN (MASV, HO, TEN, NGAYSINH, DIACHI, EMAIL, MALOP) VALUES (N'024     ', N'NGUYEN PHU', N'LOC', '2002-06-12', N'121 Luy Ban Bich, Tan Phu', N'024@student.edu.vn', N'TH08           ');
+INSERT INTO SINHVIEN (MASV, HO, TEN, NGAYSINH, DIACHI, EMAIL, MALOP) VALUES (N'025     ', N'LAM THI', N'YEN', '2002-08-19', N'73 Truong Chinh, Tan Phu', N'025@student.edu.vn', N'TH08           ');
+INSERT INTO SINHVIEN (MASV, HO, TEN, NGAYSINH, DIACHI, EMAIL, MALOP) VALUES (N'026     ', N'PHAM HUU', N'PHUC', '2002-10-25', N'144 Tan Huong, Tan Phu', N'026@student.edu.vn', N'TH08           ');
+INSERT INTO SINHVIEN (MASV, HO, TEN, NGAYSINH, DIACHI, EMAIL, MALOP) VALUES (N'027     ', N'LE TAN', N'TAI', '2001-01-08', N'17 Nguyen Van Linh, Quan 7', N'027@student.edu.vn', N'VT04           ');
+INSERT INTO SINHVIEN (MASV, HO, TEN, NGAYSINH, DIACHI, EMAIL, MALOP) VALUES (N'028     ', N'NGUYEN THI', N'DAO', '2001-03-27', N'31 Huynh Tan Phat, Quan 7', N'028@student.edu.vn', N'VT04           ');
+INSERT INTO SINHVIEN (MASV, HO, TEN, NGAYSINH, DIACHI, EMAIL, MALOP) VALUES (N'029     ', N'TRAN QUOC', N'VINH', '2001-05-16', N'102 Tran Xuan Soan, Quan 7', N'029@student.edu.vn', N'VT04           ');
+INSERT INTO SINHVIEN (MASV, HO, TEN, NGAYSINH, DIACHI, EMAIL, MALOP) VALUES (N'030     ', N'BUI THAO', N'VY', '2001-08-06', N'56 Nguyen Thi Thap, Quan 7', N'030@student.edu.vn', N'VT04           ');
+INSERT INTO SINHVIEN (MASV, HO, TEN, NGAYSINH, DIACHI, EMAIL, MALOP) VALUES (N'031     ', N'VO NGOC', N'THI', '2001-11-13', N'89 Tan My, Quan 7', N'031@student.edu.vn', N'VT04           ');
+INSERT INTO SINHVIEN (MASV, HO, TEN, NGAYSINH, DIACHI, EMAIL, MALOP) VALUES (N'032     ', N'NGUYEN KHAC', N'DUY', '2000-02-22', N'11 To Huu, Thu Duc', N'032@student.edu.vn', N'D18CQCN01      ');
+INSERT INTO SINHVIEN (MASV, HO, TEN, NGAYSINH, DIACHI, EMAIL, MALOP) VALUES (N'033     ', N'PHAM MY', N'LINH', '2000-04-14', N'25 Xa Lo Ha Noi, Thu Duc', N'033@student.edu.vn', N'D18CQCN01      ');
+INSERT INTO SINHVIEN (MASV, HO, TEN, NGAYSINH, DIACHI, EMAIL, MALOP) VALUES (N'034     ', N'TRAN HUU', N'NHAN', '2000-07-29', N'64 Vo Chi Cong, Thu Duc', N'034@student.edu.vn', N'D18CQCN01      ');
+INSERT INTO SINHVIEN (MASV, HO, TEN, NGAYSINH, DIACHI, EMAIL, MALOP) VALUES (N'035     ', N'LE THI', N'THUY', '2000-09-10', N'90 Do Xuan Hop, Thu Duc', N'035@student.edu.vn', N'D18CQCN01      ');
+INSERT INTO SINHVIEN (MASV, HO, TEN, NGAYSINH, DIACHI, EMAIL, MALOP) VALUES (N'036     ', N'NGO ANH', N'QUAN', '2000-12-05', N'43 Nguyen Duy Trinh, Thu Duc', N'036@student.edu.vn', N'D18CQCN01      ');
 
 /* =========================================
             TABLE GIAOVIEN
@@ -86,14 +117,16 @@ CREATE TABLE GIAOVIEN (
     TEN NVARCHAR(10),
     SODTLL NCHAR(15),
     DIACHI NVARCHAR(50),
-    IS_DELETED BIT NOT NULL DEFAULT 0
+    IS_DELETED BIT NOT NULL DEFAULT 0,
+    EMAIL NVARCHAR(150)
 )
+INSERT [dbo].[GIAOVIEN] ([MAGV], [HO], [TEN], [SODTLL], [DIACHI], [EMAIL]) VALUES (N'TH101   ', N'KIEU DAC', N'THIEN', N'0901234567', N'9,3A, Q.BINH TAN', N'th101@teacher.edu.vn');
 
-INSERT [dbo].[GIAOVIEN] ([MAGV], [HO], [TEN], [DIACHI]) VALUES (N'TH101   ', N'KIEU DAC', N'THIEN', N'9,3A, Q.BINH TAN')
-INSERT [dbo].[GIAOVIEN] ([MAGV], [HO], [TEN], [DIACHI]) VALUES (N'TH123   ', N'PHAN VAN ', N'HAI', N'15/72 LE VAN THO F8 GO VAP')
-INSERT [dbo].[GIAOVIEN] ([MAGV], [HO], [TEN], [DIACHI]) VALUES (N'TH234   ', N'DAO VAN ', N'TUYET', N'14/7 BUI DINH TUY TAN BINH')
-INSERT [dbo].[GIAOVIEN] ([MAGV], [HO], [TEN], [DIACHI]) VALUES (N'TH657   ', N'PHAN HONG', N'NGOC', N'')
+INSERT [dbo].[GIAOVIEN] ([MAGV], [HO], [TEN], [SODTLL], [DIACHI], [EMAIL]) VALUES (N'TH123   ', N'PHAN VAN ', N'HAI', N'0912345678', N'15/72 LE VAN THO F8 GO VAP', N'th123@teacher.edu.vn');
 
+INSERT [dbo].[GIAOVIEN] ([MAGV], [HO], [TEN], [SODTLL], [DIACHI], [EMAIL]) VALUES (N'TH234   ', N'DAO VAN ', N'TUYET', N'0923456789', N'14/7 BUI DINH TUY TAN BINH', N'th234@teacher.edu.vn');
+
+INSERT [dbo].[GIAOVIEN] ([MAGV], [HO], [TEN], [SODTLL], [DIACHI], [EMAIL]) VALUES (N'TH657   ', N'PHAN HONG', N'NGOC', N'0934567890', N'', N'th657@teacher.edu.vn');
 /* =========================================
             TABLE TAIKHOAN
 ========================================= */
@@ -106,6 +139,27 @@ CREATE TABLE TAIKHOAN (
     ROLE VARCHAR(20) NOT NULL
         CHECK (ROLE IN ('PGV', 'GIAOVIEN', 'SINHVIEN'))
 );
+CREATE TABLE PASSWORD_RESET_OTP (
+    ID BIGINT IDENTITY(1,1) PRIMARY KEY,
+    ACCOUNT_ID NCHAR(8) NOT NULL,
+    EMAIL NVARCHAR(150) NOT NULL,
+    PURPOSE NVARCHAR(30) NOT NULL,
+    OTP_CODE CHAR(6) NOT NULL,
+    EXPIRES_AT DATETIME2 NOT NULL,
+    USED BIT NOT NULL DEFAULT 0,
+    USED_AT DATETIME2 NULL,
+    CREATED_AT DATETIME2 NOT NULL DEFAULT SYSDATETIME()
+);
+
+CREATE INDEX IX_PASSWORD_RESET_OTP_ACCOUNT
+ON PASSWORD_RESET_OTP (ACCOUNT_ID);
+
+CREATE INDEX IX_PASSWORD_RESET_OTP_CODE
+ON PASSWORD_RESET_OTP (OTP_CODE);
+
+CREATE INDEX IX_PASSWORD_RESET_OTP_EXPIRES_AT
+ON PASSWORD_RESET_OTP (EXPIRES_AT);
+
 INSERT INTO TAIKHOAN (MA, PASSWORD_HASH, ROLE) VALUES ('PGV00001', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'PGV');
 INSERT INTO TAIKHOAN (MA, PASSWORD_HASH, ROLE) VALUES ('001', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'SINHVIEN');
 INSERT INTO TAIKHOAN (MA, PASSWORD_HASH, ROLE) VALUES ('002', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'SINHVIEN');
@@ -118,6 +172,39 @@ INSERT INTO TAIKHOAN (MA, PASSWORD_HASH, ROLE) VALUES ('008', '8d969eef6ecad3c29
 INSERT INTO TAIKHOAN (MA, PASSWORD_HASH, ROLE) VALUES ('009', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'SINHVIEN');
 INSERT INTO TAIKHOAN (MA, PASSWORD_HASH, ROLE) VALUES ('011', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'SINHVIEN');
 INSERT INTO TAIKHOAN (MA, PASSWORD_HASH, ROLE) VALUES ('TH101', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'GIAOVIEN');
+INSERT INTO TAIKHOAN (MA, PASSWORD_HASH, ROLE) VALUES ('TH123', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'GIAOVIEN');
+INSERT INTO TAIKHOAN (MA, PASSWORD_HASH, ROLE) VALUES ('TH234', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'GIAOVIEN');
+INSERT INTO TAIKHOAN (MA, PASSWORD_HASH, ROLE) VALUES ('TH657', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'GIAOVIEN');
+INSERT INTO TAIKHOAN (MA, PASSWORD_HASH, ROLE) VALUES ('012', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'SINHVIEN');
+INSERT INTO TAIKHOAN (MA, PASSWORD_HASH, ROLE) VALUES ('013', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'SINHVIEN');
+INSERT INTO TAIKHOAN (MA, PASSWORD_HASH, ROLE) VALUES ('014', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'SINHVIEN');
+INSERT INTO TAIKHOAN (MA, PASSWORD_HASH, ROLE) VALUES ('015', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'SINHVIEN');
+INSERT INTO TAIKHOAN (MA, PASSWORD_HASH, ROLE) VALUES ('016', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'SINHVIEN');
+INSERT INTO TAIKHOAN (MA, PASSWORD_HASH, ROLE) VALUES ('017', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'SINHVIEN');
+INSERT INTO TAIKHOAN (MA, PASSWORD_HASH, ROLE) VALUES ('018', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'SINHVIEN');
+INSERT INTO TAIKHOAN (MA, PASSWORD_HASH, ROLE) VALUES ('019', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'SINHVIEN');
+INSERT INTO TAIKHOAN (MA, PASSWORD_HASH, ROLE) VALUES ('020', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'SINHVIEN');
+INSERT INTO TAIKHOAN (MA, PASSWORD_HASH, ROLE) VALUES ('021', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'SINHVIEN');
+INSERT INTO TAIKHOAN (MA, PASSWORD_HASH, ROLE) VALUES ('022', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'SINHVIEN');
+INSERT INTO TAIKHOAN (MA, PASSWORD_HASH, ROLE) VALUES ('023', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'SINHVIEN');
+INSERT INTO TAIKHOAN (MA, PASSWORD_HASH, ROLE) VALUES ('024', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'SINHVIEN');
+INSERT INTO TAIKHOAN (MA, PASSWORD_HASH, ROLE) VALUES ('025', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'SINHVIEN');
+INSERT INTO TAIKHOAN (MA, PASSWORD_HASH, ROLE) VALUES ('026', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'SINHVIEN');
+INSERT INTO TAIKHOAN (MA, PASSWORD_HASH, ROLE) VALUES ('027', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'SINHVIEN');
+INSERT INTO TAIKHOAN (MA, PASSWORD_HASH, ROLE) VALUES ('028', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'SINHVIEN');
+INSERT INTO TAIKHOAN (MA, PASSWORD_HASH, ROLE) VALUES ('029', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'SINHVIEN');
+INSERT INTO TAIKHOAN (MA, PASSWORD_HASH, ROLE) VALUES ('030', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'SINHVIEN');
+INSERT INTO TAIKHOAN (MA, PASSWORD_HASH, ROLE) VALUES ('031', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'SINHVIEN');
+INSERT INTO TAIKHOAN (MA, PASSWORD_HASH, ROLE) VALUES ('032', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'SINHVIEN');
+INSERT INTO TAIKHOAN (MA, PASSWORD_HASH, ROLE) VALUES ('033', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'SINHVIEN');
+INSERT INTO TAIKHOAN (MA, PASSWORD_HASH, ROLE) VALUES ('034', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'SINHVIEN');
+INSERT INTO TAIKHOAN (MA, PASSWORD_HASH, ROLE) VALUES ('035', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'SINHVIEN');
+INSERT INTO TAIKHOAN (MA, PASSWORD_HASH, ROLE) VALUES ('036', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'SINHVIEN');
+
+INSERT INTO PASSWORD_RESET_OTP (ACCOUNT_ID, EMAIL, PURPOSE, OTP_CODE, EXPIRES_AT, USED, USED_AT, CREATED_AT)
+VALUES
+    (N'001     ', N'bao0908235279@gmail.com', N'PASSWORD_RESET', '135790', DATEADD(MINUTE, 5, SYSDATETIME()), 0, NULL, SYSDATETIME()),
+    (N'TH123   ', N'th123@teacher.edu.vn', N'EMAIL_CHANGE', '246810', DATEADD(MINUTE, -10, SYSDATETIME()), 1, DATEADD(MINUTE, -7, SYSDATETIME()), DATEADD(MINUTE, -15, SYSDATETIME()));
 /* =========================================
         TABLE GIAOVIEN_DANGKY
 ========================================= */
@@ -413,7 +500,155 @@ INSERT [dbo].[BODE] ([CAUHOI], [MAMH], [TRINHDO], [NOIDUNG], [A], [B], [C], [D],
 INSERT [dbo].[BODE] ([CAUHOI], [MAMH], [TRINHDO], [NOIDUNG], [A], [B], [C], [D], [DAP_AN], [MAGV]) VALUES (220, N'MMTCB', N'C', N'Địa chỉ MAC ', N'Gồm có 32 bit', N'Còn gọi là địa chỉ logic', N'Nằm trong cấp Network', N'Dùng để phân biệt các máy trong mạng', N'D', N'TH123   ')
 
 
+INSERT [dbo].[BODE] ([CAUHOI], [MAMH], [TRINHDO], [NOIDUNG], [A], [B], [C], [D], [DAP_AN], [MAGV]) VALUES
+    (221, N'CTDL ', N'A', N'Queue hoạt động theo nguyên tắc nào?', N'FIFO', N'LIFO', N'Random', N'Binary', N'A', N'TH101   '),
+    (222, N'CTDL ', N'A', N'Stack hoạt động theo nguyên tắc nào?', N'FIFO', N'LIFO', N'Round Robin', N'Hashing', N'B', N'TH101   '),
+    (223, N'CTDL ', N'A', N'Cấu trúc dữ liệu nào truy cập phần tử đầu nhanh nhất?', N'Linked list', N'Stack', N'Queue', N'Array', N'D', N'TH101   '),
+    (224, N'CTDL ', N'A', N'Thao tác push áp dụng với cấu trúc nào?', N'Tree', N'Stack', N'Graph', N'Heap', N'B', N'TH101   '),
+    (225, N'CTDL ', N'A', N'Thao tác enqueue áp dụng với cấu trúc nào?', N'Queue', N'Stack', N'Tree', N'Set', N'A', N'TH101   '),
+    (226, N'CTDL ', N'A', N'Tìm kiếm tuyến tính có độ phức tạp xấu nhất là?', N'O(1)', N'O(log n)', N'O(n)', N'O(n log n)', N'C', N'TH101   '),
+    (227, N'CTDL ', N'A', N'Mảng bắt đầu đánh chỉ số thường từ?', N'0', N'1', N'2', N'-1', N'A', N'TH101   '),
+    (228, N'CTDL ', N'A', N'Linked list đơn mỗi node thường chứa?', N'Data và 1 next', N'2 next', N'Chỉ data', N'Key và color', N'A', N'TH101   '),
+    (229, N'CTDL ', N'A', N'Cây nhị phân mỗi node có tối đa bao nhiêu con?', N'1', N'2', N'3', N'4', N'B', N'TH101   '),
+    (230, N'CTDL ', N'A', N'Thao tác pop lấy dữ liệu ở đâu trong stack?', N'Đầu', N'Giữa', N'Cuối', N'Đỉnh', N'D', N'TH101   '),
+    (231, N'CTDL ', N'A', N'Thao tác dequeue lấy phần tử nào?', N'Cuối hàng đợi', N'Đầu hàng đợi', N'Giữa hàng đợi', N'Bất kỳ', N'B', N'TH101   '),
+    (232, N'CTDL ', N'A', N'Bubble sort thuộc nhóm sắp xếp nào?', N'Đổi chỗ', N'Chèn', N'Chọn', N'Trộn', N'A', N'TH101   '),
+    (233, N'CTDL ', N'B', N'Binary search yêu cầu điều kiện gì?', N'Dữ liệu đã sắp xếp', N'Dữ liệu ngẫu nhiên', N'Chỉ dành cho queue', N'Chỉ dùng cho tree', N'A', N'TH101   '),
+    (234, N'CTDL ', N'B', N'Quick sort có độ phức tạp trung bình là?', N'O(n^2)', N'O(n log n)', N'O(log n)', N'O(n)', N'B', N'TH101   '),
+    (235, N'CTDL ', N'B', N'Merge sort dùng ý tưởng nào?', N'Đệ quy chia để trị', N'Tham lam', N'Quy hoạch động', N'Băm', N'A', N'TH101   '),
+    (236, N'CTDL ', N'B', N'Node là gì trong linked list?', N'Một phép toán', N'Một phần tử có liên kết', N'Một kiểu sắp xếp', N'Một hash key', N'B', N'TH101   '),
+    (237, N'CTDL ', N'B', N'Cây nhị phân tìm kiếm có tính chất nào?', N'Trái > gốc > phải', N'Trái < gốc < phải', N'Không có thứ tự', N'Mỗi node có 3 con', N'B', N'TH101   '),
+    (238, N'CTDL ', N'B', N'Duyệt LNR trên BST cho kết quả?', N'Thứ tự giảm dần', N'Thứ tự tăng dần', N'Ngẫu nhiên', N'Chỉ lá là', N'B', N'TH101   '),
+    (239, N'CTDL ', N'B', N'Thao tác peek của stack dùng để?', N'Xóa đỉnh', N'Xem đỉnh không xóa', N'Chèn vào đỉnh', N'Đảo ngược stack', N'B', N'TH101   '),
+    (240, N'CTDL ', N'B', N'Cấu trúc nào phù hợp nhất để mô phỏng undo?', N'Queue', N'Stack', N'Heap', N'Graph', N'B', N'TH101   '),
+    (241, N'CTDL ', N'B', N'Heap nhị phân là?', N'Cây cân bằng tuyệt đối', N'Cây gần đầy và có tính chất heap', N'Danh sách liên kết', N'Bảng băm', N'B', N'TH101   '),
+    (242, N'CTDL ', N'B', N'Insertion sort tốt cho trường hợp nào?', N'Dữ liệu gần đã sắp xếp', N'Dữ liệu rất lớn', N'Dữ liệu phân tán', N'Chỉ dùng cho queue', N'A', N'TH101   '),
+    (243, N'CTDL ', N'B', N'Selection sort mỗi vòng lặp sẽ?', N'Chọn phần tử nhỏ nhất đưa về đúng vị trí', N'Chia mảng làm đôi', N'Trộn hai dãy', N'Đổi chỗ ngẫu nhiên', N'A', N'TH101   '),
+    (244, N'CTDL ', N'B', N'Độ phức tạp truy cập node thứ k của linked list đơn là?', N'O(1)', N'O(log n)', N'O(k)', N'O(n log n)', N'C', N'TH101   '),
+    (245, N'CTDL ', N'C', N'AVL tree được dùng để?', N'Cân bằng cây tìm kiếm', N'Lưu queue', N'Tạo hash', N'Duyệt đồ thị', N'A', N'TH101   '),
+    (246, N'CTDL ', N'C', N'Rotation trong AVL tree nhằm mục đích gì?', N'Tăng bộ nhớ', N'Giữ cây cân bằng', N'Xóa node lá', N'Tìm đường đi ngắn nhất', N'B', N'TH101   '),
+    (247, N'CTDL ', N'C', N'Hash collision xảy ra khi?', N'Hai khóa trùng vị trí băm', N'Khóa âm', N'Mảng rỗng', N'Dữ liệu đã sắp xếp', N'A', N'TH101   '),
+    (248, N'CTDL ', N'C', N'Chaining là kỹ thuật giải quyết?', N'Đệ quy', N'Collision trong hash', N'Sắp xếp trộn', N'Cân bằng cây', N'B', N'TH101   '),
+    (249, N'CTDL ', N'C', N'BFS thường sử dụng cấu trúc nào?', N'Stack', N'Queue', N'Heap', N'Array 2 chiều', N'B', N'TH101   '),
+    (250, N'CTDL ', N'C', N'DFS thường sử dụng cấu trúc nào?', N'Queue', N'Stack', N'Set', N'Hash map', N'B', N'TH101   '),
+    (251, N'CTDL ', N'C', N'Dijkstra dùng để tìm?', N'Cây khung nhỏ nhất', N'Đường đi ngắn nhất', N'Chu trình Euler', N'Liên thông mạnh', N'B', N'TH101   '),
+    (252, N'CTDL ', N'C', N'Min-heap có tính chất nào ở nút gốc?', N'Lớn nhất', N'Nhỏ nhất', N'Ngẫu nhiên', N'Luôn bằng 0', N'B', N'TH101   '),
+    (253, N'CTDL ', N'C', N'Red-black tree đảm bảo điều gì?', N'Cân bằng tương đối', N'Cân bằng tuyệt đối', N'Không cân bằng', N'Chỉ có node đỏ', N'A', N'TH101   '),
+    (254, N'CTDL ', N'C', N'Prim và Kruskal dùng cho bài toán nào?', N'Đường đi ngắn nhất', N'Cây khung nhỏ nhất', N'Tìm chuỗi', N'Bảng băm', N'B', N'TH101   '),
+    (255, N'CTDL ', N'C', N'Độ phức tạp trung bình của thao tác tìm kiếm trong hash table tốt là?', N'O(1)', N'O(n)', N'O(log n)', N'O(n log n)', N'A', N'TH101   '),
+    (256, N'CTDL ', N'C', N'Topo sort áp dụng cho?', N'Graph vô hướng', N'DAG', N'Cây nhị phân', N'Queue', N'B', N'TH101   '),
+    (257, N'CSDL ', N'A', N'Hệ quản trị cơ sở dữ liệu viết tắt là?', N'DBMS', N'DNS', N'HTML', N'LAN', N'A', N'TH657   '),
+    (258, N'CSDL ', N'A', N'Lệnh dùng để truy vấn dữ liệu là?', N'UPDATE', N'DELETE', N'SELECT', N'DROP', N'C', N'TH657   '),
+    (259, N'CSDL ', N'A', N'Khóa chính dùng để?', N'Đánh dấu bản ghi duy nhất', N'Lưu file', N'Tăng tốc RAM', N'Nối mạng', N'A', N'TH657   '),
+    (260, N'CSDL ', N'A', N'Khóa ngoại dùng để?', N'Ràng buộc liên kết giữa bảng', N'Tạo view', N'Để mã hóa', N'Tính tổng', N'A', N'TH657   '),
+    (261, N'CSDL ', N'A', N'Lệnh thêm dữ liệu là?', N'ALTER', N'INSERT', N'JOIN', N'GROUP', N'B', N'TH657   '),
+    (262, N'CSDL ', N'A', N'Lệnh sửa dữ liệu là?', N'UPDATE', N'ORDER BY', N'CREATE', N'HAVING', N'A', N'TH657   '),
+    (263, N'CSDL ', N'A', N'Lệnh xóa dữ liệu là?', N'DELETE', N'SELECT', N'VALUES', N'FROM', N'A', N'TH657   '),
+    (264, N'CSDL ', N'A', N'Mệnh đề lọc dữ liệu là?', N'GROUP BY', N'ORDER BY', N'WHERE', N'INNER', N'C', N'TH657   '),
+    (265, N'CSDL ', N'A', N'Kiểu join lấy dữ liệu khớp ở cả hai bảng là?', N'LEFT JOIN', N'INNER JOIN', N'RIGHT JOIN', N'FULL JOIN', N'B', N'TH657   '),
+    (266, N'CSDL ', N'A', N'NULL trong CSDL thể hiện?', N'Giá trị bằng 0', N'Không có giá trị', N'Chuỗi rỗng', N'Sai ràng buộc', N'B', N'TH657   '),
+    (267, N'CSDL ', N'A', N'Bảng dữ liệu gồm?', N'Hàng và cột', N'Chỉ cột', N'Chỉ hàng', N'Chỉ khóa', N'A', N'TH657   '),
+    (268, N'CSDL ', N'A', N'Constraint UNIQUE dùng để?', N'Cấm giá trị trùng', N'Cho phép NULL', N'Nối bảng', N'Tính tổng cột', N'A', N'TH657   '),
+    (269, N'CSDL ', N'B', N'Chuẩn hóa 1NF yêu cầu?', N'Thuộc tính nguyên tố', N'Không có khóa', N'Không cần PK', N'Chỉ 1 bảng', N'A', N'TH657   '),
+    (270, N'CSDL ', N'B', N'Chuẩn hóa 2NF loại bỏ?', N'Phụ thuộc bộ phận', N'Phụ thuộc bắc cầu', N'Dữ liệu trùng khóa ngoại', N'Giá trị NULL', N'A', N'TH657   '),
+    (271, N'CSDL ', N'B', N'Chuẩn hóa 3NF loại bỏ?', N'Phụ thuộc bộ phận', N'Phụ thuộc bắc cầu', N'Chỉ mục', N'Ràng buộc check', N'B', N'TH657   '),
+    (272, N'CSDL ', N'B', N'GROUP BY dùng để?', N'Sắp xếp', N'Nhóm dữ liệu', N'Nối bảng', N'Tạo bảng', N'B', N'TH657   '),
+    (273, N'CSDL ', N'B', N'HAVING dùng để?', N'Lọc sau khi nhóm', N'Lọc trước khi nhóm', N'Tạo khóa', N'Xóa bảng', N'A', N'TH657   '),
+    (274, N'CSDL ', N'B', N'Chỉ mục index giúp?', N'Tăng tốc truy vấn', N'Tăng dung lượng RAM', N'Giảm cột', N'Bỏ khóa chính', N'A', N'TH657   '),
+    (275, N'CSDL ', N'B', N'Transaction có tính chất ACID, chữ C là?', N'Consistent', N'Concurrent', N'Connected', N'Computed', N'A', N'TH657   '),
+    (276, N'CSDL ', N'B', N'COMMIT dùng để?', N'Hủy giao dịch', N'Lưu giao dịch', N'Khóa bảng', N'Khởi tạo DB', N'B', N'TH657   '),
+    (277, N'CSDL ', N'B', N'ROLLBACK dùng để?', N'Lưu thay đổi', N'Phục hồi giao dịch', N'Tạo view', N'Xem log', N'B', N'TH657   '),
+    (278, N'CSDL ', N'B', N'View là?', N'Bảng ảo từ câu truy vấn', N'Bảng vật lý', N'Khóa chính', N'Stored procedure', N'A', N'TH657   '),
+    (279, N'CSDL ', N'B', N'Lệnh tạo bảng là?', N'CREATE TABLE', N'ALTER TABLE', N'DROP TABLE', N'SELECT INTO', N'A', N'TH657   '),
+    (280, N'CSDL ', N'B', N'Lệnh sửa cấu trúc bảng là?', N'INSERT', N'UPDATE', N'ALTER TABLE', N'TRUNCATE', N'C', N'TH657   '),
+    (281, N'CSDL ', N'C', N'Isolation level dùng để kiểm soát?', N'Trạng thái server', N'Mức độ cô lập giao dịch', N'Kích thước bảng', N'Khóa chính', N'B', N'TH657   '),
+    (282, N'CSDL ', N'C', N'Deadlock xảy ra khi?', N'Hai giao dịch chờ nhau giải phóng tài nguyên', N'Không có index', N'Bảng rỗng', N'Server tắt', N'A', N'TH657   '),
+    (283, N'CSDL ', N'C', N'Stored procedure là?', N'Tập lệnh SQL được lưu để tái sử dụng', N'Bảng tạm', N'Khóa ngoại', N'Một index', N'A', N'TH657   '),
+    (284, N'CSDL ', N'C', N'Trigger thường kích hoạt khi?', N'Có sự kiện INSERT UPDATE DELETE', N'Khởi động máy', N'Tạo user', N'Mở file', N'A', N'TH657   '),
+    (285, N'CSDL ', N'C', N'Clustered index sắp xếp?', N'Dữ liệu vật lý trong bảng', N'Chỉ bộ nhớ', N'Chỉ log', N'Chỉ khóa ngoại', N'A', N'TH657   '),
+    (286, N'CSDL ', N'C', N'Nonclustered index lưu?', N'Cấu trúc chỉ mục tách dữ liệu', N'Dữ liệu trùng lặp toàn bộ', N'Chỉ giao dịch', N'Chỉ khóa chính', N'A', N'TH657   '),
+    (287, N'CSDL ', N'C', N'Backup full dùng để?', N'Sao lưu toàn bộ CSDL', N'Xóa dữ liệu cũ', N'Nối bảng', N'Tạo view', N'A', N'TH657   '),
+    (288, N'CSDL ', N'C', N'Restore log dùng khi?', N'Phục hồi theo chuỗi backup', N'Tạo index', N'Chuẩn hóa 3NF', N'Tìm khóa chính', N'A', N'TH657   '),
+    (289, N'CSDL ', N'C', N'Phân mảnh dữ liệu thường dùng để?', N'Tăng khả năng mở rộng', N'Giảm bảo mật', N'Bỏ transaction', N'Bỏ index', N'A', N'TH657   '),
+    (290, N'CSDL ', N'C', N'Replication dùng để?', N'Đồng bộ dữ liệu giữa các hệ thống', N'Xóa dữ liệu trùng', N'Thay khóa chính', N'Đổi kiểu dữ liệu', N'A', N'TH657   '),
+    (291, N'CSDL ', N'C', N'Dirty read là?', N'Đọc dữ liệu chưa commit', N'Đọc dữ liệu đã xóa', N'Đọc dữ liệu đã mã hóa', N'Đọc dữ liệu trùng', N'A', N'TH657   '),
+    (292, N'CSDL ', N'C', N'Phân quyền SELECT cho user dùng lệnh nào?', N'REVOKE', N'GRANT', N'DENY', N'BACKUP', N'B', N'TH657   ');
+
 SET IDENTITY_INSERT [dbo].[BODE] OFF
+
+INSERT INTO GIAOVIEN_DANGKY (MAGV, MALOP, MAMH, TRINHDO, NGAYTHI, LAN, SOCAUTHI, THOIGIAN) VALUES
+    (N'TH123   ', N'TH04           ', N'MMTCB', N'A', '2026-06-10 08:00:00', 1, 20, 45),
+    (N'TH123   ', N'TH04           ', N'MMTCB', N'B', '2026-06-17 08:00:00', 2, 20, 45),
+    (N'TH234   ', N'TH05           ', N'AVCB ', N'A', '2026-06-11 09:00:00', 1, 15, 30),
+    (N'TH234   ', N'TH05           ', N'AVCB ', N'C', '2026-06-18 09:00:00', 2, 12, 25),
+    (N'TH101   ', N'TH06           ', N'CTDL ', N'A', '2026-06-12 10:00:00', 1, 12, 25),
+    (N'TH101   ', N'TH06           ', N'CTDL ', N'B', '2026-06-19 10:00:00', 2, 12, 25),
+    (N'TH657   ', N'TH07           ', N'CSDL ', N'B', '2026-06-13 13:30:00', 1, 12, 25),
+    (N'TH657   ', N'TH07           ', N'CSDL ', N'C', '2026-06-20 13:30:00', 2, 10, 20),
+    (N'TH657   ', N'TH08           ', N'MMTCB', N'C', '2026-06-14 14:00:00', 1, 15, 30),
+    (N'TH657   ', N'VT04           ', N'CSDL ', N'A', '2026-06-15 08:30:00', 1, 10, 20),
+    (N'TH234   ', N'D18CQCN01      ', N'AVCB ', N'B', '2026-06-16 15:00:00', 1, 12, 25),
+    (N'TH657   ', N'D18CQCN01      ', N'CSDL ', N'A', '2026-06-21 15:00:00', 2, 10, 20);
+
+INSERT INTO CT_GIAOVIEN_DANGKY (MALOP, MAMH, LAN, CAUHOI)
+SELECT N'TH04           ', N'MMTCB', 1, CAUHOI
+FROM BODE
+WHERE CAUHOI = 1 OR CAUHOI BETWEEN 3 AND 15 OR CAUHOI BETWEEN 161 AND 166;
+
+INSERT INTO CT_GIAOVIEN_DANGKY (MALOP, MAMH, LAN, CAUHOI)
+SELECT N'TH04           ', N'MMTCB', 2, CAUHOI
+FROM BODE
+WHERE CAUHOI BETWEEN 142 AND 155 OR CAUHOI BETWEEN 181 AND 186;
+
+INSERT INTO CT_GIAOVIEN_DANGKY (MALOP, MAMH, LAN, CAUHOI)
+SELECT N'TH05           ', N'AVCB ', 1, CAUHOI
+FROM BODE
+WHERE CAUHOI BETWEEN 20 AND 29 OR CAUHOI = 50 OR CAUHOI BETWEEN 30 AND 33;
+
+INSERT INTO CT_GIAOVIEN_DANGKY (MALOP, MAMH, LAN, CAUHOI)
+SELECT N'TH05           ', N'AVCB ', 2, CAUHOI
+FROM BODE
+WHERE CAUHOI BETWEEN 40 AND 49 OR CAUHOI BETWEEN 70 AND 71;
+
+INSERT INTO CT_GIAOVIEN_DANGKY (MALOP, MAMH, LAN, CAUHOI)
+SELECT N'TH06           ', N'CTDL ', 1, CAUHOI
+FROM BODE
+WHERE CAUHOI BETWEEN 221 AND 229 OR CAUHOI BETWEEN 233 AND 235;
+
+INSERT INTO CT_GIAOVIEN_DANGKY (MALOP, MAMH, LAN, CAUHOI)
+SELECT N'TH06           ', N'CTDL ', 2, CAUHOI
+FROM BODE
+WHERE CAUHOI BETWEEN 233 AND 241 OR CAUHOI BETWEEN 245 AND 247;
+
+INSERT INTO CT_GIAOVIEN_DANGKY (MALOP, MAMH, LAN, CAUHOI)
+SELECT N'TH07           ', N'CSDL ', 1, CAUHOI
+FROM BODE
+WHERE CAUHOI BETWEEN 269 AND 277 OR CAUHOI BETWEEN 281 AND 283;
+
+INSERT INTO CT_GIAOVIEN_DANGKY (MALOP, MAMH, LAN, CAUHOI)
+SELECT N'TH07           ', N'CSDL ', 2, CAUHOI
+FROM BODE
+WHERE CAUHOI BETWEEN 281 AND 290;
+
+INSERT INTO CT_GIAOVIEN_DANGKY (MALOP, MAMH, LAN, CAUHOI)
+SELECT N'TH08           ', N'MMTCB', 1, CAUHOI
+FROM BODE
+WHERE CAUHOI BETWEEN 181 AND 195;
+
+INSERT INTO CT_GIAOVIEN_DANGKY (MALOP, MAMH, LAN, CAUHOI)
+SELECT N'VT04           ', N'CSDL ', 1, CAUHOI
+FROM BODE
+WHERE CAUHOI BETWEEN 257 AND 264 OR CAUHOI BETWEEN 269 AND 270;
+
+INSERT INTO CT_GIAOVIEN_DANGKY (MALOP, MAMH, LAN, CAUHOI)
+SELECT N'D18CQCN01      ', N'AVCB ', 1, CAUHOI
+FROM BODE
+WHERE CAUHOI BETWEEN 30 AND 38 OR CAUHOI BETWEEN 40 AND 42;
+
+INSERT INTO CT_GIAOVIEN_DANGKY (MALOP, MAMH, LAN, CAUHOI)
+SELECT N'D18CQCN01      ', N'CSDL ', 2, CAUHOI
+FROM BODE
+WHERE CAUHOI BETWEEN 257 AND 263 OR CAUHOI BETWEEN 269 AND 271;
 
 /* =========================================
                 TABLE BAITHI
@@ -458,6 +693,70 @@ CREATE TABLE CHITIETBAITHI (
         PRIMARY KEY (BAITHI_ID, CAUHOI)
 )
 
+SET IDENTITY_INSERT [dbo].[BAITHI] ON
+
+INSERT INTO BAITHI (ID, MASV, MALOP, MAMH, LAN, NGAYTHI, DIEM, THOIGIANBATDAU, THOIGIANKETTHUC) VALUES
+    (1, N'001     ', N'TH04           ', N'MMTCB', 1, '2026-06-10 08:00:00', 10.0, '2026-06-10 08:00:00', '2026-06-10 08:35:00'),
+    (2, N'002     ', N'TH04           ', N'MMTCB', 1, '2026-06-10 08:05:00', 8.0, '2026-06-10 08:05:00', '2026-06-10 08:44:00'),
+    (3, N'003     ', N'TH04           ', N'MMTCB', 2, '2026-06-17 08:00:00', 7.5, '2026-06-17 08:00:00', '2026-06-17 08:40:00'),
+    (4, N'005     ', N'TH05           ', N'AVCB ', 1, '2026-06-11 09:00:00', 4.0, '2026-06-11 09:00:00', '2026-06-11 09:24:00'),
+    (5, N'006     ', N'TH05           ', N'AVCB ', 2, '2026-06-18 09:00:00', 6.7, '2026-06-18 09:00:00', '2026-06-18 09:21:00'),
+    (6, N'008     ', N'TH06           ', N'CTDL ', 1, '2026-06-12 10:00:00', 5.0, '2026-06-12 10:00:00', '2026-06-12 10:20:00'),
+    (7, N'012     ', N'TH06           ', N'CTDL ', 2, '2026-06-19 10:00:00', 9.2, '2026-06-19 10:00:00', '2026-06-19 10:18:00'),
+    (8, N'017     ', N'TH07           ', N'CSDL ', 1, '2026-06-13 13:30:00', 7.5, '2026-06-13 13:30:00', '2026-06-13 13:52:00'),
+    (9, N'027     ', N'VT04           ', N'CSDL ', 1, '2026-06-15 08:30:00', 8.0, '2026-06-15 08:30:00', '2026-06-15 08:47:00'),
+    (10, N'032     ', N'D18CQCN01      ', N'AVCB ', 1, '2026-06-16 15:00:00', 5.8, '2026-06-16 15:00:00', '2026-06-16 15:23:00');
+
+SET IDENTITY_INSERT [dbo].[BAITHI] OFF;
+
+;WITH ExamSeed AS (
+    SELECT *
+    FROM (VALUES
+        (1, N'TH04           ', N'MMTCB', 1, 20, 0),
+        (2, N'TH04           ', N'MMTCB', 1, 16, 2),
+        (3, N'TH04           ', N'MMTCB', 2, 15, 3),
+        (4, N'TH05           ', N'AVCB ', 1, 6, 7),
+        (5, N'TH05           ', N'AVCB ', 2, 8, 3),
+        (6, N'TH06           ', N'CTDL ', 1, 6, 4),
+        (7, N'TH06           ', N'CTDL ', 2, 11, 1),
+        (8, N'TH07           ', N'CSDL ', 1, 9, 2),
+        (9, N'VT04           ', N'CSDL ', 1, 8, 1),
+        (10, N'D18CQCN01      ', N'AVCB ', 1, 7, 4)
+    ) AS S(EXAM_ID, MALOP, MAMH, LAN, CORRECT_COUNT, WRONG_COUNT)
+),
+ExamQuestions AS (
+    SELECT
+        S.EXAM_ID,
+        C.CAUHOI,
+        ROW_NUMBER() OVER (PARTITION BY S.EXAM_ID ORDER BY C.CAUHOI) AS THUTU,
+        S.CORRECT_COUNT,
+        S.WRONG_COUNT
+    FROM ExamSeed S
+    INNER JOIN CT_GIAOVIEN_DANGKY C
+        ON C.MALOP = S.MALOP
+       AND C.MAMH = S.MAMH
+       AND C.LAN = S.LAN
+)
+INSERT INTO CHITIETBAITHI (BAITHI_ID, CAUHOI, THUTU, DAPAN_SV)
+SELECT
+    EQ.EXAM_ID,
+    EQ.CAUHOI,
+    EQ.THUTU,
+    CASE
+        WHEN EQ.THUTU <= EQ.CORRECT_COUNT THEN B.DAP_AN
+        WHEN EQ.THUTU <= EQ.CORRECT_COUNT + EQ.WRONG_COUNT THEN
+            CASE B.DAP_AN
+                WHEN 'A' THEN 'B'
+                WHEN 'B' THEN 'C'
+                WHEN 'C' THEN 'D'
+                ELSE 'A'
+            END
+        ELSE NULL
+    END
+FROM ExamQuestions EQ
+INNER JOIN BODE B
+    ON B.CAUHOI = EQ.CAUHOI;
+
 /* =========================================
             ADD CONSTRAINTS
 ========================================= */
@@ -470,6 +769,11 @@ REFERENCES LOP(MALOP)
 ALTER TABLE SINHVIEN
 ADD CONSTRAINT FK_SINHVIEN_TAIKHOAN
 FOREIGN KEY (MASV)
+REFERENCES TAIKHOAN(MA);
+
+ALTER TABLE PASSWORD_RESET_OTP
+ADD CONSTRAINT FK_PASSWORD_RESET_OTP_TAIKHOAN
+FOREIGN KEY (ACCOUNT_ID)
 REFERENCES TAIKHOAN(MA);
 
 ALTER TABLE GIAOVIEN_DANGKY

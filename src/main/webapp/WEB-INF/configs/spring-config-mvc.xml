@@ -1,64 +1,86 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <beans
-    xmlns="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:context="http://www.springframework.org/schema/context"
-    xmlns:mvc="http://www.springframework.org/schema/mvc"
-    xmlns:tx="http://www.springframework.org/schema/tx"
-    xmlns:p="http://www.springframework.org/schema/p"
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+						http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+						http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
 
-    xsi:schemaLocation="
-        http://www.springframework.org/schema/beans
-        http://www.springframework.org/schema/beans/spring-beans.xsd
+	<!-- Scan -->
+	<context:component-scan base-package="com.tracnghiem" />
 
-        http://www.springframework.org/schema/context
-        http://www.springframework.org/schema/context/spring-context.xsd
+	<!-- MVC -->
+	<mvc:annotation-driven />
 
-        http://www.springframework.org/schema/mvc
-        http://www.springframework.org/schema/mvc/spring-mvc.xsd
+	<!-- STATIC RESOURCES -->
+	<mvc:resources mapping="/assets/**" location="/assets/" />
 
-        http://www.springframework.org/schema/tx
-        http://www.springframework.org/schema/tx/spring-tx.xsd">
+	<!-- Transaction -->
+	<tx:annotation-driven />
 
-    <!-- Scan -->
-    <context:component-scan base-package="com.tracnghiem"/>
+	<!-- View Resolver -->
+	<bean id="viewResolver"
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver"
+		p:prefix="/WEB-INF/views/"
+		p:suffix=".jsp" />
 
-    <!-- MVC -->
-    <mvc:annotation-driven/>
+	<!-- Interceptor Bean -->
+	<bean id="loginInterceptor"
+		class="com.tracnghiem.interceptor.LoginInterceptor" />
+		
+	<!-- Email Bean -->
+	<bean id="mailSender"
+		class="org.springframework.mail.javamail.JavaMailSenderImpl">
 
-    <!-- STATIC RESOURCES -->
-    <mvc:resources mapping="/assets/**" location="/assets/" />
+		<property name="host" value="smtp.gmail.com" />
 
-    <!-- Transaction -->
-    <tx:annotation-driven/>
+		<property name="port" value="465" />
 
-    <!-- View Resolver -->
-    <bean id="viewResolver"
-          class="org.springframework.web.servlet.view.InternalResourceViewResolver"
-          p:prefix="/WEB-INF/views/"
-          p:suffix=".jsp"/>
+		<property name="username"
+			value="#{T(config.MailConfig).USERNAME}" />
 
-    <!-- Interceptor Bean -->
-    <bean id="loginInterceptor"
-          class="com.tracnghiem.interceptor.LoginInterceptor"/>
+		<property name="password"
+			value="#{T(config.MailConfig).APP_PASSWORD}" />
 
-    <!-- Interceptors -->
-    <mvc:interceptors>
+		<property name="defaultEncoding"
+			value="utf-8" />
 
-        <mvc:interceptor>
+		<property name="javaMailProperties">
+			<props>
+				<prop key="mail.smtp.auth">true</prop>
+				<prop key="mail.smtp.socketFactory.class">javax.net.ssl.SSLSocketFactory</prop>
+				<prop key="mail.smtp.socketFactory.port">465</prop>
+				<prop key="mail.smtp.starttls.enable">false</prop>
+				<prop key="mail.debug">true</prop>
+			</props>
+		</property>
 
-            <mvc:mapping path="/**"/>
+	</bean>
+	<!-- Interceptors -->
+	<mvc:interceptors>
 
-            <mvc:exclude-mapping path="/"/>
-            <mvc:exclude-mapping path="/hello"/>
-            <mvc:exclude-mapping path="/auth/login"/>
-            <mvc:exclude-mapping path="/assets/**"/>
+		<mvc:interceptor>
 
-            <ref bean="loginInterceptor"/>
+			<mvc:mapping path="/**" />
 
-        </mvc:interceptor>
+			<mvc:exclude-mapping path="/" />
+			<mvc:exclude-mapping path="/hello" />
+			<mvc:exclude-mapping path="/auth/login" />
+			<mvc:exclude-mapping path="/auth/forgot-password" />
+			<mvc:exclude-mapping path="/auth/forgot-password/otp" />
+			<mvc:exclude-mapping path="/auth/reset-password" />
+			<mvc:exclude-mapping path="/assets/**" />
 
-    </mvc:interceptors>
+			<ref bean="loginInterceptor" />
+
+		</mvc:interceptor>
+
+	</mvc:interceptors>
 
 </beans>

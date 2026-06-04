@@ -48,7 +48,7 @@ request.setAttribute("customJs", "student-management.js");
 		</form>
 
 		<form:form id="studentForm" method="post"
-			action="${pageContext.request.contextPath}/students/add"
+			action="${pageContext.request.contextPath}/studentss/add"
 			modelAttribute="studentDTO">
 			<input type="hidden" name="page" value="${currentPage}" />
 			<input type="hidden" name="keyword" value="${keyword}" />
@@ -117,6 +117,17 @@ request.setAttribute("customJs", "student-management.js");
 
 				<div class="col-md-4">
 
+					<label class="form-label small text-secondary"> Email </label>
+
+					<form:input path="email" id="email" cssClass="form-control" />
+
+					<form:errors path="email"
+						cssClass="text-danger small mt-1 d-block" />
+
+				</div>
+
+				<div class="col-md-4">
+
 					<label class="form-label small text-secondary"> Class ID </label>
 
 					<select id="classId" name="classId" class="form-select">
@@ -138,13 +149,13 @@ request.setAttribute("customJs", "student-management.js");
 			<div class="d-flex gap-2 mt-4">
 
 				<button type="submit" class="btn btn-dark px-4"
-					onclick="submitForm('/students/add')">Add</button>
+					onclick="submitForm('/studentss/add')">Add</button>
 
 				<button type="submit" class="btn btn-outline-secondary px-4"
-					onclick="submitForm('/students/update')">Update</button>
+					onclick="submitForm('/studentss/update')">Update</button>
 
 				<button type="submit" class="btn btn-outline-danger px-4"
-					onclick="submitForm('/students/delete')">Delete</button>
+					onclick="submitForm('/studentss/delete')">Delete</button>
 
 			<button type="button" class="btn btn-outline-secondary" id="btnUndo" disabled>Undo</button>
 
@@ -176,6 +187,8 @@ request.setAttribute("customJs", "student-management.js");
 
 						<th>Address</th>
 
+						<th>Email</th>
+
 						<th>Class ID</th>
 
 						<th class="text-end">Actions</th>
@@ -198,6 +211,8 @@ request.setAttribute("customJs", "student-management.js");
 							<td>${student.birthDate}</td>
 
 							<td>${student.address}</td>
+
+							<td>${student.email}</td>
 
 							<td>${student.classRoom.classId}</td>
 
@@ -224,8 +239,8 @@ request.setAttribute("customJs", "student-management.js");
 
 		<div class="pagination-wrapper">
 			<c:if test="${currentPage > 1}">
-				<a class="pagination-item" href="students?page=1&keyword=${keyword}&filterClassId=${classId}"> First </a>
-				<a class="pagination-item" href="students?page=${currentPage - 1}&keyword=${keyword}&filterClassId=${classId}">
+				<a class="pagination-item" href="studentss?page=1&keyword=${keyword}&filterClassId=${classId}"> First </a>
+				<a class="pagination-item" href="studentss?page=${currentPage - 1}&keyword=${keyword}&filterClassId=${classId}">
 					&laquo; </a>
 			</c:if>
 
@@ -236,7 +251,7 @@ request.setAttribute("customJs", "student-management.js");
 			<c:forEach begin="${currentPage - 2 < 1 ? 1 : currentPage - 2}"
 				end="${currentPage + 2 > totalPages ? totalPages : currentPage + 2}"
 				var="i">
-				<a href="students?page=${i}&keyword=${keyword}&filterClassId=${classId}"
+				<a href="studentss?page=${i}&keyword=${keyword}&filterClassId=${classId}"
 					class="pagination-item ${currentPage == i ? 'active' : ''}">
 					${i} </a>
 			</c:forEach>
@@ -246,9 +261,9 @@ request.setAttribute("customJs", "student-management.js");
 			</c:if>
 
 			<c:if test="${currentPage < totalPages}">
-				<a class="pagination-item" href="students?page=${currentPage + 1}&keyword=${keyword}&filterClassId=${classId}">
+				<a class="pagination-item" href="studentss?page=${currentPage + 1}&keyword=${keyword}&filterClassId=${classId}">
 					&raquo; </a>
-				<a class="pagination-item" href="students?page=${totalPages}&keyword=${keyword}&filterClassId=${classId}">
+				<a class="pagination-item" href="studentss?page=${totalPages}&keyword=${keyword}&filterClassId=${classId}">
 					Last </a>
 			</c:if>
 		</div>

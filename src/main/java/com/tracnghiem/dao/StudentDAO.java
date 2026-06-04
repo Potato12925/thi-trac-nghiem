@@ -20,12 +20,50 @@ public class StudentDAO extends GenericDAO<Student> {
         return getSession().createQuery(hql, Student.class).list();
     }
 
+	public String findEmailByStudentId(String studentId) {
+		String hql = "SELECT s.email FROM Student s WHERE s.studentId = :studentId";
+
+		List<String> emails = getSession()
+				.createQuery(hql, String.class)
+				.setParameter("studentId", studentId)
+				.list();
+
+		return emails.isEmpty() ? null : emails.get(0);
+	}
+
+	public boolean existsByEmail(String email, String excludedStudentId) {
+		String hql = "SELECT COUNT(s.studentId) FROM Student s "
+				+ "WHERE lower(s.email) = :email "
+				+ "AND (:excludedStudentId IS NULL OR s.studentId <> :excludedStudentId)";
+
+		Long count = getSession()
+				.createQuery(hql, Long.class)
+				.setParameter("email", email)
+				.setParameter("excludedStudentId", excludedStudentId)
+				.uniqueResult();
+
+		return count != null && count > 0;
+	}
+
     public List<Student> findByClassId(String classId) {
         String hql = "FROM Student s WHERE s.deleted = false AND s.classRoom.classId = :classId ORDER BY s.lastName, s.firstName";
         return getSession().createQuery(hql, Student.class)
                 .setParameter("classId", classId)
                 .list();
     }
+
+	public Student findDashboardProfileByStudentId(String studentId) {
+		String hql = "SELECT s FROM Student s "
+				+ "JOIN FETCH s.classRoom c "
+				+ "WHERE function('ltrim', function('rtrim', s.studentId)) = :studentId";
+
+		List<Student> students = getSession()
+				.createQuery(hql, Student.class)
+				.setParameter("studentId", studentId)
+				.list();
+
+		return students.isEmpty() ? null : students.get(0);
+	}
 
     public List<Student> findPage(int page, int pageSize, String keyword, String classId) {
         String trimmedKeyword = keyword == null ? "" : keyword.trim().toLowerCase();

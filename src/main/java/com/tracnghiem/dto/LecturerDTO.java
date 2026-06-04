@@ -1,5 +1,6 @@
 package com.tracnghiem.dto;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -19,14 +20,17 @@ public class LecturerDTO {
 	@Size(max = 10, message = "First name must not exceed 10 characters")
 	private String firstName;
 
-	@NotBlank(message = "Phone number is required")
 	@Size(max = 15, message = "Phone number must not exceed 15 characters")
-	@Pattern(regexp = "^[0-9+\\-\\s]+$", message = "Phone number is invalid")
+	@Pattern(regexp = "^$|^[0-9+\\-\\s]+$", message = "Phone number is invalid")
 	private String phoneNumber;
 
 	@NotBlank(message = "Address is required")
 	@Size(max = 50, message = "Address must not exceed 50 characters")
 	private String address;
+
+	@Email(message = "Email is invalid")
+	@Size(max = 150, message = "Email must not exceed 150 characters")
+	private String email;
 
 	public LecturerDTO() {
 	}
@@ -69,5 +73,13 @@ public class LecturerDTO {
 
 	public void setAddress(String address) {
 		this.address = address;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 }
