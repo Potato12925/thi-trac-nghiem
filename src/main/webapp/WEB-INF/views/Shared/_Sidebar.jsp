@@ -102,7 +102,7 @@ String activeSettings = path.equals("/lecturers/settings") || path.startsWith("/
 			</a></li>
 
 			<li><a class="nav-link <%= activeScore %>"
-				href="${pageContext.request.contextPath}/score"> <i
+				href="${pageContext.request.contextPath}/scores"> <i
 					class="bi bi-bar-chart"></i> <span>Bảng điểm</span>
 			</a></li>
 
