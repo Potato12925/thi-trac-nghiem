@@ -9,12 +9,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.tracnghiem.dao.ClassroomDAO;
+import com.tracnghiem.dao.ExamDAO;
 import com.tracnghiem.dao.LecturerDAO;
 import com.tracnghiem.dao.LecturerRegistrationDAO;
 import com.tracnghiem.dao.QuestionDAO;
 import com.tracnghiem.dao.SubjectDAO;
 import com.tracnghiem.dto.LecturerRegistrationDTO;
 import com.tracnghiem.entity.Classroom;
+import com.tracnghiem.entity.Exam;
 import com.tracnghiem.entity.Lecturer;
 import com.tracnghiem.entity.LecturerRegistration;
 import com.tracnghiem.entity.Question;
@@ -39,6 +41,9 @@ public class LecturerRegistrationService {
 
     @Autowired
     private LecturerDAO lecturerDAO;
+
+    @Autowired
+    private ExamDAO examDAO;
 
     public void registerExam(LecturerRegistrationDTO dto, String userMaGv, String role) throws Exception {
         // 1. Determine Lecturer ID based on role
@@ -89,9 +94,53 @@ public class LecturerRegistrationService {
         lecturerRegistrationDAO.create(entity);
     }
 
+    public void updateExam(LecturerRegistrationDTO dto, String userMaGv, String role) throws Exception {
+        LecturerRegistration entity = lecturerRegistrationDAO.findExamByKeys(dto.getClassId(), dto.getSubjectId(), dto.getTryNumber());
+
+        if (entity == null) {
+            throw new Exception("Không tìm thấy lịch thi này.");
+        }
+
+        List<Exam> takenExams = examDAO.findClassExams(dto.getClassId(), dto.getSubjectId(), dto.getTryNumber());
+        if (takenExams != null && !takenExams.isEmpty()) {
+            throw new Exception("Lịch thi này đã có thí sinh thi, không được chỉnh sửa.");
+        }
+
+        if (!"PGV".equals(role) && !entity.getLecturer().getLecturerId().equals(userMaGv)) {
+            throw new Exception("Bạn không có quyền cập nhật lịch thi của người khác.");
+        }
+
+        if ("PGV".equals(role) && dto.getLecturerId() != null && !dto.getLecturerId().trim().isEmpty()) {
+            Lecturer lecturer = lecturerDAO.findById(dto.getLecturerId());
+            if (lecturer == null) {
+                throw new Exception("Giáo viên không hợp lệ.");
+            }
+            entity.setLecturer(lecturer);
+        }
+
+        boolean recreateQuestions = false;
+        if (!entity.getLevel().equals(dto.getLevel()) || !entity.getNumberOfQuestions().equals(dto.getNumberOfQuestions())) {
+            recreateQuestions = true;
+        }
+
+        entity.setLevel(dto.getLevel());
+        entity.setExamDate(dto.getExamDate());
+        entity.setDuration(dto.getDuration());
+
+        if (recreateQuestions) {
+            entity.setNumberOfQuestions(dto.getNumberOfQuestions());
+            List<Question> selectedQuestions = generateExamQuestions(dto.getSubjectId(), dto.getLevel(), dto.getNumberOfQuestions());
+            if (selectedQuestions.size() != dto.getNumberOfQuestions()) {
+                throw new Exception("Không thể tạo đủ số lượng câu hỏi yêu cầu.");
+            }
+            entity.setQuestions(selectedQuestions);
+        }
+
+        lecturerRegistrationDAO.update(entity);
+    }
+
     public void deleteExam(String maLop, String maMh, Short lan, String userMaGv, String role) throws Exception {
-        LecturerRegistrationId id = new LecturerRegistrationId(maLop, maMh, lan);
-        LecturerRegistration entity = lecturerRegistrationDAO.findById(id);
+        LecturerRegistration entity = lecturerRegistrationDAO.findExamByKeys(maLop, maMh, lan);
 
         if (entity == null) {
             throw new Exception("Không tìm thấy lịch thi này.");

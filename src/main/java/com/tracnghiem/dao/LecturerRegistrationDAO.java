@@ -42,4 +42,16 @@ public class LecturerRegistrationDAO extends GenericDAO<LecturerRegistration> {
                 .setParameter("now", now)
                 .list();
     }
+
+    public LecturerRegistration findExamByKeys(String classId, String subjectId, Short tryNumber) {
+        String hql = "FROM LecturerRegistration g " +
+                     "WHERE function('ltrim', function('rtrim', g.id.classId)) = function('ltrim', function('rtrim', :classId)) " +
+                     "AND function('ltrim', function('rtrim', g.id.subjectId)) = function('ltrim', function('rtrim', :subjectId)) " +
+                     "AND g.id.tryNumber = :tryNumber";
+        return getSession().createQuery(hql, LecturerRegistration.class)
+                .setParameter("classId", classId)
+                .setParameter("subjectId", subjectId)
+                .setParameter("tryNumber", tryNumber)
+                .uniqueResult();
+    }
 }

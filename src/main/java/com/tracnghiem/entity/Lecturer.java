@@ -90,6 +90,10 @@ public class Lecturer {
 		this.email = email;
 	}
 
+    public String getDisplayLecturer() {
+        return this.lecturerId + " - " + this.lastName + " " + this.firstName;
+    }
+
     @Override
     public String toString() {
         return "Lecturer{" + "lecturerId='" + lecturerId + '\'' + ", lastName='" + lastName + '\'' + ", firstName='"

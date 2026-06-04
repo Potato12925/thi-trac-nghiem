@@ -32,7 +32,7 @@
                                             <form:select path="classId" class="form-select" id="classId">
                                                 <option value="">-- Chọn lớp --</option>
                                                 <form:options items="${dsLop}" itemValue="classId"
-                                                    itemLabel="classId" />
+                                                    itemLabel="classDisplayName" />
                                             </form:select>
                                             <form:errors path="classId" cssClass="text-danger small mt-1 d-block" />
                                         </div>
@@ -43,7 +43,7 @@
                                             <form:select path="subjectId" class="form-select" id="subjectId">
                                                 <option value="">-- Chọn môn học --</option>
                                                 <form:options items="${dsMonHoc}" itemValue="subjectId"
-                                                    itemLabel="subjectId" />
+                                                    itemLabel="subjectDisplayName" />
                                             </form:select>
                                             <form:errors path="subjectId" cssClass="text-danger small mt-1 d-block" />
                                         </div>
@@ -76,11 +76,7 @@
                                                         class="text-danger">*</span></label>
                                                 <form:select path="lecturerId" class="form-select" id="lecturerId">
                                                     <option value="">-- Chọn giáo viên --</option>
-                                                    <c:forEach items="${dsGiaoVien}" var="gv">
-                                                        <option value="${gv.lecturerId}">${gv.lecturerId} - ${gv.lastName}
-                                                            ${gv.firstName}
-                                                        </option>
-                                                    </c:forEach>
+                                                    <form:options items="${dsGiaoVien}" itemValue="lecturerId" itemLabel="displayLecturer" />
                                                 </form:select>
                                                 <form:errors path="lecturerId"
                                                     cssClass="text-danger small mt-1 d-block" />
@@ -115,11 +111,11 @@
 
                                     <div class="d-flex gap-2 mt-4">
                                         <button type="submit" class="btn btn-dark px-4"
-                                            onclick="submitForm('add', 'POST')">Thêm</button>
-                                        <!-- Uncomment to support update later -->
-                                        <!-- <button type="submit" class="btn btn-outline-secondary px-4" onclick="submitForm('update', 'PUT')">Chỉnh sửa</button> -->
+                                            onclick="submitForm('add', 'POST')" id="btnAdd">Thêm</button>
+                                        <button type="submit" class="btn btn-primary px-4 d-none" 
+                                            onclick="submitForm('update', 'POST')" id="btnUpdate">Lưu</button>
                                         <button type="submit" class="btn btn-outline-danger px-4"
-                                            onclick="submitForm('delete', 'DELETE')">Xóa</button>
+                                            onclick="submitForm('delete', 'DELETE')" id="btnDelete">Xóa</button>
                                         <button type="button" class="btn btn-outline-dark"
                                             onclick="resetForm()">Reset</button>
                                     </div>
@@ -181,6 +177,17 @@
                         </div>
 
                         <script>
+                            function setSelectValueTrimmed(selectId, valueToMatch) {
+                                const select = document.getElementById(selectId);
+                                if (!select) return;
+                                for (let i = 0; i < select.options.length; i++) {
+                                    if (select.options[i].value.trim() === valueToMatch) {
+                                        select.selectedIndex = i;
+                                        break;
+                                    }
+                                }
+                            }
+
                             function fillFormFromRow(row) {
                                 const cells = row.querySelectorAll("td");
 
@@ -193,12 +200,12 @@
                                 const duration = cells[6].innerText.trim();
                                 const examDate = cells[7].innerText.trim();
 
-                                document.getElementById("classId").value = classId;
-                                document.getElementById("subjectId").value = subjectId;
+                                setSelectValueTrimmed("classId", classId);
+                                setSelectValueTrimmed("subjectId", subjectId);
                                 document.getElementById("tryNumber").value = tryNumber;
                                 document.getElementById("level").value = level;
                                 if (document.getElementById("lecturerId")) {
-                                    document.getElementById("lecturerId").value = lecturerId;
+                                    setSelectValueTrimmed("lecturerId", lecturerId);
                                 }
                                 document.getElementById("numberOfQuestions").value = numberOfQuestions;
                                 document.getElementById("duration").value = duration;
@@ -208,22 +215,12 @@
                                 document.getElementById("subjectId").disabled = true;
                                 document.getElementById("tryNumber").disabled = true;
 
-                                // Add hidden inputs to ensure data is passed to backend since disabled fields are omitted in POST
-                                appendHiddenInput("hidden_classId", "classId", classId);
-                                appendHiddenInput("hidden_subjectId", "subjectId", subjectId);
-                                appendHiddenInput("hidden_tryNumber", "tryNumber", tryNumber);
-                            }
+                                // Switch to edit mode
+                                document.getElementById("btnAdd").classList.add("d-none");
+                                document.getElementById("btnUpdate").classList.remove("d-none");
+                                document.getElementById("btnDelete").classList.add("d-none");
 
-                            function appendHiddenInput(id, name, value) {
-                                let hiddenInput = document.getElementById(id);
-                                if (!hiddenInput) {
-                                    hiddenInput = document.createElement("input");
-                                    hiddenInput.type = "hidden";
-                                    hiddenInput.id = id;
-                                    hiddenInput.name = name;
-                                    document.getElementById("lecturerRegistrationForm").appendChild(hiddenInput);
-                                }
-                                hiddenInput.value = value;
+
                             }
 
                             const editButtons = document.querySelectorAll(".btn-edit");
@@ -240,7 +237,6 @@
                                 form.action = "${pageContext.request.contextPath}/lecturer-registration/" + action;
                                 document.getElementById("_method").value = method;
 
-                                // Un-disable fields right before submit so they can be validated (or sent if hidden inputs are missing)
                                 document.getElementById("classId").disabled = false;
                                 document.getElementById("subjectId").disabled = false;
                                 document.getElementById("tryNumber").disabled = false;
@@ -252,9 +248,11 @@
                                 document.getElementById("subjectId").disabled = false;
                                 document.getElementById("tryNumber").disabled = false;
 
-                                if (document.getElementById("hidden_classId")) document.getElementById("hidden_classId").remove();
-                                if (document.getElementById("hidden_subjectId")) document.getElementById("hidden_subjectId").remove();
-                                if (document.getElementById("hidden_tryNumber")) document.getElementById("hidden_tryNumber").remove();
+                                document.getElementById("btnAdd").classList.remove("d-none");
+                                document.getElementById("btnUpdate").classList.add("d-none");
+                                document.getElementById("btnDelete").classList.remove("d-none");
+
+
                             }
                         </script>
 
