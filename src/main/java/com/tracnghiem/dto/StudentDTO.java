@@ -2,6 +2,7 @@ package com.tracnghiem.dto;
 
 import java.util.Date;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
@@ -34,6 +35,10 @@ public class StudentDTO {
 	@Size(max = 100, message = "Address must not exceed 100 characters")
 	private String address;
 
+	@Email(message = "Email is invalid")
+	@Size(max = 150, message = "Email must not exceed 150 characters")
+	private String email;
+
 	@NotBlank(message = "Class ID is required")
 	@Size(max = 15, message = "Class ID must not exceed 15 characters")
 	private String classId;
@@ -48,6 +53,7 @@ public class StudentDTO {
 			@NotBlank(message = "First name is required") @Size(max = 10, message = "First name must not exceed 10 characters") String firstName,
 			@NotNull(message = "Birth date is required") @Past(message = "Birth date must be in the past") Date birthDate,
 			@NotBlank(message = "Address is required") @Size(max = 100, message = "Address must not exceed 100 characters") String address,
+			@Email(message = "Email is invalid") @Size(max = 150, message = "Email must not exceed 150 characters") String email,
 			@NotBlank(message = "Class ID is required") @Size(max = 15, message = "Class ID must not exceed 15 characters") String classId) {
 		super();
 		this.studentId = studentId;
@@ -55,6 +61,7 @@ public class StudentDTO {
 		this.firstName = firstName;
 		this.birthDate = birthDate;
 		this.address = address;
+		this.email = email;
 		this.classId = classId;
 	}
 
@@ -96,6 +103,14 @@ public class StudentDTO {
 
 	public void setAddress(String address) {
 		this.address = address;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	public String getClassId() {

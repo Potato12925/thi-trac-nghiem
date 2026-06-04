@@ -177,6 +177,14 @@ body {
 								</div>
 							</c:if>
 
+							<c:if test="${not empty success}">
+								<div
+									class="alert alert-success border-0 mb-4 py-3 d-flex align-items-center gap-2">
+									<i class="bi bi-check-circle-fill"></i> <span
+										class="small fw-medium">${success}</span>
+								</div>
+							</c:if>
+
 							<form:form method="post"
 								action="${pageContext.request.contextPath}/auth/login"
 								modelAttribute="taiKhoan">
@@ -222,6 +230,11 @@ body {
 
 									Đăng nhập ngay <i class="bi bi-box-arrow-in-right ms-2"></i>
 								</button>
+
+								<div class="text-center mt-3">
+									<a href="${pageContext.request.contextPath}/auth/forgot-password"
+										class="small text-decoration-none">Quên mật khẩu?</a>
+								</div>
 
 							</form:form>
 						</div>

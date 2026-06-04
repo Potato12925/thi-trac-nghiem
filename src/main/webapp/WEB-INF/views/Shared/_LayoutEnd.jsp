@@ -15,5 +15,8 @@
             }
         });
     </script>
+    <c:if test="${not empty customJs}">
+        <script src="${pageContext.request.contextPath}/assets/js/${customJs}"></script>
+    </c:if>
 </body>
 </html>

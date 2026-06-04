@@ -55,7 +55,7 @@ public abstract class GenericDAO<T> {
 		return getSession().createQuery(hql, entityClass).list();
 	}
 
-	public List<T> getPagination(int page, int pageSize) {
+	public List<T> findPage(int page, int pageSize) {
 		String hql = "FROM " + entityClass.getSimpleName();
 
 		int offset = (page - 1) * pageSize;
@@ -63,7 +63,7 @@ public abstract class GenericDAO<T> {
 		return getSession().createQuery(hql, entityClass).setFirstResult(offset).setMaxResults(pageSize).list();
 	}
 
-	public long count() {
+	public long countAll() {
 		String hql = "SELECT COUNT(*) FROM " + entityClass.getSimpleName();
 		return getSession().createQuery(hql, Long.class).uniqueResult();
 	}

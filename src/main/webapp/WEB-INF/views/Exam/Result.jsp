@@ -17,7 +17,7 @@
 				<h2 class="text-success mb-4">Nộp bài thành công!</h2>
 				<h4 class="mb-4">Điểm số của bạn là: <strong>${score} / 10</strong></h4>
 				
-				<a href="${pageContext.request.contextPath}/student/home" class="btn btn-primary mt-3">Về trang chủ</a>
+				<a href="${pageContext.request.contextPath}/students/home" class="btn btn-primary mt-3">Về trang chủ</a>
 			</div>
 		</div>
 	</div>

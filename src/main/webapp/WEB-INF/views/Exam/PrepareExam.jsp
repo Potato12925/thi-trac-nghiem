@@ -45,7 +45,7 @@
 					</div>
 
 					<button type="submit" class="btn btn-primary">Bắt đầu thi</button>
-					<a href="${pageContext.request.contextPath}/student/home" class="btn btn-secondary">Quay lại</a>
+					<a href="${pageContext.request.contextPath}/students/home" class="btn btn-secondary">Quay lại</a>
 				</form:form>
 			</div>
 		</div>

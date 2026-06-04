@@ -21,9 +21,15 @@ if (pageTitle == null)
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/assets/css/theme.css" />
 
-<link rel="stylesheet"
-	href="${pageContext.request.contextPath}/assets/css/question-management.css">
-	
+<c:if test="${not empty customCss}">
+	<link rel="stylesheet"
+		href="${pageContext.request.contextPath}/assets/css/${customCss}" />
+</c:if>
+
+<script>
+	window.APP_BASE_PATH = "${pageContext.request.contextPath}";
+</script>
+
 <style>
 body {
 	min-height: 100vh;

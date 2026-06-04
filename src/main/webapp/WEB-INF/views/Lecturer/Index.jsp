@@ -7,28 +7,61 @@
 
 <%
 request.setAttribute("pageTitle", "Lecturer Management");
+request.setAttribute("customCss", "management.css");
+request.setAttribute("customJs", "lecturer-management.js");
 %>
 
 <%@ include file="../Shared/_LayoutStart.jsp"%>
 
-<div class="container-fluid">
+<div class="container-fluid page-wrapper">
 	<div class="d-flex justify-content-between align-items-center mb-4">
 		<h1 class="h3 mb-0">Lecturer Management</h1>
+		<div class="d-flex gap-2">
+			<a href="${pageContext.request.contextPath}/lecturers/export"
+				class="btn btn-outline-success d-flex align-items-center gap-2">
+				<i class="bi bi-file-earmark-excel"></i> Xuất Excel
+			</a>
+			<button type="button"
+				class="btn btn-success d-flex align-items-center gap-2"
+				data-bs-toggle="modal" data-bs-target="#lecturerImportModal">
+				<i class="bi bi-file-earmark-arrow-up"></i> Nhập Excel
+			</button>
+		</div>
 	</div>
 
 	<c:if test="${not empty error}">
 		<div class="alert alert-danger">${error}</div>
 	</c:if>
 
+	<c:if test="${not empty successMessage}">
+		<div class="alert alert-success">${successMessage}</div>
+	</c:if>
+
 	<c:if test="${not empty errorMessage}">
 		<div class="alert alert-danger">${errorMessage}</div>
 	</c:if>
 
-	<div class="border rounded-3 bg-white p-4 mb-4">
+	<div id="clientAlert" class="alert alert-danger d-none mb-3"></div>
+	<div id="unsavedChangesAlert" class="alert alert-warning d-none mb-3">
+		<i class="bi bi-exclamation-circle-fill me-2"></i>Bạn có <span id="unsavedCount" class="fw-bold">0</span> thay đổi chưa lưu xuống Database. Hãy nhấn nút <strong>Ghi</strong> để lưu thay đổi.
+	</div>
+
+	<div class="border rounded-3 bg-white p-4 mb-4 form-section">
+		<form method="get" action="${pageContext.request.contextPath}/lecturers" class="row g-3 mb-4">
+			<div class="col-md-8">
+				<label class="form-label small text-secondary"> Search keyword </label>
+				<input type="text" name="keyword" class="form-control" value="${keyword}" placeholder="ID, last name, first name" />
+			</div>
+			<div class="col-md-4 d-flex align-items-end">
+				<button type="submit" class="btn btn-outline-secondary w-100">Search</button>
+			</div>
+		</form>
+
 		<form:form id="lecturerForm" method="post"
-			action="${pageContext.request.contextPath}/lecturer/add"
+			action="${pageContext.request.contextPath}/lecturers/add"
 			modelAttribute="lecturerDTO">
 			<input type="hidden" name="page" value="${currentPage}" />
+			<input type="hidden" name="keyword" value="${keyword}" />
 
 			<div class="row g-3">
 				<div class="col-md-2">
@@ -80,33 +113,46 @@ request.setAttribute("pageTitle", "Lecturer Management");
 					<form:errors path="address"
 						cssClass="text-danger small mt-1 d-block" />
 				</div>
+
+				<div class="col-md-3">
+					<label class="form-label small text-secondary"> Email </label>
+
+					<form:input path="email" id="email" cssClass="form-control" />
+
+					<form:errors path="email"
+						cssClass="text-danger small mt-1 d-block" />
+				</div>
 			</div>
 
 			<div class="d-flex gap-2 mt-4">
-				<button type="submit"
-					formaction="${pageContext.request.contextPath}/lecturer/add"
-					class="btn btn-dark px-4">Add</button>
+				<button type="button" class="btn btn-dark px-4" id="btnAdd">Thêm</button>
 
-				<button type="submit" disabled id="btnUpdate"
-					formaction="${pageContext.request.contextPath}/lecturer/update"
-					class="btn btn-outline-secondary px-4">Update</button>
+				<button type="button" class="btn btn-outline-secondary px-4" id="btnUpdate" disabled>Chỉnh sửa</button>
 
-				<button type="submit"
-					formaction="${pageContext.request.contextPath}/lecturer/delete"
-					disabled id="btnDelete" class="btn btn-outline-danger px-4"
-					onclick="return confirm('Delete this lecturer?')">Delete</button>
+				<button type="button" class="btn btn-outline-danger px-4" id="btnDelete" disabled>Xóa</button>
+				
+				<button type="button" class="btn btn-outline-secondary" id="btnUndo" disabled>
+					<i class="bi bi-arrow-counterclockwise me-1"></i> Undo
+				</button>
 
-				<button type="button" class="btn btn-outline-dark"
-					onclick="resetForm()">Reset</button>
+				<button type="button" class="btn btn-primary px-4" id="btnSave" disabled>
+					<i class="bi bi-save me-1"></i> Ghi
+				</button>
+
+				<button type="button" class="btn btn-outline-secondary px-4" id="btnReset">Xóa dữ liệu</button>
 			</div>
-
 		</form:form>
-
 	</div>
 
-	<div class="card border-0 shadow-sm">
-		<div class="table-responsive p-3">
-			<table class="table table-hover align-middle mb-0">
+	<form id="saveForm" action="${pageContext.request.contextPath}/lecturers/save" method="post" class="d-none">
+		<input type="hidden" name="page" value="${currentPage}" />
+		<input type="hidden" name="keyword" value="${keyword}" />
+		<input type="hidden" name="actionsData" id="actionsDataInput" />
+	</form>
+
+	<div class="card border-0 shadow-sm management-card">
+		<div class="table-responsive p-3 management-table-wrapper">
+			<table class="table table-hover align-middle mb-0 management-table">
 				<thead class="table-light">
 					<tr>
 						<th>Lecturer ID</th>
@@ -119,6 +165,8 @@ request.setAttribute("pageTitle", "Lecturer Management");
 
 						<th>Address</th>
 
+						<th>Email</th>
+
 						<th class="text-end">Actions</th>
 					</tr>
 				</thead>
@@ -129,7 +177,8 @@ request.setAttribute("pageTitle", "Lecturer Management");
 							data-lastname="${lecturer.lastName}"
 							data-firstname="${lecturer.firstName}"
 							data-phone="${lecturer.phoneNumber}"
-							data-address="${lecturer.address}">
+							data-address="${lecturer.address}"
+							data-email="${lecturer.email}">
 
 							<td class="fw-medium text-success">${lecturer.lecturerId}</td>
 
@@ -140,6 +189,8 @@ request.setAttribute("pageTitle", "Lecturer Management");
 							<td>${lecturer.phoneNumber}</td>
 
 							<td>${lecturer.address}</td>
+
+							<td>${lecturer.email}</td>
 
 							<td class="text-end">
 								<button type="button"
@@ -163,8 +214,8 @@ request.setAttribute("pageTitle", "Lecturer Management");
 
 		<div class="pagination-wrapper">
 			<c:if test="${currentPage > 1}">
-				<a class="pagination-item" href="lecturer?page=1"> First </a>
-				<a class="pagination-item" href="lecturer?page=${currentPage - 1}">
+				<a class="pagination-item" href="lecturers?page=1&keyword=${keyword}"> First </a>
+				<a class="pagination-item" href="lecturers?page=${currentPage - 1}&keyword=${keyword}">
 					&laquo; </a>
 			</c:if>
 
@@ -175,7 +226,7 @@ request.setAttribute("pageTitle", "Lecturer Management");
 			<c:forEach begin="${currentPage - 2 < 1 ? 1 : currentPage - 2}"
 				end="${currentPage + 2 > totalPages ? totalPages : currentPage + 2}"
 				var="i">
-				<a href="lecturer?page=${i}"
+				<a href="lecturers?page=${i}&keyword=${keyword}"
 					class="pagination-item ${currentPage == i ? 'active' : ''}">
 					${i} </a>
 			</c:forEach>
@@ -185,72 +236,53 @@ request.setAttribute("pageTitle", "Lecturer Management");
 			</c:if>
 
 			<c:if test="${currentPage < totalPages}">
-				<a class="pagination-item" href="lecturer?page=${currentPage + 1}">
+				<a class="pagination-item" href="lecturers?page=${currentPage + 1}&keyword=${keyword}">
 					&raquo; </a>
-				<a class="pagination-item" href="lecturer?page=${totalPages}">
+				<a class="pagination-item" href="lecturers?page=${totalPages}&keyword=${keyword}">
 					Last </a>
 			</c:if>
 		</div>
 	</div>
+	<!-- Import Excel Modal -->
+	<div class="modal fade" id="lecturerImportModal" tabindex="-1"
+		aria-labelledby="lecturerImportModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content border-0 shadow">
+				<form action="${pageContext.request.contextPath}/lecturers/import"
+					method="post" enctype="multipart/form-data">
+					<div class="modal-header bg-success text-white">
+						<h5 class="modal-title fw-semibold" id="lecturerImportModalLabel">
+							<i class="bi bi-file-earmark-excel me-2"></i> Nhập dữ liệu từ Excel
+						</h5>
+						<button type="button" class="btn-close btn-close-white"
+							data-bs-dismiss="modal" aria-label="Đóng"></button>
+					</div>
+					<div class="modal-body">
+						<div class="mb-3">
+							<label for="excelFile"
+								class="form-label fw-medium text-secondary">Chọn tệp Excel (.xlsx, .xls)</label>
+							<input class="form-control" type="file"
+								id="excelFile" name="file" accept=".xlsx, .xls" required />
+						</div>
+						<div class="alert alert-info py-2 px-3 mb-0 small">
+							<i class="bi bi-info-circle-fill me-1"></i> Tệp Excel nên có tiêu đề ở dòng đầu tiên.
+							<br/>Cột 1: Mã giảng viên (tối đa 8 ký tự)
+							<br/>Cột 2: Họ giảng viên (tối đa 40 ký tự)
+							<br/>Cột 3: Tên giảng viên (tối đa 10 ký tự)
+							<br/>Cột 4: Số điện thoại (tối đa 15 ký tự)
+							<br/>Cột 5: Địa chỉ (tối đa 50 ký tự)
+						</div>
+					</div>
+					<div class="modal-footer bg-light">
+						<button type="button" class="btn btn-secondary"
+							data-bs-dismiss="modal">Hủy</button>
+						<button type="submit" class="btn btn-success">Nhập dữ liệu</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
 </div>
-
-<script>
-
-function fillFormFromRow(row) {
-
-	document.getElementById("lecturerId").value =
-		row.dataset.id.trim();
-
-	document.getElementById("lastName").value =
-		row.dataset.lastname;
-
-	document.getElementById("firstName").value =
-		row.dataset.firstname;
-
-	document.getElementById("phoneNumber").value =
-		row.dataset.phone;
-
-	document.getElementById("address").value =
-		row.dataset.address;
-
-	document.getElementById("lecturerId").readOnly = true;
-}
-
-	document
-		.querySelectorAll(".btn-edit")
-		.forEach(button => {
-
-			button.addEventListener("click", function () {
-				const row =
-					this.closest("tr");
-
-				fillFormFromRow(row);
-
-				document.getElementById("btnUpdate").disabled = false;
-				document.getElementById("btnDelete").disabled = false;
-			});
-
-		});
-
-	function resetForm() {
-
-		document
-			.getElementById("lecturerForm")
-			.reset();
-
-		document
-			.getElementById("lecturerId")
-			.readOnly = false;
-		
-		document
-		.getElementById("btnUpdate")
-		.disabled = true;
-
-	document
-		.getElementById("btnDelete")
-		.disabled = true;
-	}
-
-</script>
 
 <%@ include file="../Shared/_LayoutEnd.jsp"%>

@@ -25,7 +25,7 @@ public class AuthService {
 
 		String normalizedUsername = dto.getUsername().trim();
 
-		Account user = accountDAO.findById(normalizedUsername);
+		Account user = accountDAO.findByUsername(normalizedUsername);
 
 		if (user == null) {
 			return "Tên đăng nhập không tồn tại";
@@ -88,5 +88,24 @@ public class AuthService {
 		Account accountToDelete = accountDAO.findById(studentId);
 		accountDAO.delete(accountToDelete);
 		return accountToDelete;
+	}
+
+	public Account findAccountByUsername(String username) {
+		if (username == null) {
+			return null;
+		}
+
+		return accountDAO.findByUsername(username.trim());
+	}
+
+	@Transactional
+	public void updatePassword(String username, String rawPassword) {
+		Account account = accountDAO.findByUsername(username);
+
+		if (account == null) {
+			throw new IllegalArgumentException("Tài khoản không tồn tại");
+		}
+
+		account.setPasswordHash(sha256(rawPassword));
 	}
 }
