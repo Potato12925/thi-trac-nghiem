@@ -61,4 +61,11 @@
 
     </mvc:interceptors>
 
+    <!-- CommonsMultipartResolver for file uploads -->
+    <bean id="multipartResolver"
+          class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!-- max upload size in bytes (5MB) -->
+        <property name="maxUploadSize" value="5242880" />
+    </bean>
+
 </beans>
