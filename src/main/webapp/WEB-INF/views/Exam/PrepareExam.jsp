@@ -24,19 +24,8 @@
 			<div class="card-body">
 				<form:form action="${pageContext.request.contextPath}/exam/start" method="post" modelAttribute="prepareExamDTO">
 					<div class="mb-3">
-						<label for="classId" class="form-label">Chọn lớp:</label>
-						<c:choose>
-							<c:when test="${role == 'SINHVIEN'}">
-								<input type="text" class="form-control" value="${dsLop[0].classId} - ${dsLop[0].className}" readonly>
-								<form:hidden path="classId" value="${dsLop[0].classId}"/>
-							</c:when>
-							<c:otherwise>
-								<form:select path="classId" class="form-select" required="required">
-									<option value="">-- Chọn Lớp --</option>
-									<form:options items="${dsLop}" itemValue="classId" itemLabel="classDisplayName" />
-								</form:select>
-							</c:otherwise>
-						</c:choose>
+						<label for="classId" class="form-label">Lớp:</label>
+						<p class="form-control-plaintext fw-bold">${lopSinhVien.classId} - ${lopSinhVien.className}</p>
 					</div>
 
 					<div class="mb-3">
@@ -56,14 +45,7 @@
 					</div>
 
 					<button type="submit" class="btn btn-primary">Bắt đầu thi</button>
-					<c:choose>
-						<c:when test="${role == 'SINHVIEN'}">
-							<a href="${pageContext.request.contextPath}/student/home" class="btn btn-secondary">Quay lại</a>
-						</c:when>
-						<c:otherwise>
-							<a href="${pageContext.request.contextPath}/lecturer/home" class="btn btn-secondary">Quay lại</a>
-						</c:otherwise>
-					</c:choose>
+					<a href="${pageContext.request.contextPath}/student/home" class="btn btn-secondary">Quay lại</a>
 				</form:form>
 			</div>
 		</div>

@@ -1,6 +1,7 @@
 package com.tracnghiem.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -164,7 +165,7 @@ public class LecturerRegistrationService {
             throw new Exception("Trình độ không hợp lệ.");
         }
 
-        java.util.Collections.shuffle(examQuestions);
+        Collections.shuffle(examQuestions);
         return examQuestions;
     }
 }

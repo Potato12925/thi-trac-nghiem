@@ -1,5 +1,6 @@
 package com.tracnghiem.service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -43,18 +44,17 @@ public class ExamService {
     private SubjectDAO subjectDAO;
 
     public Exam startExam(String userId, String role, String classId, String subjectId, Short tryNumber) throws Exception {
-        Student student = null;
+        if (!"SINHVIEN".equals(role)) {
+            throw new Exception("Chỉ sinh viên mới được quyền thi.");
+        }
 
-        if ("SINHVIEN".equals(role)) {
-            student = studentDAO.findById(userId);
-            if (student == null) {
-                throw new Exception("Không tìm thấy sinh viên.");
-            }
+        Student student = studentDAO.findById(userId);
+        if (student == null) {
+            throw new Exception("Không tìm thấy sinh viên.");
+        }
 
-            // Check if student already took this exam
-            if (examDAO.findExam(userId, subjectId, tryNumber) != null) {
-                throw new Exception("Sinh viên đã thi môn này ở lần thi thứ " + tryNumber + ".");
-            }
+        if (examDAO.findExam(userId, subjectId, tryNumber) != null) {
+            throw new Exception("Sinh viên đã thi môn này ở lần thi thứ " + tryNumber + ".");
         }
 
         Subject subject = subjectDAO.findById(subjectId);
@@ -73,25 +73,18 @@ public class ExamService {
             throw new Exception("Bộ đề chưa có câu hỏi nào.");
         }
 
-        // Shuffle questions
         Collections.shuffle(questions);
 
-        // Create new Exam
         Exam exam = new Exam();
-        exam.setStudent(student); // null if GIAOVIEN
+        exam.setStudent(student);
         exam.setSubject(subject);
         exam.setAttempt(tryNumber);
         exam.setClassId(classId);
         exam.setExamDate(new Date());
         exam.setStartTime(new Date());
         
-        // For GIAOVIEN, we don't need to link to student initially, 
-        // but we might need to handle this based on role if needed.
-        // Currently assuming startExam gets student details from session or controller
-        
         examDAO.create(exam);
 
-        // Create ExamDetails
         int order = 1;
         for (Question q : questions) {
             ExamDetail detail = new ExamDetail();
@@ -114,8 +107,7 @@ public class ExamService {
 
         exam.setEndTime(new Date());
 
-        List<ExamDetail> details = exam.getExamDetails(); // assuming fetch=lazy but active inside transaction
-        // if not fetched, might need a specific query in ExamDetailDAO to get by Exam ID
+        List<ExamDetail> details = exam.getExamDetails();
 
         float correctCount = 0;
         int totalQuestions = details.size();
@@ -132,7 +124,6 @@ public class ExamService {
         }
 
         float scoreValue = (correctCount / totalQuestions) * 10;
-        // round to 1 decimal place
         scoreValue = Math.round(scoreValue * 10.0f) / 10.0f;
         exam.setScore(scoreValue);
         examDAO.update(exam);
@@ -149,5 +140,16 @@ public class ExamService {
             }
         }
         return exam;
+    }
+
+    public List<Subject> getSubjectsForClass(String classId) {
+        List<LecturerRegistration> registrations = lecturerRegistrationDAO.findByClass(classId);
+        List<Subject> dsMonHoc = new ArrayList<>();
+        for (LecturerRegistration reg : registrations) {
+            if (!dsMonHoc.contains(reg.getSubject())) {
+                dsMonHoc.add(reg.getSubject());
+            }
+        }
+        return dsMonHoc;
     }
 }

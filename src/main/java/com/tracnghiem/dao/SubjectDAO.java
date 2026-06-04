@@ -7,6 +7,6 @@ import com.tracnghiem.entity.Subject;
 @Repository
 public class SubjectDAO extends GenericDAO<Subject> {
     public boolean existsById(String subjectId) {
-	    return findById(subjectId) != null;
+        return findById(subjectId) != null;
     }
 }

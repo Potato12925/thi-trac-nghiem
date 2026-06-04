@@ -2,6 +2,7 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -53,28 +54,28 @@
 					<h5 class="mb-3">Câu ${status.index + 1}: ${detail.question.content}</h5>
 					
 					<div class="form-check mb-2">
-						<input class="form-check-input" type="radio" name="answer_${detail.question.questionId}" id="q${detail.question.questionId}_A" value="A">
+						<input class="form-check-input" type="radio" name="answers[${detail.question.questionId}]" id="q${detail.question.questionId}_A" value="A">
 						<label class="form-check-label" for="q${detail.question.questionId}_A">
 							A. ${detail.question.optionA}
 						</label>
 					</div>
 					
 					<div class="form-check mb-2">
-						<input class="form-check-input" type="radio" name="answer_${detail.question.questionId}" id="q${detail.question.questionId}_B" value="B">
+						<input class="form-check-input" type="radio" name="answers[${detail.question.questionId}]" id="q${detail.question.questionId}_B" value="B">
 						<label class="form-check-label" for="q${detail.question.questionId}_B">
 							B. ${detail.question.optionB}
 						</label>
 					</div>
 					
 					<div class="form-check mb-2">
-						<input class="form-check-input" type="radio" name="answer_${detail.question.questionId}" id="q${detail.question.questionId}_C" value="C">
+						<input class="form-check-input" type="radio" name="answers[${detail.question.questionId}]" id="q${detail.question.questionId}_C" value="C">
 						<label class="form-check-label" for="q${detail.question.questionId}_C">
 							C. ${detail.question.optionC}
 						</label>
 					</div>
 					
 					<div class="form-check mb-2">
-						<input class="form-check-input" type="radio" name="answer_${detail.question.questionId}" id="q${detail.question.questionId}_D" value="D">
+						<input class="form-check-input" type="radio" name="answers[${detail.question.questionId}]" id="q${detail.question.questionId}_D" value="D">
 						<label class="form-check-label" for="q${detail.question.questionId}_D">
 							D. ${detail.question.optionD}
 						</label>

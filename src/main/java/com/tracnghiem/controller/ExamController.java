@@ -1,10 +1,9 @@
 package com.tracnghiem.controller;
 
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,12 +14,14 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.tracnghiem.dao.ClassroomDAO;
-import com.tracnghiem.dao.SubjectDAO;
+import com.tracnghiem.dao.LecturerRegistrationDAO;
+import com.tracnghiem.dao.StudentDAO;
+import com.tracnghiem.dto.ExamSubmissionDTO;
 import com.tracnghiem.dto.PrepareExamDTO;
 import com.tracnghiem.entity.Exam;
 import com.tracnghiem.entity.LecturerRegistration;
 import com.tracnghiem.entity.Student;
+import com.tracnghiem.entity.Subject;
 import com.tracnghiem.entity.id.LecturerRegistrationId;
 import com.tracnghiem.service.ExamService;
 
@@ -32,33 +33,25 @@ public class ExamController {
     private ExamService examService;
 
     @Autowired
-    private ClassroomDAO classRoomDAO;
+    private LecturerRegistrationDAO lecturerRegistrationDAO;
 
     @Autowired
-    private SubjectDAO subjectDAO;
-
-    @Autowired
-    private com.tracnghiem.dao.LecturerRegistrationDAO lecturerRegistrationDAO;
-
-    @Autowired
-    private com.tracnghiem.dao.StudentDAO studentDAO;
+    private StudentDAO studentDAO;
 
     @GetMapping
     public String prepare(ModelMap model, HttpSession session) {
         String role = (String) session.getAttribute("ROLE");
-        if (!"SINHVIEN".equals(role) && !"GIAOVIEN".equals(role)) {
+        if (!"SINHVIEN".equals(role)) {
             return "redirect:/auth/login";
         }
 
-        if ("SINHVIEN".equals(role)) {
-            String studentId = (String) session.getAttribute("LOGIN_USER");
-            Student student = studentDAO.findById(studentId);
-            model.addAttribute("dsLop", Collections.singletonList(student.getClassRoom()));
-        } else {
-            model.addAttribute("dsLop", classRoomDAO.findAll());
-        }
+        String studentId = (String) session.getAttribute("LOGIN_USER");
+        Student student = studentDAO.findById(studentId);
+        String classId = student.getClassRoom().getClassId();
+        List<Subject> dsMonHoc = examService.getSubjectsForClass(classId);
 
-        model.addAttribute("dsMonHoc", subjectDAO.findAll());
+        model.addAttribute("lopSinhVien", student.getClassRoom());
+        model.addAttribute("dsMonHoc", dsMonHoc);
         model.addAttribute("role", role);
         model.addAttribute("prepareExamDTO", new PrepareExamDTO());
 
@@ -78,8 +71,13 @@ public class ExamController {
         String role = (String) session.getAttribute("ROLE");
         String userId = (String) session.getAttribute("LOGIN_USER");
 
-        if (!"SINHVIEN".equals(role) && !"GIAOVIEN".equals(role)) {
+        if (!"SINHVIEN".equals(role)) {
             return "redirect:/auth/login";
+        }
+
+        Student student = studentDAO.findById(userId);
+        if (student != null && student.getClassRoom() != null) {
+            classId = student.getClassRoom().getClassId();
         }
 
         try {
@@ -96,14 +94,12 @@ public class ExamController {
                 errorMessage += " | Root: " + e.getCause().getCause().getMessage();
             }
             model.addAttribute("error", errorMessage);
-            if ("SINHVIEN".equals(role)) {
-                Student student = studentDAO.findById(userId);
-                model.addAttribute("dsLop", java.util.Collections.singletonList(student.getClassRoom()));
-            } else {
-                model.addAttribute("dsLop", classRoomDAO.findAll());
-            }
+
+            student = studentDAO.findById(userId);
+            model.addAttribute("lopSinhVien", student.getClassRoom());
             
-            model.addAttribute("dsMonHoc", subjectDAO.findAll());
+            List<Subject> dsMonHoc = examService.getSubjectsForClass(student.getClassRoom().getClassId());
+            model.addAttribute("dsMonHoc", dsMonHoc);
             model.addAttribute("role", role);
             return "Exam/PrepareExam";
         }
@@ -115,7 +111,7 @@ public class ExamController {
         Integer examId = (Integer) session.getAttribute("CURRENT_EXAM_ID");
         String classId = (String) session.getAttribute("CURRENT_EXAM_CLASS_ID");
 
-        if (!"SINHVIEN".equals(role) && !"GIAOVIEN".equals(role)) {
+        if (!"SINHVIEN".equals(role)) {
             return "redirect:/auth/login";
         }
 
@@ -134,10 +130,13 @@ public class ExamController {
             classId = exam.getStudent().getClassRoom().getClassId();
         }
 
-        LecturerRegistrationId regId = new LecturerRegistrationId(classId, exam.getSubject().getSubjectId(), exam.getAttempt());
+        String subjectId = exam.getSubject().getSubjectId();
+        Short attempt = exam.getAttempt();
+
+        LecturerRegistrationId regId = new LecturerRegistrationId(classId, subjectId, attempt);
         LecturerRegistration registration = lecturerRegistrationDAO.findById(regId);
         
-        Short duration = (registration != null) ? registration.getDuration() : 60; // Default 60 mins
+        Short duration = (registration != null) ? registration.getDuration() : 60;
 
         model.addAttribute("exam", exam);
         model.addAttribute("durationMinutes", duration);
@@ -146,11 +145,14 @@ public class ExamController {
     }
 
     @PostMapping("/submit")
-    public String submit(HttpServletRequest request, HttpSession session, ModelMap model) {
+    public String submit(
+            @ModelAttribute("exam") ExamSubmissionDTO submission,
+            HttpSession session,
+            ModelMap model) {
         String role = (String) session.getAttribute("ROLE");
         Integer examId = (Integer) session.getAttribute("CURRENT_EXAM_ID");
 
-        if (!"SINHVIEN".equals(role) && !"GIAOVIEN".equals(role)) {
+        if (!"SINHVIEN".equals(role)) {
             return "redirect:/auth/login";
         }
 
@@ -158,20 +160,9 @@ public class ExamController {
             return "redirect:/exam/prepare";
         }
 
-        Map<Integer, String> studentAnswers = new HashMap<>();
-        Map<String, String[]> parameterMap = request.getParameterMap();
-        
-        for (String paramName : parameterMap.keySet()) {
-            if (paramName.startsWith("answer_")) {
-                String questionIdStr = paramName.substring("answer_".length());
-                try {
-                    Integer questionId = Integer.parseInt(questionIdStr);
-                    String answer = parameterMap.get(paramName)[0];
-                    studentAnswers.put(questionId, answer);
-                } catch (NumberFormatException e) {
-                    // Ignore invalid params
-                }
-            }
+        Map<Integer, String> studentAnswers = submission.getAnswers();
+        if (studentAnswers == null) {
+            studentAnswers = new HashMap<>();
         }
 
         try {
