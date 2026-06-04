@@ -108,8 +108,9 @@ public class LecturerService {
 			String firstName = parts.length > 3 ? parts[3].trim() : "";
 			String phoneNumber = parts.length > 4 ? parts[4].trim() : "";
 			String address = parts.length > 5 ? parts[5].trim() : "";
+			String email = parts.length > 6 ? parts[6].trim() : "";
 
-			actions.add(new LecturerActionDTO(type, lecturerId, lastName, firstName, phoneNumber, address));
+			actions.add(new LecturerActionDTO(type, lecturerId, lastName, firstName, phoneNumber, address, email));
 		}
 
 		for (LecturerActionDTO action : actions) {
@@ -119,6 +120,7 @@ public class LecturerService {
 			dto.setFirstName(action.getFirstName());
 			dto.setPhoneNumber(action.getPhoneNumber());
 			dto.setAddress(action.getAddress());
+			dto.setEmail(action.getEmail());
 
 			if ("ADD".equals(action.getType())) {
 				addLecturer(dto);

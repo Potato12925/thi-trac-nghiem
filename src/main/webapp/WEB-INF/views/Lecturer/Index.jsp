@@ -58,7 +58,7 @@ request.setAttribute("customJs", "lecturer-management.js");
 		</form>
 
 		<form:form id="lecturerForm" method="post"
-			action="${pageContext.request.contextPath}/lecturerss/add"
+			action="${pageContext.request.contextPath}/lecturers/add"
 			modelAttribute="lecturerDTO">
 			<input type="hidden" name="page" value="${currentPage}" />
 			<input type="hidden" name="keyword" value="${keyword}" />
@@ -214,8 +214,8 @@ request.setAttribute("customJs", "lecturer-management.js");
 
 		<div class="pagination-wrapper">
 			<c:if test="${currentPage > 1}">
-				<a class="pagination-item" href="lecturerss?page=1&keyword=${keyword}"> First </a>
-				<a class="pagination-item" href="lecturerss?page=${currentPage - 1}&keyword=${keyword}">
+				<a class="pagination-item" href="lecturers?page=1&keyword=${keyword}"> First </a>
+				<a class="pagination-item" href="lecturers?page=${currentPage - 1}&keyword=${keyword}">
 					&laquo; </a>
 			</c:if>
 
@@ -226,7 +226,7 @@ request.setAttribute("customJs", "lecturer-management.js");
 			<c:forEach begin="${currentPage - 2 < 1 ? 1 : currentPage - 2}"
 				end="${currentPage + 2 > totalPages ? totalPages : currentPage + 2}"
 				var="i">
-				<a href="lecturerss?page=${i}&keyword=${keyword}"
+				<a href="lecturers?page=${i}&keyword=${keyword}"
 					class="pagination-item ${currentPage == i ? 'active' : ''}">
 					${i} </a>
 			</c:forEach>
@@ -236,9 +236,9 @@ request.setAttribute("customJs", "lecturer-management.js");
 			</c:if>
 
 			<c:if test="${currentPage < totalPages}">
-				<a class="pagination-item" href="lecturerss?page=${currentPage + 1}&keyword=${keyword}">
+				<a class="pagination-item" href="lecturers?page=${currentPage + 1}&keyword=${keyword}">
 					&raquo; </a>
-				<a class="pagination-item" href="lecturerss?page=${totalPages}&keyword=${keyword}">
+				<a class="pagination-item" href="lecturers?page=${totalPages}&keyword=${keyword}">
 					Last </a>
 			</c:if>
 		</div>

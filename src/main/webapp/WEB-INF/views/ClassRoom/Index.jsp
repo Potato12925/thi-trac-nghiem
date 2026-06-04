@@ -378,8 +378,8 @@ function handleLocalAdd() {
     tr.classList.add("table-success");
     tr.setAttribute("data-local-added", "true");
     tr.innerHTML = `
-      <td>${classId}</td>
-      <td>${className}</td>
+      <td>\${classId}</td>
+      <td>\${className}</td>
       <td class="text-end pe-4">
         <button class="btn btn-sm btn-outline-secondary me-2 btn-edit">
           <i class="bi bi-pencil"></i>

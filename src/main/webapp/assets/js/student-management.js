@@ -59,7 +59,8 @@ function fillFormFromRow(row) {
   document.getElementById("firstName").value = cells[2].innerText.trim();
   document.getElementById("birthDate").value = cells[3].innerText.trim();
   document.getElementById("address").value = cells[4].innerText.trim();
-  document.getElementById("classId").value = cells[5].innerText.trim();
+  document.getElementById("email").value = cells[5].innerText.trim();
+  document.getElementById("classId").value = cells[6].innerText.trim();
   document.getElementById("studentId").readOnly = true;
   setActiveRow(row);
 }
@@ -142,6 +143,7 @@ function handleLocalAdd() {
   const firstName = document.getElementById("firstName").value.trim();
   const birthDate = document.getElementById("birthDate").value.trim();
   const address = document.getElementById("address").value.trim();
+  const email = document.getElementById("email").value.trim();
   const classId = document.getElementById("classId").value.trim();
 
   // Client-side validations
@@ -187,6 +189,7 @@ function handleLocalAdd() {
     firstName: firstName,
     birthDate: birthDate,
     address: address,
+    email: email,
     classId: classId
   });
 
@@ -202,6 +205,7 @@ function handleLocalAdd() {
       <td>${firstName}</td>
       <td>${birthDate}</td>
       <td>${address}</td>
+      <td>${email}</td>
       <td>${classId}</td>
       <td class="text-end">
         <button type="button" class="btn btn-sm btn-outline-secondary btn-edit">
@@ -222,6 +226,7 @@ function handleLocalUpdate() {
   const firstName = document.getElementById("firstName").value.trim();
   const birthDate = document.getElementById("birthDate").value.trim();
   const address = document.getElementById("address").value.trim();
+  const email = document.getElementById("email").value.trim();
   const classId = document.getElementById("classId").value.trim();
 
   // Client-side validations
@@ -260,12 +265,13 @@ function handleLocalUpdate() {
     firstName: cells[2].innerText.trim(),
     birthDate: cells[3].innerText.trim(),
     address: cells[4].innerText.trim(),
-    classId: cells[5].innerText.trim()
+    email: cells[5].innerText.trim(),
+    classId: cells[6].innerText.trim()
   };
 
   if (lastName === oldState.lastName && firstName === oldState.firstName &&
       birthDate === oldState.birthDate && address === oldState.address &&
-      classId === oldState.classId) {
+      email === oldState.email && classId === oldState.classId) {
     resetForm();
     return; // No change
   }
@@ -278,6 +284,7 @@ function handleLocalUpdate() {
     firstName: firstName,
     birthDate: birthDate,
     address: address,
+    email: email,
     classId: classId,
     oldState: oldState
   });
@@ -287,7 +294,8 @@ function handleLocalUpdate() {
   cells[2].innerText = firstName;
   cells[3].innerText = birthDate;
   cells[4].innerText = address;
-  cells[5].innerText = classId;
+  cells[5].innerText = email;
+  cells[6].innerText = classId;
 
   if (!row.hasAttribute("data-local-added")) {
     row.classList.add("table-warning");
@@ -342,7 +350,8 @@ function handleUndo() {
       cells[2].innerText = action.oldState.firstName;
       cells[3].innerText = action.oldState.birthDate;
       cells[4].innerText = action.oldState.address;
-      cells[5].innerText = action.oldState.classId;
+      cells[5].innerText = action.oldState.email;
+      cells[6].innerText = action.oldState.classId;
 
       let hasOtherUpdates = false;
       for (let act of pendingActions) {
@@ -368,10 +377,10 @@ function handleUndo() {
 function handleSave() {
   if (pendingActions.length === 0) return;
 
-  // Serialize format: type:::studentId:::lastName:::firstName:::birthDate:::address:::classId\n
+  // Serialize format: type:::studentId:::lastName:::firstName:::birthDate:::address:::email:::classId\n
   let dataStr = "";
   pendingActions.forEach(function (act) {
-    dataStr += act.type + ":::" + act.studentId + ":::" + act.lastName + ":::" + act.firstName + ":::" + act.birthDate + ":::" + act.address + ":::" + act.classId + "\n";
+    dataStr += act.type + ":::" + act.studentId + ":::" + act.lastName + ":::" + act.firstName + ":::" + act.birthDate + ":::" + act.address + ":::" + act.email + ":::" + act.classId + "\n";
   });
 
   const actionsDataInput = document.getElementById("actionsDataInput");

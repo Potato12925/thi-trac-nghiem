@@ -74,7 +74,7 @@ request.setAttribute("customJs", "student-management.js");
 		</form>
 
 		<form:form id="studentForm" method="post"
-			action="${pageContext.request.contextPath}/studentss/add"
+			action="${pageContext.request.contextPath}/students/add"
 			modelAttribute="studentDTO">
 			<input type="hidden" name="page" value="${currentPage}" />
 			<input type="hidden" name="keyword" value="${keyword}" />
@@ -270,8 +270,8 @@ request.setAttribute("customJs", "student-management.js");
 
 		<div class="pagination-wrapper">
 			<c:if test="${currentPage > 1}">
-				<a class="pagination-item" href="studentss?page=1&keyword=${keyword}&filterClassId=${classId}"> First </a>
-				<a class="pagination-item" href="studentss?page=${currentPage - 1}&keyword=${keyword}&filterClassId=${classId}">
+				<a class="pagination-item" href="students?page=1&keyword=${keyword}&filterClassId=${classId}"> First </a>
+				<a class="pagination-item" href="students?page=${currentPage - 1}&keyword=${keyword}&filterClassId=${classId}">
 					&laquo; </a>
 			</c:if>
 
@@ -282,7 +282,7 @@ request.setAttribute("customJs", "student-management.js");
 			<c:forEach begin="${currentPage - 2 < 1 ? 1 : currentPage - 2}"
 				end="${currentPage + 2 > totalPages ? totalPages : currentPage + 2}"
 				var="i">
-				<a href="studentss?page=${i}&keyword=${keyword}&filterClassId=${classId}"
+				<a href="students?page=${i}&keyword=${keyword}&filterClassId=${classId}"
 					class="pagination-item ${currentPage == i ? 'active' : ''}">
 					${i} </a>
 			</c:forEach>
@@ -292,9 +292,9 @@ request.setAttribute("customJs", "student-management.js");
 			</c:if>
 
 			<c:if test="${currentPage < totalPages}">
-				<a class="pagination-item" href="studentss?page=${currentPage + 1}&keyword=${keyword}&filterClassId=${classId}">
+				<a class="pagination-item" href="students?page=${currentPage + 1}&keyword=${keyword}&filterClassId=${classId}">
 					&raquo; </a>
-				<a class="pagination-item" href="studentss?page=${totalPages}&keyword=${keyword}&filterClassId=${classId}">
+				<a class="pagination-item" href="students?page=${totalPages}&keyword=${keyword}&filterClassId=${classId}">
 					Last </a>
 			</c:if>
 		</div>

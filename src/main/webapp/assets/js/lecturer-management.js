@@ -58,6 +58,7 @@ function fillFormFromRow(row) {
   document.getElementById("firstName").value = row.getAttribute("data-firstname") || row.querySelectorAll("td")[2]?.innerText.trim() || "";
   document.getElementById("phoneNumber").value = row.getAttribute("data-phone") || row.querySelectorAll("td")[3]?.innerText.trim() || "";
   document.getElementById("address").value = row.getAttribute("data-address") || row.querySelectorAll("td")[4]?.innerText.trim() || "";
+  document.getElementById("email").value = row.getAttribute("data-email") || row.querySelectorAll("td")[5]?.innerText.trim() || "";
   document.getElementById("lecturerId").readOnly = true;
   setActiveRow(row);
 }
@@ -140,6 +141,7 @@ function handleLocalAdd() {
   const firstName = document.getElementById("firstName").value.trim();
   const phoneNumber = document.getElementById("phoneNumber").value.trim();
   const address = document.getElementById("address").value.trim();
+  const email = document.getElementById("email").value.trim();
 
   // Client-side validations
   if (!lecturerId) {
@@ -207,7 +209,8 @@ function handleLocalAdd() {
     lastName: lastName,
     firstName: firstName,
     phoneNumber: phoneNumber,
-    address: address
+    address: address,
+    email: email
   });
 
   // Update DOM: Insert new row at the top
@@ -221,12 +224,14 @@ function handleLocalAdd() {
     tr.setAttribute("data-firstname", firstName);
     tr.setAttribute("data-phone", phoneNumber);
     tr.setAttribute("data-address", address);
+    tr.setAttribute("data-email", email);
     tr.innerHTML = `
       <td class="fw-medium text-success">${lecturerId}</td>
       <td>${lastName}</td>
       <td>${firstName}</td>
       <td>${phoneNumber}</td>
       <td>${address}</td>
+      <td>${email}</td>
       <td class="text-end">
         <button type="button" class="btn btn-sm btn-outline-secondary btn-edit">
           <i class="bi bi-pencil"></i>
@@ -246,6 +251,7 @@ function handleLocalUpdate() {
   const firstName = document.getElementById("firstName").value.trim();
   const phoneNumber = document.getElementById("phoneNumber").value.trim();
   const address = document.getElementById("address").value.trim();
+  const email = document.getElementById("email").value.trim();
 
   // Client-side validations
   if (!lastName) {
@@ -297,11 +303,13 @@ function handleLocalUpdate() {
     lastName: row.getAttribute("data-lastname") || row.querySelectorAll("td")[1]?.innerText.trim(),
     firstName: row.getAttribute("data-firstname") || row.querySelectorAll("td")[2]?.innerText.trim(),
     phoneNumber: row.getAttribute("data-phone") || row.querySelectorAll("td")[3]?.innerText.trim(),
-    address: row.getAttribute("data-address") || row.querySelectorAll("td")[4]?.innerText.trim()
+    address: row.getAttribute("data-address") || row.querySelectorAll("td")[4]?.innerText.trim(),
+    email: row.getAttribute("data-email") || row.querySelectorAll("td")[5]?.innerText.trim()
   };
 
   if (lastName === oldState.lastName && firstName === oldState.firstName &&
-      phoneNumber === oldState.phoneNumber && address === oldState.address) {
+      phoneNumber === oldState.phoneNumber && address === oldState.address &&
+      email === oldState.email) {
     resetForm();
     return; // No change
   }
@@ -314,6 +322,7 @@ function handleLocalUpdate() {
     firstName: firstName,
     phoneNumber: phoneNumber,
     address: address,
+    email: email,
     oldState: oldState
   });
 
@@ -322,12 +331,14 @@ function handleLocalUpdate() {
   row.setAttribute("data-firstname", firstName);
   row.setAttribute("data-phone", phoneNumber);
   row.setAttribute("data-address", address);
+  row.setAttribute("data-email", email);
 
   const cells = row.querySelectorAll("td");
   cells[1].innerText = lastName;
   cells[2].innerText = firstName;
   cells[3].innerText = phoneNumber;
   cells[4].innerText = address;
+  cells[5].innerText = email;
 
   if (!row.hasAttribute("data-local-added")) {
     row.classList.add("table-warning");
@@ -380,12 +391,14 @@ function handleUndo() {
       row.setAttribute("data-firstname", action.oldState.firstName);
       row.setAttribute("data-phone", action.oldState.phoneNumber);
       row.setAttribute("data-address", action.oldState.address);
+      row.setAttribute("data-email", action.oldState.email);
 
       const cells = row.querySelectorAll("td");
       cells[1].innerText = action.oldState.lastName;
       cells[2].innerText = action.oldState.firstName;
       cells[3].innerText = action.oldState.phoneNumber;
       cells[4].innerText = action.oldState.address;
+      cells[5].innerText = action.oldState.email;
 
       let hasOtherUpdates = false;
       for (let act of pendingActions) {
@@ -411,10 +424,10 @@ function handleUndo() {
 function handleSave() {
   if (pendingActions.length === 0) return;
 
-  // Serialize format: type:::lecturerId:::lastName:::firstName:::phoneNumber:::address\n
+  // Serialize format: type:::lecturerId:::lastName:::firstName:::phoneNumber:::address:::email\n
   let dataStr = "";
   pendingActions.forEach(function (act) {
-    dataStr += act.type + ":::" + act.lecturerId + ":::" + act.lastName + ":::" + act.firstName + ":::" + act.phoneNumber + ":::" + act.address + "\n";
+    dataStr += act.type + ":::" + act.lecturerId + ":::" + act.lastName + ":::" + act.firstName + ":::" + act.phoneNumber + ":::" + act.address + ":::" + act.email + "\n";
   });
 
   const actionsDataInput = document.getElementById("actionsDataInput");

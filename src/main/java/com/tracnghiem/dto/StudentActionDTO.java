@@ -7,19 +7,21 @@ public class StudentActionDTO {
 	private String firstName;
 	private String birthDate;
 	private String address;
+	private String email;
 	private String classId;
 
 	public StudentActionDTO() {
 	}
 
 	public StudentActionDTO(String type, String studentId, String lastName, String firstName, String birthDate,
-			String address, String classId) {
+			String address, String email, String classId) {
 		this.type = type;
 		this.studentId = studentId;
 		this.lastName = lastName;
 		this.firstName = firstName;
 		this.birthDate = birthDate;
 		this.address = address;
+		this.email = email;
 		this.classId = classId;
 	}
 
@@ -69,6 +71,14 @@ public class StudentActionDTO {
 
 	public void setAddress(String address) {
 		this.address = address;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	public String getClassId() {
