@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<beans
-	xmlns="http://www.springframework.org/schema/beans"
+<beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:mvc="http://www.springframework.org/schema/mvc"
@@ -13,7 +12,8 @@
 						http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
 
 	<!-- Scan -->
-	<context:component-scan base-package="com.tracnghiem" />
+	<context:component-scan
+		base-package="com.tracnghiem" />
 
 	<!-- MVC -->
 	<mvc:annotation-driven />
@@ -27,13 +27,12 @@
 	<!-- View Resolver -->
 	<bean id="viewResolver"
 		class="org.springframework.web.servlet.view.InternalResourceViewResolver"
-		p:prefix="/WEB-INF/views/"
-		p:suffix=".jsp" />
+		p:prefix="/WEB-INF/views/" p:suffix=".jsp" />
 
 	<!-- Interceptor Bean -->
 	<bean id="loginInterceptor"
 		class="com.tracnghiem.interceptor.LoginInterceptor" />
-		
+
 	<!-- Email Bean -->
 	<bean id="mailSender"
 		class="org.springframework.mail.javamail.JavaMailSenderImpl">
@@ -48,8 +47,7 @@
 		<property name="password"
 			value="#{T(config.MailConfig).APP_PASSWORD}" />
 
-		<property name="defaultEncoding"
-			value="utf-8" />
+		<property name="defaultEncoding" value="utf-8" />
 
 		<property name="javaMailProperties">
 			<props>
@@ -73,7 +71,8 @@
 			<mvc:exclude-mapping path="/hello" />
 			<mvc:exclude-mapping path="/auth/login" />
 			<mvc:exclude-mapping path="/auth/forgot-password" />
-			<mvc:exclude-mapping path="/auth/forgot-password/otp" />
+			<mvc:exclude-mapping
+				path="/auth/forgot-password/otp" />
 			<mvc:exclude-mapping path="/auth/reset-password" />
 			<mvc:exclude-mapping path="/assets/**" />
 
@@ -82,13 +81,11 @@
 		</mvc:interceptor>
 
 	</mvc:interceptors>
-
+	<!-- CommonsMultipartResolver for file uploads -->
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<!-- max upload size in bytes (5MB) -->
+		<property name="maxUploadSize" value="5242880" />
+	</bean>
 </beans>
-    <!-- CommonsMultipartResolver for file uploads -->
-    <bean id="multipartResolver"
-          class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
-        <!-- max upload size in bytes (5MB) -->
-        <property name="maxUploadSize" value="5242880" />
-    </bean>
 
-</beans>

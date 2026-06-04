@@ -46,207 +46,189 @@ import com.tracnghiem.service.LecturerService;
 @RequestMapping("/lecturers")
 public class LecturerController {
 
-    private static final String INDEX_VIEW = "Lecturer/Index";
-    private static final String REDIRECT_INDEX = "redirect:/lecturers";
+	private static final String INDEX_VIEW = "Lecturer/Index";
+	private static final String REDIRECT_INDEX = "redirect:/lecturers";
 
-    @Autowired
-    private LecturerService lecturerService;
+	@Autowired
+	private LecturerService lecturerService;
 
-    @Autowired
-    private AccountSettingsService accountSettingsService;
+	@Autowired
+	private AccountSettingsService accountSettingsService;
 
-    @Autowired
-    private AccountSettingsService accountSettingsService;
+	private void prepareLecturerPage(ModelMap model, int page, String keyword) {
+		int pageSize = 10;
 
-    private void prepareLecturerPage(ModelMap model, int page, String keyword) {
-        int pageSize = 10;
+		if (keyword != null && !keyword.trim().isEmpty()) {
+			model.addAttribute("lecturers", lecturerService.getLecturers(page, pageSize, keyword));
+			model.addAttribute("keyword", keyword);
+			long total = lecturerService.countLecturers(keyword);
+			int totalPages = (int) Math.ceil((double) total / pageSize);
+			model.addAttribute("currentPage", page);
+			model.addAttribute("totalPages", totalPages);
+		} else {
+			model.addAttribute("lecturers", lecturerService.getLecturers(page, pageSize));
+			long total = lecturerService.countLecturers();
+			int totalPages = (int) Math.ceil((double) total / pageSize);
+			model.addAttribute("currentPage", page);
+			model.addAttribute("totalPages", totalPages);
+		}
+	}
 
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            model.addAttribute("lecturers", lecturerService.getLecturers(page, pageSize, keyword));
-            model.addAttribute("keyword", keyword);
-            long total = lecturerService.countLecturers(keyword);
-            int totalPages = (int) Math.ceil((double) total / pageSize);
-            model.addAttribute("currentPage", page);
-            model.addAttribute("totalPages", totalPages);
-        } else {
-            model.addAttribute("lecturers", lecturerService.getLecturers(page, pageSize));
-            long total = lecturerService.countLecturers();
-            int totalPages = (int) Math.ceil((double) total / pageSize);
-            model.addAttribute("currentPage", page);
-            model.addAttribute("totalPages", totalPages);
-        }
-    }
+	@GetMapping("/home")
+	public String home(ModelMap model, HttpSession session) {
+		String lecturerId = (String) session.getAttribute("LOGIN_USER");
+		Lecturer lecturer = lecturerId != null ? lecturerService.findLecturerById(lecturerId) : null;
 
-    @GetMapping("/home")
-    public String home(ModelMap model, HttpSession session) {
-        String lecturerId = (String) session.getAttribute("LOGIN_USER");
-        Lecturer lecturer = lecturerId != null ? lecturerService.findLecturerById(lecturerId) : null;
+		model.addAttribute("pageTitle", "Lecturer Homepage");
+		model.addAttribute("lecturerProfile", lecturer);
+		model.addAttribute("today", new Date());
 
-        model.addAttribute("pageTitle", "Lecturer Homepage");
-        model.addAttribute("lecturerProfile", lecturer);
-        model.addAttribute("today", new Date());
+		return "Lecturer/Home";
+	}
 
-        return "Lecturer/Home";
-    }
+	@GetMapping("/settings")
+	public String settings(ModelMap model, HttpSession session) {
+		String redirect = validateLecturerAccess(session);
+		if (redirect != null) {
+			return redirect;
+		}
 
-    @GetMapping("/settings")
-    public String settings(ModelMap model, HttpSession session) {
-        String redirect = validateLecturerAccess(session);
-        if (redirect != null) {
-            return redirect;
-        }
+		populateSettingsPageModel(model, session, null, null);
+		return "Lecturer/Settings";
+	}
 
-        populateSettingsPageModel(model, session, null, null);
-        return "Lecturer/Settings";
-    }
+	@PostMapping("/settings/email/send-otp")
+	public String sendEmailOtp(@Validated @ModelAttribute("changeEmailDTO") ChangeEmailDTO changeEmailDTO,
+			BindingResult errors, ModelMap model, HttpSession session) {
 
-    @PostMapping("/settings/email/send-otp")
-    public String sendEmailOtp(
-            @Validated @ModelAttribute("changeEmailDTO") ChangeEmailDTO changeEmailDTO,
-            BindingResult errors,
-            ModelMap model,
-            HttpSession session) {
+		String redirect = validateLecturerAccess(session);
+		if (redirect != null) {
+			return redirect;
+		}
 
-        String redirect = validateLecturerAccess(session);
-        if (redirect != null) {
-            return redirect;
-        }
+		if (errors.hasErrors()) {
+			populateSettingsPageModel(model, session, changeEmailDTO.getNewEmail(), null);
+			return "Lecturer/Settings";
+		}
 
-        if (errors.hasErrors()) {
-            populateSettingsPageModel(model, session, changeEmailDTO.getNewEmail(), null);
-            return "Lecturer/Settings";
-        }
+		try {
+			String lecturerId = (String) session.getAttribute("LOGIN_USER");
+			String role = (String) session.getAttribute("ROLE");
 
-        try {
-            String lecturerId = (String) session.getAttribute("LOGIN_USER");
-            String role = (String) session.getAttribute("ROLE");
+			accountSettingsService.sendEmailChangeOtp(lecturerId, role, changeEmailDTO.getNewEmail());
+			populateSettingsPageModel(model, session, changeEmailDTO.getNewEmail(), changeEmailDTO.getNewEmail());
+			model.addAttribute("successMessage", "Mã OTP đã được gửi tới email mới của bạn");
+			return "Lecturer/Settings";
+		} catch (IllegalArgumentException | IllegalStateException ex) {
+			populateSettingsPageModel(model, session, changeEmailDTO.getNewEmail(), null);
+			model.addAttribute("errorMessage", ex.getMessage());
+			return "Lecturer/Settings";
+		}
+	}
 
-            accountSettingsService.sendEmailChangeOtp(lecturerId, role, changeEmailDTO.getNewEmail());
-            populateSettingsPageModel(model, session, changeEmailDTO.getNewEmail(), changeEmailDTO.getNewEmail());
-            model.addAttribute("successMessage", "Mã OTP đã được gửi tới email mới của bạn");
-            return "Lecturer/Settings";
-        } catch (IllegalArgumentException | IllegalStateException ex) {
-            populateSettingsPageModel(model, session, changeEmailDTO.getNewEmail(), null);
-            model.addAttribute("errorMessage", ex.getMessage());
-            return "Lecturer/Settings";
-        }
-    }
+	@PostMapping("/settings/email/confirm")
+	public String confirmEmailChange(
+			@Validated @ModelAttribute("confirmEmailChangeDTO") ConfirmEmailChangeDTO confirmEmailChangeDTO,
+			BindingResult errors, ModelMap model, HttpSession session, RedirectAttributes redirectAttributes) {
 
-    @PostMapping("/settings/email/confirm")
-    public String confirmEmailChange(
-            @Validated @ModelAttribute("confirmEmailChangeDTO") ConfirmEmailChangeDTO confirmEmailChangeDTO,
-            BindingResult errors,
-            ModelMap model,
-            HttpSession session,
-            RedirectAttributes redirectAttributes) {
+		String redirect = validateLecturerAccess(session);
+		if (redirect != null) {
+			return redirect;
+		}
 
-        String redirect = validateLecturerAccess(session);
-        if (redirect != null) {
-            return redirect;
-        }
+		if (errors.hasErrors()) {
+			populateSettingsPageModel(model, session, confirmEmailChangeDTO.getNewEmail(),
+					confirmEmailChangeDTO.getNewEmail());
+			return "Lecturer/Settings";
+		}
 
-        if (errors.hasErrors()) {
-            populateSettingsPageModel(model, session, confirmEmailChangeDTO.getNewEmail(), confirmEmailChangeDTO.getNewEmail());
-            return "Lecturer/Settings";
-        }
+		try {
+			String lecturerId = (String) session.getAttribute("LOGIN_USER");
+			String role = (String) session.getAttribute("ROLE");
 
-        try {
-            String lecturerId = (String) session.getAttribute("LOGIN_USER");
-            String role = (String) session.getAttribute("ROLE");
+			accountSettingsService.confirmEmailChange(lecturerId, role, confirmEmailChangeDTO.getNewEmail(),
+					confirmEmailChangeDTO.getOtpCode());
+			redirectAttributes.addFlashAttribute("successMessage", "Cập nhật email thành công");
+			return "redirect:/lecturers/settings";
+		} catch (IllegalArgumentException ex) {
+			populateSettingsPageModel(model, session, confirmEmailChangeDTO.getNewEmail(),
+					confirmEmailChangeDTO.getNewEmail());
+			model.addAttribute("errorMessage", ex.getMessage());
+			return "Lecturer/Settings";
+		}
+	}
 
-            accountSettingsService.confirmEmailChange(lecturerId, role, confirmEmailChangeDTO.getNewEmail(),
-                    confirmEmailChangeDTO.getOtpCode());
-            redirectAttributes.addFlashAttribute("successMessage", "Cập nhật email thành công");
-            return "redirect:/lecturers/settings";
-        } catch (IllegalArgumentException ex) {
-            populateSettingsPageModel(model, session, confirmEmailChangeDTO.getNewEmail(), confirmEmailChangeDTO.getNewEmail());
-            model.addAttribute("errorMessage", ex.getMessage());
-            return "Lecturer/Settings";
-        }
-    }
+	@GetMapping
+	public String index(@RequestParam(defaultValue = "1") int page, @RequestParam(required = false) String keyword,
+			ModelMap model) {
+		prepareLecturerPage(model, page, keyword);
+		model.addAttribute("lecturerDTO", new LecturerDTO());
+		return INDEX_VIEW;
+	}
 
-    @GetMapping
-    public String index(@RequestParam(defaultValue = "1") int page,
-            @RequestParam(required = false) String keyword,
-            ModelMap model) {
-        prepareLecturerPage(model, page, keyword);
-        model.addAttribute("lecturerDTO", new LecturerDTO());
-        return INDEX_VIEW;
-    }
+	@PostMapping("/add")
+	public String add(@RequestParam(defaultValue = "1") int page, @RequestParam(required = false) String keyword,
+			@Validated @ModelAttribute("lecturerDTO") LecturerDTO lecturerDTO, BindingResult errors, ModelMap model) {
 
-    @PostMapping("/add")
-    public String add(@RequestParam(defaultValue = "1") int page,
-            @RequestParam(required = false) String keyword,
-            @Validated @ModelAttribute("lecturerDTO") LecturerDTO lecturerDTO,
-            BindingResult errors,
-            ModelMap model) {
+		if (errors.hasErrors()) {
+			prepareLecturerPage(model, page, keyword);
+			model.addAttribute("lecturerDTO", lecturerDTO);
+			return INDEX_VIEW;
+		}
 
-        if (errors.hasErrors()) {
-            prepareLecturerPage(model, page, keyword);
-            model.addAttribute("lecturerDTO", lecturerDTO);
-            return INDEX_VIEW;
-        }
+		try {
+			lecturerService.addLecturer(lecturerDTO);
+			return REDIRECT_INDEX + buildQuery(page, keyword);
+		} catch (IllegalArgumentException ex) {
+			model.addAttribute("errorMessage", ex.getMessage());
+			prepareLecturerPage(model, page, keyword);
+			model.addAttribute("lecturerDTO", lecturerDTO);
+			return INDEX_VIEW;
+		}
+	}
 
-        try {
-            lecturerService.addLecturer(lecturerDTO);
-            return REDIRECT_INDEX + buildQuery(page, keyword);
-        } catch (IllegalArgumentException ex) {
-            model.addAttribute("errorMessage", ex.getMessage());
-            prepareLecturerPage(model, page, keyword);
-            model.addAttribute("lecturerDTO", lecturerDTO);
-            return INDEX_VIEW;
-        }
-    }
+	@PostMapping("/update")
+	public String update(@RequestParam(defaultValue = "1") int page, @RequestParam(required = false) String keyword,
+			@Validated @ModelAttribute("lecturerDTO") LecturerDTO lecturerDTO, BindingResult errors, ModelMap model) {
+		if (errors.hasErrors()) {
+			prepareLecturerPage(model, page, keyword);
+			model.addAttribute("lecturerDTO", lecturerDTO);
+			return INDEX_VIEW;
+		}
 
-    @PostMapping("/update")
-    public String update(@RequestParam(defaultValue = "1") int page,
-            @RequestParam(required = false) String keyword,
-            @Validated @ModelAttribute("lecturerDTO") LecturerDTO lecturerDTO,
-            BindingResult errors,
-            ModelMap model) {
-        if (errors.hasErrors()) {
-            prepareLecturerPage(model, page, keyword);
-            model.addAttribute("lecturerDTO", lecturerDTO);
-            return INDEX_VIEW;
-        }
+		try {
+			lecturerService.updateLecturer(lecturerDTO);
+			return REDIRECT_INDEX + buildQuery(page, keyword);
+		} catch (IllegalArgumentException ex) {
+			model.addAttribute("errorMessage", ex.getMessage());
+			prepareLecturerPage(model, page, keyword);
+			model.addAttribute("lecturerDTO", lecturerDTO);
+			return INDEX_VIEW;
+		}
+	}
 
-        try {
-            lecturerService.updateLecturer(lecturerDTO);
-            return REDIRECT_INDEX + buildQuery(page, keyword);
-        } catch (IllegalArgumentException ex) {
-            model.addAttribute("errorMessage", ex.getMessage());
-            prepareLecturerPage(model, page, keyword);
-            model.addAttribute("lecturerDTO", lecturerDTO);
-            return INDEX_VIEW;
-        }
-    }
+	@PostMapping("/delete")
+	public String delete(@RequestParam(defaultValue = "1") int page, @RequestParam(required = false) String keyword,
+			@Validated @ModelAttribute("lecturerDTO") LecturerDTO lecturerDTO, BindingResult errors, ModelMap model) {
+		if (errors.hasErrors()) {
+			prepareLecturerPage(model, page, keyword);
+			model.addAttribute("lecturerDTO", lecturerDTO);
+			return INDEX_VIEW;
+		}
 
-    @PostMapping("/delete")
-    public String delete(@RequestParam(defaultValue = "1") int page,
-            @RequestParam(required = false) String keyword,
-            @Validated @ModelAttribute("lecturerDTO") LecturerDTO lecturerDTO,
-            BindingResult errors,
-            ModelMap model) {
-        if (errors.hasErrors()) {
-            prepareLecturerPage(model, page, keyword);
-            model.addAttribute("lecturerDTO", lecturerDTO);
-            return INDEX_VIEW;
-        }
-
-        try {
-            lecturerService.deleteLecturer(lecturerDTO);
-            return REDIRECT_INDEX + buildQuery(page, keyword);
-        } catch (IllegalArgumentException ex) {
-            model.addAttribute("errorMessage", ex.getMessage());
-            prepareLecturerPage(model, page, keyword);
-            model.addAttribute("lecturerDTO", lecturerDTO);
-            return INDEX_VIEW;
-        }
-    }
+		try {
+			lecturerService.deleteLecturer(lecturerDTO);
+			return REDIRECT_INDEX + buildQuery(page, keyword);
+		} catch (IllegalArgumentException ex) {
+			model.addAttribute("errorMessage", ex.getMessage());
+			prepareLecturerPage(model, page, keyword);
+			model.addAttribute("lecturerDTO", lecturerDTO);
+			return INDEX_VIEW;
+		}
+	}
 
 	@PostMapping("/save")
-	public String save(@RequestParam(defaultValue = "1") int page,
-			@RequestParam(required = false) String keyword,
+	public String save(@RequestParam(defaultValue = "1") int page, @RequestParam(required = false) String keyword,
 			@RequestParam("actionsData") String actionsData, ModelMap model, RedirectAttributes redirectAttributes) {
 
 		if (actionsData == null || actionsData.trim().isEmpty()) {
@@ -267,54 +249,55 @@ public class LecturerController {
 		}
 	}
 
-    private String buildQuery(int page, String keyword) {
-        StringBuilder query = new StringBuilder("?page=").append(page);
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            query.append("&keyword=").append(URLEncoder.encode(keyword.trim(), StandardCharsets.UTF_8));
-        }
-        return query.toString();
-    }
+	private String buildQuery(int page, String keyword) {
+		StringBuilder query = new StringBuilder("?page=").append(page);
+		if (keyword != null && !keyword.trim().isEmpty()) {
+			query.append("&keyword=").append(URLEncoder.encode(keyword.trim(), StandardCharsets.UTF_8));
+		}
+		return query.toString();
+	}
 
-    private void populateSettingsPageModel(ModelMap model, HttpSession session, String newEmail, String confirmEmail) {
-        String lecturerId = (String) session.getAttribute("LOGIN_USER");
-        Lecturer lecturer = lecturerService.findLecturerById(lecturerId);
+	private void populateSettingsPageModel(ModelMap model, HttpSession session, String newEmail, String confirmEmail) {
+		String lecturerId = (String) session.getAttribute("LOGIN_USER");
+		Lecturer lecturer = lecturerService.findLecturerById(lecturerId);
 
-        model.addAttribute("pageTitle", "Cài đặt giảng viên");
-        model.addAttribute("lecturerProfile", lecturer);
+		model.addAttribute("pageTitle", "Cài đặt giảng viên");
+		model.addAttribute("lecturerProfile", lecturer);
 
-        if (!model.containsAttribute("changeEmailDTO")) {
-            ChangeEmailDTO emailDTO = new ChangeEmailDTO();
-            emailDTO.setNewEmail(newEmail);
-            model.addAttribute("changeEmailDTO", emailDTO);
-        }
+		if (!model.containsAttribute("changeEmailDTO")) {
+			ChangeEmailDTO emailDTO = new ChangeEmailDTO();
+			emailDTO.setNewEmail(newEmail);
+			model.addAttribute("changeEmailDTO", emailDTO);
+		}
 
-        if (!model.containsAttribute("confirmEmailChangeDTO")) {
-            ConfirmEmailChangeDTO confirmEmailChangeDTO = new ConfirmEmailChangeDTO();
-            confirmEmailChangeDTO.setNewEmail(confirmEmail);
-            model.addAttribute("confirmEmailChangeDTO", confirmEmailChangeDTO);
-        }
+		if (!model.containsAttribute("confirmEmailChangeDTO")) {
+			ConfirmEmailChangeDTO confirmEmailChangeDTO = new ConfirmEmailChangeDTO();
+			confirmEmailChangeDTO.setNewEmail(confirmEmail);
+			model.addAttribute("confirmEmailChangeDTO", confirmEmailChangeDTO);
+		}
 
-        if (!model.containsAttribute("changePasswordDTO")) {
-            model.addAttribute("changePasswordDTO", new ChangePasswordDTO());
-        }
-    }
+		if (!model.containsAttribute("changePasswordDTO")) {
+			model.addAttribute("changePasswordDTO", new ChangePasswordDTO());
+		}
+	}
 
-    private String validateLecturerAccess(HttpSession session) {
-        String role = (String) session.getAttribute("ROLE");
-        if ("GIAOVIEN".equals(role)) {
-            return null;
-        }
+	private String validateLecturerAccess(HttpSession session) {
+		String role = (String) session.getAttribute("ROLE");
+		if ("GIAOVIEN".equals(role)) {
+			return null;
+		}
 
-        if ("SINHVIEN".equals(role)) {
-            return "redirect:/students/home";
-        }
+		if ("SINHVIEN".equals(role)) {
+			return "redirect:/students/home";
+		}
 
-        if ("PGV".equals(role)) {
-            return "redirect:/admin/home";
-        }
+		if ("PGV".equals(role)) {
+			return "redirect:/admin/home";
+		}
 
-        return "redirect:/hello";
-    }
+		return "redirect:/hello";
+	}
+
 	@GetMapping("/export")
 	public void exportToExcel(HttpServletResponse response) throws IOException {
 		response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
@@ -327,7 +310,7 @@ public class LecturerController {
 
 			// Header
 			Row header = sheet.createRow(0);
-			String[] headers = {"Mã giảng viên", "Họ", "Tên", "Số điện thoại", "Địa chỉ"};
+			String[] headers = { "Mã giảng viên", "Họ", "Tên", "Số điện thoại", "Địa chỉ" };
 			for (int j = 0; j < headers.length; j++) {
 				Cell cell = header.createCell(j);
 				cell.setCellValue(headers[j]);
@@ -403,10 +386,12 @@ public class LecturerController {
 			}
 
 			if (dtos.isEmpty()) {
-				redirectAttributes.addFlashAttribute("errorMessage", "Không tìm thấy dữ liệu giảng viên hợp lệ trong tệp Excel.");
+				redirectAttributes.addFlashAttribute("errorMessage",
+						"Không tìm thấy dữ liệu giảng viên hợp lệ trong tệp Excel.");
 			} else {
 				lecturerService.importLecturers(dtos);
-				redirectAttributes.addFlashAttribute("successMessage", "Nhập danh sách giảng viên từ Excel thành công (Đã nhập " + dtos.size() + " giảng viên).");
+				redirectAttributes.addFlashAttribute("successMessage",
+						"Nhập danh sách giảng viên từ Excel thành công (Đã nhập " + dtos.size() + " giảng viên).");
 			}
 
 		} catch (IllegalArgumentException e) {
