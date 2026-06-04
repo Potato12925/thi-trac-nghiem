@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.tracnghiem.dto.PrepareExamDTO;
 import com.tracnghiem.service.ClassroomService;
 import com.tracnghiem.service.SubjectService;
 import com.tracnghiem.service.ScoreService;
@@ -47,6 +48,7 @@ public class ScoreController {
 
         model.addAttribute("dsLop", classroomService.getAllClassrooms());
         model.addAttribute("dsMonHoc", subjectService.getAllSubjects());
+        model.addAttribute("scoreFilter", new PrepareExamDTO(classId, subjectId, tryNumber));
 
         // Pass selected parameters back to form
         model.addAttribute("selectedClassId", classId);

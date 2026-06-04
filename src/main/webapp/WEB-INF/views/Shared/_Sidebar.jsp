@@ -132,13 +132,6 @@ String activeSettings = path.equals("/lecturers/settings") || path.startsWith("/
 					class="bi bi-bar-chart"></i> <span>Bảng điểm</span>
 			</a></li>
 
-			<li><a class="nav-link <%= activeReview %>"
-				href="${pageContext.request.contextPath}/review"> <i
-					class="bi bi-file-earmark-text"></i> <span>Xem bài thi</span>
-			</a></li>
-
-
-
 			<li><a class="nav-link <%= activeSettings %>"
 				href="${pageContext.request.contextPath}/lecturers/settings"> <i
 					class="bi bi-gear"></i> <span>Cài đặt</span>

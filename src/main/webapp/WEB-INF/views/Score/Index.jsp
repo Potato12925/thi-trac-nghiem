@@ -2,6 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 
 <% request.setAttribute("pageTitle", "Xem Bảng Điểm" ); %>
 
@@ -199,7 +200,7 @@
 
 <div class="container-fluid py-4 no-print">
     <!-- Page title on screen -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 no-print">
         <div>
             <h1 class="h3 mb-0 text-dark fw-bold">Xem Bảng Điểm Thi Hết Môn</h1>
             <p class="text-secondary small mb-0">Tra cứu và in bảng điểm của lớp học theo môn học và lần thi</p>
@@ -209,38 +210,30 @@
     <!-- Selector Form -->
     <div class="card filter-card mb-4">
         <div class="card-body p-4">
-            <form action="${pageContext.request.contextPath}/scores" method="get">
+            <form:form action="${pageContext.request.contextPath}/scores" method="get" modelAttribute="scoreFilter">
                 <div class="row g-3 align-items-end">
                     <div class="col-md-4">
                         <label for="classId" class="form-label small fw-semibold text-secondary">Tên lớp học</label>
-                        <select name="classId" id="classId" class="form-select rounded-3" required>
+                        <form:select path="classId" id="classId" class="form-select rounded-3" required="required">
                             <option value="">-- Chọn lớp học --</option>
-                            <c:forEach items="${dsLop}" var="lop">
-                                <option value="${lop.classId}" ${lop.classId eq selectedClassId ? 'selected' : ''}>
-                                    ${lop.classId} - ${lop.className}
-                                </option>
-                            </c:forEach>
-                        </select>
+                            <form:options items="${dsLop}" itemValue="classId" itemLabel="classDisplayName" />
+                        </form:select>
                     </div>
 
                     <div class="col-md-4">
                         <label for="subjectId" class="form-label small fw-semibold text-secondary">Tên môn học</label>
-                        <select name="subjectId" id="subjectId" class="form-select rounded-3" required>
+                        <form:select path="subjectId" id="subjectId" class="form-select rounded-3" required="required">
                             <option value="">-- Chọn môn học --</option>
-                            <c:forEach items="${dsMonHoc}" var="mh">
-                                <option value="${mh.subjectId}" ${mh.subjectId eq selectedSubjectId ? 'selected' : ''}>
-                                    ${mh.subjectId} - ${mh.subjectName}
-                                </option>
-                            </c:forEach>
-                        </select>
+                            <form:options items="${dsMonHoc}" itemValue="subjectId" itemLabel="subjectDisplayName" />
+                        </form:select>
                     </div>
 
                     <div class="col-md-2">
                         <label for="tryNumber" class="form-label small fw-semibold text-secondary">Lần thi</label>
-                        <select name="tryNumber" id="tryNumber" class="form-select rounded-3" required>
-                            <option value="1" ${selectedTryNumber eq 1 ? 'selected' : ''}>Lần 1</option>
-                            <option value="2" ${selectedTryNumber eq 2 ? 'selected' : ''}>Lần 2</option>
-                        </select>
+                        <form:select path="tryNumber" id="tryNumber" class="form-select rounded-3" required="required">
+                            <form:option value="1">Lần 1</form:option>
+                            <form:option value="2">Lần 2</form:option>
+                        </form:select>
                     </div>
 
                     <div class="col-md-2 d-grid">
@@ -249,7 +242,7 @@
                         </button>
                     </div>
                 </div>
-            </form>
+            </form:form>
         </div>
     </div>
 </div>
