@@ -21,6 +21,8 @@ import com.tracnghiem.entity.PasswordResetOtp;
 public class PasswordResetService {
 
 	private static final int OTP_EXPIRE_MINUTES = 5;
+	public static final String PURPOSE_PASSWORD_RESET = "PASSWORD_RESET";
+	public static final String PURPOSE_EMAIL_CHANGE = "EMAIL_CHANGE";
 
 	@Autowired
 	private AuthService authService;
@@ -39,12 +41,7 @@ public class PasswordResetService {
 
 	@Transactional
 	public void sendOtp(String username) {
-		String normalizedUsername = normalizeUsername(username);
-		Account account = authService.findAccountByUsername(normalizedUsername);
-
-		if (account == null) {
-			throw new IllegalArgumentException("Tên đăng nhập không tồn tại");
-		}
+		Account account = findExistingAccount(username);
 
 		if ("PGV".equals(account.getRole())) {
 			throw new IllegalArgumentException("Tài khoản này hiện chưa hỗ trợ khôi phục mật khẩu qua email");
@@ -53,20 +50,13 @@ public class PasswordResetService {
 		String email = resolveEmail(account);
 		LocalDateTime now = LocalDateTime.now();
 
-		passwordResetOtpDAO.invalidateActiveOtps(account.getUsername(), now);
+		passwordResetOtpDAO.invalidateActiveOtps(account.getUsername(), PURPOSE_PASSWORD_RESET, now);
 
-		PasswordResetOtp otp = new PasswordResetOtp();
-		otp.setAccountId(account.getUsername());
-		otp.setEmail(email);
-		otp.setOtpCode(generateOtp());
-		otp.setCreatedAt(now);
-		otp.setExpiresAt(now.plusMinutes(OTP_EXPIRE_MINUTES));
-		otp.setUsed(false);
-
-		passwordResetOtpDAO.create(otp);
+		PasswordResetOtp otp = createOtp(account.getUsername(), email, PURPOSE_PASSWORD_RESET, now);
 
 		try {
-			mailSender.send(buildOtpMessage(email, account.getUsername(), otp.getOtpCode()));
+			mailSender.send(buildOtpMessage(email, account.getUsername(), otp.getOtpCode(), "Mã OTP khôi phục mật khẩu",
+					"Bạn vừa yêu cầu khôi phục mật khẩu cho tài khoản " + account.getUsername() + "."));
 		} catch (MailException ex) {
 			throw new IllegalStateException("Không thể gửi email OTP. Vui lòng thử lại sau.");
 		}
@@ -74,15 +64,45 @@ public class PasswordResetService {
 
 	@Transactional
 	public void resetPassword(String username, String otpCode, String newPassword) {
-		String normalizedUsername = normalizeUsername(username);
-		String normalizedOtpCode = otpCode == null ? "" : otpCode.trim();
-		Account account = authService.findAccountByUsername(normalizedUsername);
+		Account account = findExistingAccount(username);
+		PasswordResetOtp otp = validateOtpInternal(account.getUsername(), otpCode, PURPOSE_PASSWORD_RESET, null);
 
-		if (account == null) {
-			throw new IllegalArgumentException("Tên đăng nhập không tồn tại");
+		authService.updatePassword(account.getUsername(), newPassword);
+
+		otp.setUsed(true);
+		otp.setUsedAt(LocalDateTime.now());
+	}
+
+	@Transactional
+	public void sendOtpForEmailChange(String username, String newEmail) {
+		Account account = findExistingAccount(username);
+		String normalizedEmail = normalizeEmail(newEmail);
+		LocalDateTime now = LocalDateTime.now();
+
+		passwordResetOtpDAO.invalidateActiveOtps(account.getUsername(), PURPOSE_EMAIL_CHANGE, now);
+
+		PasswordResetOtp otp = createOtp(account.getUsername(), normalizedEmail, PURPOSE_EMAIL_CHANGE, now);
+
+		try {
+			mailSender.send(buildOtpMessage(normalizedEmail, account.getUsername(), otp.getOtpCode(),
+					"Mã OTP xác nhận đổi email",
+					"Bạn vừa yêu cầu cập nhật email mới cho tài khoản " + account.getUsername() + "."));
+		} catch (MailException ex) {
+			throw new IllegalStateException("Không thể gửi email OTP. Vui lòng thử lại sau.");
 		}
+	}
 
-		PasswordResetOtp otp = passwordResetOtpDAO.findLatestOtp(account.getUsername(), normalizedOtpCode);
+	public PasswordResetOtp validateOtp(String username, String otpCode, String purpose, String email) {
+		Account account = findExistingAccount(username);
+		return validateOtpInternal(account.getUsername(), otpCode, purpose, email);
+	}
+
+	private PasswordResetOtp validateOtpInternal(String accountId, String otpCode, String purpose, String email) {
+		String normalizedOtpCode = otpCode == null ? "" : otpCode.trim();
+		String normalizedEmail = email == null ? null : normalizeEmail(email);
+
+		PasswordResetOtp otp = passwordResetOtpDAO.findLatestOtp(accountId, normalizedOtpCode, purpose,
+				normalizedEmail);
 
 		if (otp == null) {
 			throw new IllegalArgumentException("Mã OTP không hợp lệ");
@@ -96,10 +116,18 @@ public class PasswordResetService {
 			throw new IllegalArgumentException("Mã OTP đã hết hạn. Vui lòng yêu cầu mã mới");
 		}
 
-		authService.updatePassword(account.getUsername(), newPassword);
+		return otp;
+	}
 
-		otp.setUsed(true);
-		otp.setUsedAt(LocalDateTime.now());
+	private Account findExistingAccount(String username) {
+		String normalizedUsername = normalizeUsername(username);
+		Account account = authService.findAccountByUsername(normalizedUsername);
+
+		if (account == null) {
+			throw new IllegalArgumentException("Tên đăng nhập không tồn tại");
+		}
+
+		return account;
 	}
 
 	private String resolveEmail(Account account) {
@@ -120,8 +148,26 @@ public class PasswordResetService {
 		return email.trim();
 	}
 
+	private PasswordResetOtp createOtp(String accountId, String email, String purpose, LocalDateTime now) {
+		PasswordResetOtp otp = new PasswordResetOtp();
+		otp.setAccountId(accountId);
+		otp.setEmail(email);
+		otp.setPurpose(purpose);
+		otp.setOtpCode(generateOtp());
+		otp.setCreatedAt(now);
+		otp.setExpiresAt(now.plusMinutes(OTP_EXPIRE_MINUTES));
+		otp.setUsed(false);
+
+		passwordResetOtpDAO.create(otp);
+		return otp;
+	}
+
 	private String normalizeUsername(String username) {
 		return username == null ? "" : username.trim();
+	}
+
+	private String normalizeEmail(String email) {
+		return email == null ? "" : email.trim().toLowerCase();
 	}
 
 	private String generateOtp() {
@@ -129,18 +175,19 @@ public class PasswordResetService {
 		return String.valueOf(otp);
 	}
 
-	private SimpleMailMessage buildOtpMessage(String email, String username, String otpCode) {
+	private SimpleMailMessage buildOtpMessage(String email, String username, String otpCode, String subject,
+			String introLine) {
 		SimpleMailMessage message = new SimpleMailMessage();
 		if (mailSender instanceof JavaMailSenderImpl) {
 			message.setFrom(((JavaMailSenderImpl) mailSender).getUsername());
 		}
 		message.setTo(email);
-		message.setSubject("Ma OTP khoi phuc mat khau");
-		message.setText("Xin chao,\n\n"
-				+ "Ban vua yeu cau khoi phuc mat khau cho tai khoan " + username + ".\n"
-				+ "Ma OTP cua ban la: " + otpCode + "\n"
-				+ "Ma nay co hieu luc trong 5 phut.\n\n"
-				+ "Neu ban khong thuc hien yeu cau nay, vui long bo qua email.\n");
+		message.setSubject(subject);
+		message.setText("Xin chào,\n\n"
+				+ introLine + "\n"
+				+ "Mã OTP của bạn là: " + otpCode + "\n"
+				+ "Mã này có hiệu lực trong 5 phút.\n\n"
+				+ "Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua email.\n");
 		return message;
 	}
 }

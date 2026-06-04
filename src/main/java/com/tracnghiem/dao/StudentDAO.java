@@ -22,6 +22,20 @@ public class StudentDAO extends GenericDAO<Student> {
 		return emails.isEmpty() ? null : emails.get(0);
 	}
 
+	public boolean existsByEmail(String email, String excludedStudentId) {
+		String hql = "SELECT COUNT(s.studentId) FROM Student s "
+				+ "WHERE lower(s.email) = :email "
+				+ "AND (:excludedStudentId IS NULL OR s.studentId <> :excludedStudentId)";
+
+		Long count = getSession()
+				.createQuery(hql, Long.class)
+				.setParameter("email", email)
+				.setParameter("excludedStudentId", excludedStudentId)
+				.uniqueResult();
+
+		return count != null && count > 0;
+	}
+
 	public List<Student> findByClassId(String classId) {
 		String hql = "FROM Student s WHERE s.classRoom.classId = :classId ORDER BY s.firstName, s.lastName";
 		return getSession().createQuery(hql, Student.class)

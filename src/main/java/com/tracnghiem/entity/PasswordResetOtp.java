@@ -24,6 +24,9 @@ public class PasswordResetOtp {
 	@Column(name = "EMAIL", nullable = false, length = 150)
 	private String email;
 
+	@Column(name = "PURPOSE", nullable = false, length = 30)
+	private String purpose;
+
 	@Column(name = "OTP_CODE", nullable = false, length = 6)
 	private String otpCode;
 
@@ -69,6 +72,14 @@ public class PasswordResetOtp {
 
 	public void setOtpCode(String otpCode) {
 		this.otpCode = otpCode;
+	}
+
+	public String getPurpose() {
+		return purpose;
+	}
+
+	public void setPurpose(String purpose) {
+		this.purpose = purpose;
 	}
 
 	public LocalDateTime getExpiresAt() {
