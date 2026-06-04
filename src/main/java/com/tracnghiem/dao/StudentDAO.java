@@ -11,6 +11,17 @@ public class StudentDAO extends GenericDAO<Student> {
 	    return findById(studentId) != null;
 	}
 
+	public String findEmailByStudentId(String studentId) {
+		String hql = "SELECT s.email FROM Student s WHERE s.studentId = :studentId";
+
+		List<String> emails = getSession()
+				.createQuery(hql, String.class)
+				.setParameter("studentId", studentId)
+				.list();
+
+		return emails.isEmpty() ? null : emails.get(0);
+	}
+
 	public List<Student> findByClassId(String classId) {
 		String hql = "FROM Student s WHERE s.classRoom.classId = :classId ORDER BY s.firstName, s.lastName";
 		return getSession().createQuery(hql, Student.class)

@@ -23,4 +23,15 @@ public class LecturerDAO extends GenericDAO<Lecturer> {
     public boolean existsById(String maGV) {
         return findById(maGV) != null;
     }
+
+    public String findEmailByLecturerId(String lecturerId) {
+        String hql = "SELECT l.email FROM Lecturer l WHERE l.lecturerId = :lecturerId";
+
+        List<String> emails = getSession()
+                .createQuery(hql, String.class)
+                .setParameter("lecturerId", lecturerId)
+                .list();
+
+        return emails.isEmpty() ? null : emails.get(0);
+    }
 }
