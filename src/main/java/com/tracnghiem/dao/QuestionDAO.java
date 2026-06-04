@@ -115,4 +115,17 @@ public class QuestionDAO extends GenericDAO<Question> {
         return query.uniqueResult();
     }
 
+    public List<Question> findAllQuestions(String lecturerId) {
+        String hql = "FROM Question q WHERE q.deleted = false";
+        boolean hasLecturer = lecturerId != null && !lecturerId.trim().isEmpty();
+        if (hasLecturer) {
+            hql += " AND q.lecturer.lecturerId = :lecturerId";
+        }
+        hql += " ORDER BY q.questionId";
+        Query<Question> query = getSession().createQuery(hql, Question.class);
+        if (hasLecturer) {
+            query.setParameter("lecturerId", lecturerId);
+        }
+        return query.list();
+    }
 }

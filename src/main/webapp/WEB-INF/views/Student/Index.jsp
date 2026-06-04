@@ -4,6 +4,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
 
 <%
 request.setAttribute("pageTitle", "Student Management");
@@ -17,11 +19,35 @@ request.setAttribute("customJs", "student-management.js");
 
 	<div class="d-flex justify-content-between align-items-center mb-4">
 		<h1 class="h3 mb-0">Student Management</h1>
+		<div class="d-flex gap-2">
+			<a href="${pageContext.request.contextPath}/students/export"
+				class="btn btn-outline-success d-flex align-items-center gap-2">
+				<i class="bi bi-file-earmark-excel"></i> Xuất Excel
+			</a>
+			<button type="button"
+				class="btn btn-success d-flex align-items-center gap-2"
+				data-bs-toggle="modal" data-bs-target="#studentImportModal">
+				<i class="bi bi-file-earmark-arrow-up"></i> Nhập Excel
+			</button>
+		</div>
 	</div>
 
 	<c:if test="${not empty error}">
 		<div class="alert alert-danger">${error}</div>
 	</c:if>
+
+	<c:if test="${not empty successMessage}">
+		<div class="alert alert-success">${successMessage}</div>
+	</c:if>
+
+	<c:if test="${not empty errorMessage}">
+		<div class="alert alert-danger">${errorMessage}</div>
+	</c:if>
+
+	<div id="clientAlert" class="alert alert-danger d-none mb-3"></div>
+	<div id="unsavedChangesAlert" class="alert alert-warning d-none mb-3">
+		<i class="bi bi-exclamation-circle-fill me-2"></i>Bạn có <span id="unsavedCount" class="fw-bold">0</span> thay đổi chưa lưu xuống Database. Hãy nhấn nút <strong>Ghi</strong> để lưu thay đổi.
+	</div>
 
 	<div class="border rounded-3 bg-white p-4 mb-4 form-section">
 
@@ -147,26 +173,31 @@ request.setAttribute("customJs", "student-management.js");
 			</div>
 
 			<div class="d-flex gap-2 mt-4">
+				<button type="button" class="btn btn-dark px-4" id="btnAdd">Thêm</button>
 
-				<button type="submit" class="btn btn-dark px-4"
-					onclick="submitForm('/studentss/add')">Add</button>
+				<button type="button" class="btn btn-outline-secondary px-4" id="btnUpdate" disabled>Chỉnh sửa</button>
 
-				<button type="submit" class="btn btn-outline-secondary px-4"
-					onclick="submitForm('/studentss/update')">Update</button>
+				<button type="button" class="btn btn-outline-danger px-4" id="btnDelete" disabled>Xóa</button>
+				
+				<button type="button" class="btn btn-outline-secondary" id="btnUndo" disabled>
+					<i class="bi bi-arrow-counterclockwise me-1"></i> Undo
+				</button>
 
-				<button type="submit" class="btn btn-outline-danger px-4"
-					onclick="submitForm('/studentss/delete')">Delete</button>
+				<button type="button" class="btn btn-primary px-4" id="btnSave" disabled>
+					<i class="bi bi-save me-1"></i> Ghi
+				</button>
 
-			<button type="button" class="btn btn-outline-secondary" id="btnUndo" disabled>Undo</button>
-
-			<button type="button" class="btn btn-outline-dark"
-				onclick="resetForm()">Reset</button>
-
+				<button type="button" class="btn btn-outline-secondary px-4" id="btnReset">Xóa dữ liệu</button>
 			</div>
-
 		</form:form>
-
 	</div>
+
+	<form id="saveForm" action="${pageContext.request.contextPath}/students/save" method="post" class="d-none">
+		<input type="hidden" name="page" value="${currentPage}" />
+		<input type="hidden" name="keyword" value="${keyword}" />
+		<input type="hidden" name="filterClassId" value="${classId}" />
+		<input type="hidden" name="actionsData" id="actionsDataInput" />
+	</form>
 
 	<div class="card border-0 shadow-sm management-card">
 
@@ -208,7 +239,7 @@ request.setAttribute("customJs", "student-management.js");
 
 							<td>${student.firstName}</td>
 
-							<td>${student.birthDate}</td>
+							<td><fmt:formatDate value="${student.birthDate}" pattern="yyyy-MM-dd" /></td>
 
 							<td>${student.address}</td>
 
@@ -266,6 +297,47 @@ request.setAttribute("customJs", "student-management.js");
 				<a class="pagination-item" href="studentss?page=${totalPages}&keyword=${keyword}&filterClassId=${classId}">
 					Last </a>
 			</c:if>
+		</div>
+	</div>
+
+	<!-- Import Excel Modal -->
+	<div class="modal fade" id="studentImportModal" tabindex="-1"
+		aria-labelledby="studentImportModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content border-0 shadow">
+				<form action="${pageContext.request.contextPath}/students/import"
+					method="post" enctype="multipart/form-data">
+					<div class="modal-header bg-success text-white">
+						<h5 class="modal-title fw-semibold" id="studentImportModalLabel">
+							<i class="bi bi-file-earmark-excel me-2"></i> Nhập dữ liệu từ Excel
+						</h5>
+						<button type="button" class="btn-close btn-close-white"
+							data-bs-dismiss="modal" aria-label="Đóng"></button>
+					</div>
+					<div class="modal-body">
+						<div class="mb-3">
+							<label for="excelFile"
+								class="form-label fw-medium text-secondary">Chọn tệp Excel (.xlsx, .xls)</label>
+							<input class="form-control" type="file"
+								id="excelFile" name="file" accept=".xlsx, .xls" required />
+						</div>
+						<div class="alert alert-info py-2 px-3 mb-0 small">
+							<i class="bi bi-info-circle-fill me-1"></i> Tệp Excel nên có tiêu đề ở dòng đầu tiên.
+							<br/>Cột 1: Mã sinh viên (8 ký tự)
+							<br/>Cột 2: Họ sinh viên (tối đa 50 ký tự)
+							<br/>Cột 3: Tên sinh viên (tối đa 10 ký tự)
+							<br/>Cột 4: Ngày sinh (yyyy-MM-dd hoặc dd/MM/yyyy)
+							<br/>Cột 5: Địa chỉ (tối đa 100 ký tự)
+							<br/>Cột 6: Mã lớp (phải tồn tại trong hệ thống)
+						</div>
+					</div>
+					<div class="modal-footer bg-light">
+						<button type="button" class="btn btn-secondary"
+							data-bs-dismiss="modal">Hủy</button>
+						<button type="submit" class="btn btn-success">Nhập dữ liệu</button>
+					</div>
+				</form>
+			</div>
 		</div>
 	</div>
 

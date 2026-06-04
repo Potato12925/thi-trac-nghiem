@@ -125,6 +125,30 @@
 			<groupId>com.sun.activation</groupId>
 			<artifactId>javax.activation</artifactId>
 			<version>1.2.0</version>
+		<!-- Commons FileUpload -->
+		<dependency>
+			<groupId>commons-fileupload</groupId>
+			<artifactId>commons-fileupload</artifactId>
+			<version>1.5</version>
+		</dependency>
+
+		<!-- Force newer commons-io to fix POI runtime conflict -->
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.16.1</version>
+		</dependency>
+
+		<!-- Apache POI for Excel import/export -->
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>5.2.5</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>5.2.5</version>
 		</dependency>
 	</dependencies>
 </project>
