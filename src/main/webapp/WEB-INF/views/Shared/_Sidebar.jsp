@@ -26,7 +26,7 @@ if (path.length() > 1 && path.endsWith("/")) {
 }
 
 String activeHome = path.equals("/") || path.equals("/home") || path.equals("/admin/home")
-		|| path.equals("/lecturer/home") || path.equals("/student/home") ? "active" : "";
+		|| path.equals("/lecturers/home") || path.equals("/students/home") ? "active" : "";
 
 String activeClass = path.equals("/classrooms") || path.startsWith("/classrooms/") ? "active" : "";
 
@@ -73,9 +73,9 @@ String activeResult = path.equals("/result") || path.startsWith("/result/") ? "a
 			if (role.equals("PGV")) {
 				homeUrl = "/admin/home";
 			} else if (role.equals("GIAOVIEN")) {
-				homeUrl = "/lecturer/home";
+				homeUrl = "/lecturers/home";
 			} else if (role.equals("SINHVIEN")) {
-				homeUrl = "/student/home";
+				homeUrl = "/students/home";
 			}
 			%>
 			<!-- HOME -->

@@ -24,7 +24,7 @@ import com.tracnghiem.service.LecturerService;
 public class LecturerController {
 
     private static final String INDEX_VIEW = "Lecturer/Index";
-    private static final String REDIRECT_INDEX = "redirect:/lecturer";
+    private static final String REDIRECT_INDEX = "redirect:/lecturers";
 
     @Autowired
     private LecturerService lecturerService;

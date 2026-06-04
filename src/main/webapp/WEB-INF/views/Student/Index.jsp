@@ -24,7 +24,7 @@ request.setAttribute("pageTitle", "Student Management");
 	<div class="border rounded-3 bg-white p-4 mb-4">
 
 		<form:form id="studentForm" method="post"
-			action="${pageContext.request.contextPath}/student/add"
+			action="${pageContext.request.contextPath}/students/add"
 			modelAttribute="studentDTO">
 			<input type="hidden" name="page" value="${currentPage}" />
 
@@ -91,6 +91,17 @@ request.setAttribute("pageTitle", "Student Management");
 
 				<div class="col-md-4">
 
+					<label class="form-label small text-secondary"> Email </label>
+
+					<form:input path="email" id="email" cssClass="form-control" />
+
+					<form:errors path="email"
+						cssClass="text-danger small mt-1 d-block" />
+
+				</div>
+
+				<div class="col-md-4">
+
 					<label class="form-label small text-secondary"> Class ID </label>
 
 					<form:input path="classId" id="classId" cssClass="form-control" />
@@ -105,13 +116,13 @@ request.setAttribute("pageTitle", "Student Management");
 			<div class="d-flex gap-2 mt-4">
 
 				<button type="submit" class="btn btn-dark px-4"
-					onclick="submitForm('/student/add')">Add</button>
+					onclick="submitForm('/students/add')">Add</button>
 
 				<button type="submit" class="btn btn-outline-secondary px-4"
-					onclick="submitForm('/student/update')">Update</button>
+					onclick="submitForm('/students/update')">Update</button>
 
 				<button type="submit" class="btn btn-outline-danger px-4"
-					onclick="submitForm('/student/delete')">Delete</button>
+					onclick="submitForm('/students/delete')">Delete</button>
 
 				<button type="button" class="btn btn-outline-dark"
 					onclick="resetForm()">Reset</button>
@@ -141,6 +152,8 @@ request.setAttribute("pageTitle", "Student Management");
 
 						<th>Address</th>
 
+						<th>Email</th>
+
 						<th>Class ID</th>
 
 						<th class="text-end">Actions</th>
@@ -163,6 +176,8 @@ request.setAttribute("pageTitle", "Student Management");
 							<td>${student.birthDate}</td>
 
 							<td>${student.address}</td>
+
+							<td>${student.email}</td>
 
 							<td>${student.classRoom.classId}</td>
 
@@ -189,8 +204,8 @@ request.setAttribute("pageTitle", "Student Management");
 
 		<div class="pagination-wrapper">
 			<c:if test="${currentPage > 1}">
-				<a class="pagination-item" href="student?page=1"> First </a>
-				<a class="pagination-item" href="student?page=${currentPage - 1}">
+				<a class="pagination-item" href="students?page=1"> First </a>
+				<a class="pagination-item" href="students?page=${currentPage - 1}">
 					&laquo; </a>
 			</c:if>
 
@@ -201,7 +216,7 @@ request.setAttribute("pageTitle", "Student Management");
 			<c:forEach begin="${currentPage - 2 < 1 ? 1 : currentPage - 2}"
 				end="${currentPage + 2 > totalPages ? totalPages : currentPage + 2}"
 				var="i">
-				<a href="student?page=${i}"
+				<a href="students?page=${i}"
 					class="pagination-item ${currentPage == i ? 'active' : ''}">
 					${i} </a>
 			</c:forEach>
@@ -211,9 +226,9 @@ request.setAttribute("pageTitle", "Student Management");
 			</c:if>
 
 			<c:if test="${currentPage < totalPages}">
-				<a class="pagination-item" href="student?page=${currentPage + 1}">
+				<a class="pagination-item" href="students?page=${currentPage + 1}">
 					&raquo; </a>
-				<a class="pagination-item" href="student?page=${totalPages}">
+				<a class="pagination-item" href="students?page=${totalPages}">
 					Last </a>
 			</c:if>
 		</div>
@@ -242,8 +257,11 @@ request.setAttribute("pageTitle", "Student Management");
 		document.getElementById("address").value =
 			cells[4].innerText.trim();
 
-		document.getElementById("classId").value =
+		document.getElementById("email").value =
 			cells[5].innerText.trim();
+
+		document.getElementById("classId").value =
+			cells[6].innerText.trim();
 
 		document.getElementById("studentId").readOnly = true;
 	}

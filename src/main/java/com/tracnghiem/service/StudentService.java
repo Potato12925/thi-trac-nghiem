@@ -33,6 +33,7 @@ public class StudentService {
         student.setFirstName(dto.getFirstName());
         student.setBirthDate(dto.getBirthDate());
         student.setAddress(dto.getAddress());
+        student.setEmail(dto.getEmail());
         student.setClassRoom(classRoom);
 
         return student;

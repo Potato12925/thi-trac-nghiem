@@ -23,6 +23,7 @@ public class LecturerService {
         lecturer.setFirstName(dto.getFirstName());
         lecturer.setPhoneNumber(dto.getPhoneNumber());
         lecturer.setAddress(dto.getAddress());
+        lecturer.setEmail(dto.getEmail());
 
         return lecturer;
     }

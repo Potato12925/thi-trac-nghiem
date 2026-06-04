@@ -26,7 +26,7 @@ request.setAttribute("pageTitle", "Lecturer Management");
 
 	<div class="border rounded-3 bg-white p-4 mb-4">
 		<form:form id="lecturerForm" method="post"
-			action="${pageContext.request.contextPath}/lecturer/add"
+			action="${pageContext.request.contextPath}/lecturers/add"
 			modelAttribute="lecturerDTO">
 			<input type="hidden" name="page" value="${currentPage}" />
 
@@ -80,19 +80,28 @@ request.setAttribute("pageTitle", "Lecturer Management");
 					<form:errors path="address"
 						cssClass="text-danger small mt-1 d-block" />
 				</div>
+
+				<div class="col-md-3">
+					<label class="form-label small text-secondary"> Email </label>
+
+					<form:input path="email" id="email" cssClass="form-control" />
+
+					<form:errors path="email"
+						cssClass="text-danger small mt-1 d-block" />
+				</div>
 			</div>
 
 			<div class="d-flex gap-2 mt-4">
 				<button type="submit"
-					formaction="${pageContext.request.contextPath}/lecturer/add"
+					formaction="${pageContext.request.contextPath}/lecturers/add"
 					class="btn btn-dark px-4">Add</button>
 
 				<button type="submit" disabled id="btnUpdate"
-					formaction="${pageContext.request.contextPath}/lecturer/update"
+					formaction="${pageContext.request.contextPath}/lecturers/update"
 					class="btn btn-outline-secondary px-4">Update</button>
 
 				<button type="submit"
-					formaction="${pageContext.request.contextPath}/lecturer/delete"
+					formaction="${pageContext.request.contextPath}/lecturers/delete"
 					disabled id="btnDelete" class="btn btn-outline-danger px-4"
 					onclick="return confirm('Delete this lecturer?')">Delete</button>
 
@@ -119,6 +128,8 @@ request.setAttribute("pageTitle", "Lecturer Management");
 
 						<th>Address</th>
 
+						<th>Email</th>
+
 						<th class="text-end">Actions</th>
 					</tr>
 				</thead>
@@ -129,7 +140,8 @@ request.setAttribute("pageTitle", "Lecturer Management");
 							data-lastname="${lecturer.lastName}"
 							data-firstname="${lecturer.firstName}"
 							data-phone="${lecturer.phoneNumber}"
-							data-address="${lecturer.address}">
+							data-address="${lecturer.address}"
+							data-email="${lecturer.email}">
 
 							<td class="fw-medium text-success">${lecturer.lecturerId}</td>
 
@@ -140,6 +152,8 @@ request.setAttribute("pageTitle", "Lecturer Management");
 							<td>${lecturer.phoneNumber}</td>
 
 							<td>${lecturer.address}</td>
+
+							<td>${lecturer.email}</td>
 
 							<td class="text-end">
 								<button type="button"
@@ -163,8 +177,8 @@ request.setAttribute("pageTitle", "Lecturer Management");
 
 		<div class="pagination-wrapper">
 			<c:if test="${currentPage > 1}">
-				<a class="pagination-item" href="lecturer?page=1"> First </a>
-				<a class="pagination-item" href="lecturer?page=${currentPage - 1}">
+				<a class="pagination-item" href="lecturers?page=1"> First </a>
+				<a class="pagination-item" href="lecturers?page=${currentPage - 1}">
 					&laquo; </a>
 			</c:if>
 
@@ -175,7 +189,7 @@ request.setAttribute("pageTitle", "Lecturer Management");
 			<c:forEach begin="${currentPage - 2 < 1 ? 1 : currentPage - 2}"
 				end="${currentPage + 2 > totalPages ? totalPages : currentPage + 2}"
 				var="i">
-				<a href="lecturer?page=${i}"
+				<a href="lecturers?page=${i}"
 					class="pagination-item ${currentPage == i ? 'active' : ''}">
 					${i} </a>
 			</c:forEach>
@@ -185,9 +199,9 @@ request.setAttribute("pageTitle", "Lecturer Management");
 			</c:if>
 
 			<c:if test="${currentPage < totalPages}">
-				<a class="pagination-item" href="lecturer?page=${currentPage + 1}">
+				<a class="pagination-item" href="lecturers?page=${currentPage + 1}">
 					&raquo; </a>
-				<a class="pagination-item" href="lecturer?page=${totalPages}">
+				<a class="pagination-item" href="lecturers?page=${totalPages}">
 					Last </a>
 			</c:if>
 		</div>
@@ -212,6 +226,9 @@ function fillFormFromRow(row) {
 
 	document.getElementById("address").value =
 		row.dataset.address;
+
+	document.getElementById("email").value =
+		row.dataset.email;
 
 	document.getElementById("lecturerId").readOnly = true;
 }

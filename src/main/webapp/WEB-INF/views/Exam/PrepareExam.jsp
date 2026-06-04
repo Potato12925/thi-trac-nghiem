@@ -58,10 +58,10 @@
 					<button type="submit" class="btn btn-primary">Bắt đầu thi</button>
 					<c:choose>
 						<c:when test="${role == 'SINHVIEN'}">
-							<a href="${pageContext.request.contextPath}/student/home" class="btn btn-secondary">Quay lại</a>
+							<a href="${pageContext.request.contextPath}/students/home" class="btn btn-secondary">Quay lại</a>
 						</c:when>
 						<c:otherwise>
-							<a href="${pageContext.request.contextPath}/lecturer/home" class="btn btn-secondary">Quay lại</a>
+							<a href="${pageContext.request.contextPath}/lecturers/home" class="btn btn-secondary">Quay lại</a>
 						</c:otherwise>
 					</c:choose>
 				</form:form>

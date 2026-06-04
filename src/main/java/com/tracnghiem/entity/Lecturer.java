@@ -25,6 +25,9 @@ public class Lecturer {
 	@Column(name = "DIACHI")
 	private String address;
 
+	@Column(name = "EMAIL")
+	private String email;
+
 	public Lecturer() {
 	}
 
@@ -68,9 +71,18 @@ public class Lecturer {
 		this.address = address;
 	}
 
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
 	@Override
 	public String toString() {
 		return "Lecturer{" + "lecturerId='" + lecturerId + '\'' + ", lastName='" + lastName + '\'' + ", firstName='"
-				+ firstName + '\'' + ", phoneNumber='" + phoneNumber + '\'' + ", address='" + address + '\'' + '}';
+				+ firstName + '\'' + ", phoneNumber='" + phoneNumber + '\'' + ", address='" + address + '\''
+				+ ", email='" + email + '\'' + '}';
 	}
 }
