@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.stereotype.Repository;
 
 import com.tracnghiem.entity.LecturerRegistration;
+
 @Repository
 public class LecturerRegistrationDAO extends GenericDAO<LecturerRegistration> {
     public List<LecturerRegistration> findByLecturer(String lecturerId) {
@@ -45,13 +46,85 @@ public class LecturerRegistrationDAO extends GenericDAO<LecturerRegistration> {
 
     public LecturerRegistration findExamByKeys(String classId, String subjectId, Short tryNumber) {
         String hql = "FROM LecturerRegistration g " +
-                     "WHERE function('ltrim', function('rtrim', g.id.classId)) = function('ltrim', function('rtrim', :classId)) " +
-                     "AND function('ltrim', function('rtrim', g.id.subjectId)) = function('ltrim', function('rtrim', :subjectId)) " +
-                     "AND g.id.tryNumber = :tryNumber";
+                "WHERE function('ltrim', function('rtrim', g.id.classId)) = function('ltrim', function('rtrim', :classId)) "
+                +
+                "AND function('ltrim', function('rtrim', g.id.subjectId)) = function('ltrim', function('rtrim', :subjectId)) "
+                +
+                "AND g.id.tryNumber = :tryNumber";
         return getSession().createQuery(hql, LecturerRegistration.class)
                 .setParameter("classId", classId)
                 .setParameter("subjectId", subjectId)
                 .setParameter("tryNumber", tryNumber)
                 .uniqueResult();
+    }
+
+    public long countByLecturer(String lecturerId) {
+        String hql = "SELECT COUNT(g) FROM LecturerRegistration g "
+                + "WHERE function('ltrim', function('rtrim', g.lecturer.lecturerId)) = :lecturerId";
+
+        Long count = getSession()
+                .createQuery(hql, Long.class)
+                .setParameter("lecturerId", lecturerId)
+                .uniqueResult();
+
+        return count == null ? 0L : count.longValue();
+    }
+
+    public long countDistinctSubjectsByLecturer(String lecturerId) {
+        String hql = "SELECT COUNT(DISTINCT g.subject.subjectId) FROM LecturerRegistration g "
+                + "WHERE function('ltrim', function('rtrim', g.lecturer.lecturerId)) = :lecturerId";
+
+        Long count = getSession()
+                .createQuery(hql, Long.class)
+                .setParameter("lecturerId", lecturerId)
+                .uniqueResult();
+
+        return count == null ? 0L : count.longValue();
+    }
+
+    public long countDistinctClassesByLecturer(String lecturerId) {
+        String hql = "SELECT COUNT(DISTINCT g.classRoom.classId) FROM LecturerRegistration g "
+                + "WHERE function('ltrim', function('rtrim', g.lecturer.lecturerId)) = :lecturerId";
+
+        Long count = getSession()
+                .createQuery(hql, Long.class)
+                .setParameter("lecturerId", lecturerId)
+                .uniqueResult();
+
+        return count == null ? 0L : count.longValue();
+    }
+
+    public List<LecturerRegistration> findRecentByLecturer(String lecturerId, int limit) {
+        String hql = "SELECT g FROM LecturerRegistration g "
+                + "JOIN FETCH g.subject s "
+                + "JOIN FETCH g.classRoom c "
+                + "WHERE function('ltrim', function('rtrim', g.lecturer.lecturerId)) = :lecturerId "
+                + "ORDER BY g.examDate DESC, g.id.tryNumber DESC";
+
+        return getSession()
+                .createQuery(hql, LecturerRegistration.class)
+                .setParameter("lecturerId", lecturerId)
+                .setMaxResults(limit)
+                .list();
+    }
+
+    public LecturerRegistration findLatestByLecturer(String lecturerId) {
+        List<LecturerRegistration> registrations = findRecentByLecturer(lecturerId, 1);
+        return registrations.isEmpty() ? null : registrations.get(0);
+    }
+
+    public List<Object[]> findSubjectClassSummaryByLecturer(String lecturerId) {
+        String hql = "SELECT c.classId, c.className, s.subjectId, s.subjectName, MAX(g.examDate), COUNT(g) "
+                + "FROM LecturerRegistration g "
+                + "JOIN g.classRoom c "
+                + "JOIN g.subject s "
+                + "WHERE function('ltrim', function('rtrim', g.lecturer.lecturerId)) = :lecturerId "
+                + "GROUP BY c.classId, c.className, s.subjectId, s.subjectName "
+                + "ORDER BY MAX(g.examDate) DESC, c.classId ASC, s.subjectId ASC";
+
+        return getSession()
+                .createQuery(hql, Object[].class)
+                .setParameter("lecturerId", lecturerId)
+                .list();
     }
 }

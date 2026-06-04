@@ -76,11 +76,19 @@ public class LecturerController {
 
 	@GetMapping("/home")
 	public String home(ModelMap model, HttpSession session) {
+		String redirect = validateLecturerAccess(session);
+		if (redirect != null) {
+			return redirect;
+		}
+
 		String lecturerId = (String) session.getAttribute("LOGIN_USER");
-		Lecturer lecturer = lecturerId != null ? lecturerService.findLecturerById(lecturerId) : null;
+		Lecturer lecturer = lecturerService.getDashboardLecturerProfile(lecturerId);
 
 		model.addAttribute("pageTitle", "Lecturer Homepage");
 		model.addAttribute("lecturerProfile", lecturer);
+		model.addAttribute("dashboard", lecturerService.getLecturerDashboard(lecturerId));
+		model.addAttribute("recentRegistrations", lecturerService.getRecentExamRegistrations(lecturerId));
+		model.addAttribute("registeredSubjectClasses", lecturerService.getRegisteredSubjectClasses(lecturerId));
 		model.addAttribute("today", new Date());
 
 		return "Lecturer/Home";
