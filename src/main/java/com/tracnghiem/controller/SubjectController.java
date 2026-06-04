@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.tracnghiem.dto.SubjectActionDTO;
 import com.tracnghiem.dto.SubjectDTO;
 import com.tracnghiem.service.SubjectService;
 
@@ -127,6 +128,28 @@ public class SubjectController {
 			model.addAttribute("errorMessage", ex.getMessage());
 			loadPageData(model, page, search);
 			return INDEX_VIEW;
+		}
+	}
+
+	@PostMapping("/save")
+	public String save(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "") String search,
+			@RequestParam("actionsData") String actionsData, ModelMap model, RedirectAttributes redirectAttributes) {
+
+		if (actionsData == null || actionsData.trim().isEmpty()) {
+			redirectAttributes.addFlashAttribute("errorMessage", "Không có thay đổi nào để ghi.");
+			return buildRedirectUrl(page, search);
+		}
+
+		try {
+			subjectService.savePendingActions(actionsData);
+			redirectAttributes.addFlashAttribute("successMessage", "Ghi các thay đổi xuống CSDL thành công.");
+			return buildRedirectUrl(page, search);
+		} catch (IllegalArgumentException ex) {
+			redirectAttributes.addFlashAttribute("errorMessage", "Lỗi khi ghi dữ liệu: " + ex.getMessage());
+			return buildRedirectUrl(page, search);
+		} catch (Exception ex) {
+			redirectAttributes.addFlashAttribute("errorMessage", "Lỗi hệ thống: " + ex.getMessage());
+			return buildRedirectUrl(page, search);
 		}
 	}
 

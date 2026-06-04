@@ -1,11 +1,14 @@
 package com.tracnghiem.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.tracnghiem.dao.LecturerDAO;
+import com.tracnghiem.dto.LecturerActionDTO;
 import com.tracnghiem.dto.LecturerDTO;
 import com.tracnghiem.entity.Lecturer;
 
@@ -81,4 +84,48 @@ public class LecturerService {
             throw new IllegalArgumentException("Lecturer ID already exists");
         }
     }
+
+	@Transactional
+	public void savePendingActions(String actionsData) {
+		if (actionsData == null || actionsData.trim().isEmpty()) {
+			return;
+		}
+
+		List<LecturerActionDTO> actions = new ArrayList<>();
+		String[] lines = actionsData.split("\n");
+		for (String line : lines) {
+			if (line.trim().isEmpty()) {
+				continue;
+			}
+			String[] parts = line.split(":::", -1);
+			if (parts.length < 2) {
+				continue;
+			}
+			String type = parts[0].trim();
+			String lecturerId = parts[1].trim();
+			String lastName = parts.length > 2 ? parts[2].trim() : "";
+			String firstName = parts.length > 3 ? parts[3].trim() : "";
+			String phoneNumber = parts.length > 4 ? parts[4].trim() : "";
+			String address = parts.length > 5 ? parts[5].trim() : "";
+
+			actions.add(new LecturerActionDTO(type, lecturerId, lastName, firstName, phoneNumber, address));
+		}
+
+		for (LecturerActionDTO action : actions) {
+			LecturerDTO dto = new LecturerDTO();
+			dto.setLecturerId(action.getLecturerId());
+			dto.setLastName(action.getLastName());
+			dto.setFirstName(action.getFirstName());
+			dto.setPhoneNumber(action.getPhoneNumber());
+			dto.setAddress(action.getAddress());
+
+			if ("ADD".equals(action.getType())) {
+				addLecturer(dto);
+			} else if ("UPDATE".equals(action.getType())) {
+				updateLecturer(dto);
+			} else if ("DELETE".equals(action.getType())) {
+				deleteLecturer(dto);
+			}
+		}
+	}
 }

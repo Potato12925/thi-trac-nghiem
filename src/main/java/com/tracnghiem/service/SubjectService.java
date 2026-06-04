@@ -1,5 +1,6 @@
 package com.tracnghiem.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.tracnghiem.dao.SubjectDAO;
+import com.tracnghiem.dto.SubjectActionDTO;
 import com.tracnghiem.dto.SubjectDTO;
 import com.tracnghiem.entity.Subject;
 
@@ -127,6 +129,44 @@ public class SubjectService {
 			subject.setSubjectName(subjectName);
 			subject.setDeleted(false);
 			subjectDAO.create(subject);
+		}
+	}
+
+	@Transactional
+	public void savePendingActions(String actionsData) {
+		if (actionsData == null || actionsData.trim().isEmpty()) {
+			return;
+		}
+
+		List<SubjectActionDTO> actions = new ArrayList<>();
+		String[] lines = actionsData.split("\n");
+		for (String line : lines) {
+			if (line.trim().isEmpty()) {
+				continue;
+			}
+			String[] parts = line.split(":::", -1);
+			if (parts.length < 2) {
+				continue;
+			}
+			String type = parts[0].trim();
+			String subjectId = parts[1].trim();
+			String subjectName = parts.length > 2 ? parts[2].trim() : "";
+
+			actions.add(new SubjectActionDTO(type, subjectId, subjectName));
+		}
+
+		for (SubjectActionDTO action : actions) {
+			if ("ADD".equals(action.getType())) {
+				SubjectDTO dto = new SubjectDTO(action.getSubjectId(), action.getSubjectName());
+				addSubject(dto);
+			} else if ("UPDATE".equals(action.getType())) {
+				SubjectDTO dto = new SubjectDTO(action.getSubjectId(), action.getSubjectName());
+				updateSubject(dto);
+			} else if ("DELETE".equals(action.getType())) {
+				SubjectDTO dto = new SubjectDTO();
+				dto.setSubjectId(action.getSubjectId());
+				deleteSubject(dto);
+			}
 		}
 	}
 }

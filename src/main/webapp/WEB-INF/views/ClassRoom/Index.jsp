@@ -18,10 +18,23 @@ request.setAttribute("pageTitle", "Quản lý Lớp");
 		<div class="alert alert-danger">${error}</div>
 	</c:if>
 
+	<c:if test="${not empty successMessage}">
+		<div class="alert alert-success">${successMessage}</div>
+	</c:if>
+
+	<c:if test="${not empty errorMessage}">
+		<div class="alert alert-danger">${errorMessage}</div>
+	</c:if>
+
+	<div id="clientAlert" class="alert alert-danger d-none mb-3"></div>
+	<div id="unsavedChangesAlert" class="alert alert-warning d-none mb-3">
+		<i class="bi bi-exclamation-circle-fill me-2"></i>Bạn có <span id="unsavedCount" class="fw-bold">0</span> thay đổi chưa lưu xuống Database. Hãy nhấn nút <strong>Ghi</strong> để lưu thay đổi.
+	</div>
+
 	<div class="border rounded-3 bg-white p-4 mb-4">
 
 		<form:form id="classRoomForm"
-			action="${pageContext.request.contextPath}/classRoom/add"
+			action="${pageContext.request.contextPath}/classrooms/add"
 			method="post" modelAttribute="classroomDTO">
 
 			<input type="hidden" id="_method" name="_method" value="POST" />
@@ -49,37 +62,29 @@ request.setAttribute("pageTitle", "Quản lý Lớp");
 			</div>
 
 			<div class="d-flex gap-2 mt-4">
+				<button type="button" class="btn btn-dark px-4" id="btnAdd">Thêm</button>
 
-				<button type="submit" class="btn btn-dark px-4"
-					onclick="submitForm(
-	                        'add',
-	                    )">
+				<button type="button" class="btn btn-outline-secondary px-4" id="btnUpdate" disabled>Chỉnh sửa</button>
 
-					Add</button>
+				<button type="button" class="btn btn-outline-danger px-4" id="btnDelete" disabled>Xóa</button>
+				
+				<button type="button" class="btn btn-outline-secondary" id="btnUndo" disabled>
+					<i class="bi bi-arrow-counterclockwise me-1"></i> Undo
+				</button>
 
-				<button type="submit" class="btn btn-outline-secondary px-4"
-					onclick="submitForm(
-	                        'update',
-	                    )">
+				<button type="button" class="btn btn-primary px-4" id="btnSave" disabled>
+					<i class="bi bi-save me-1"></i> Ghi
+				</button>
 
-					Update</button>
-
-				<button type="submit" class="btn btn-outline-danger px-4"
-					onclick="submitForm(
-	                        'delete',
-	                    )">
-
-					Xóa</button>
-
-				<button type="button" class="btn btn-outline-secondary" id="btnUndo" disabled>Undo</button>
-
-				<button type="button" class="btn btn-outline-dark"
-					onclick="resetForm()">Reset</button>
+				<button type="button" class="btn btn-outline-dark px-4" id="btnReset">Xóa dữ liệu</button>
 			</div>
-
 		</form:form>
-
 	</div>
+
+	<form id="saveForm" action="${pageContext.request.contextPath}/classrooms/save" method="post" class="d-none">
+		<input type="hidden" name="page" value="${currentPage}" />
+		<input type="hidden" name="actionsData" id="actionsDataInput" />
+	</form>
 
 	<div class="card border-0 shadow-sm">
 		<div class="table-responsive p-3">
@@ -151,82 +156,321 @@ request.setAttribute("pageTitle", "Quản lý Lớp");
 </div>
 
 <script>
-	function fillFormFromRow(row) {
-		const cells = row.querySelectorAll("td");
-		
-		const maLop = cells[0].innerText;
-		const tenLop = cells[1].innerText;
-		
-		document.getElementById("classId").value = maLop;
-        document.getElementById("className").value = tenLop;
- 
-        document.getElementById("classId").readOnly = true;
-	}
+document.addEventListener("DOMContentLoaded", function () {
+  const btnAdd = document.getElementById("btnAdd");
+  const btnUpdate = document.getElementById("btnUpdate");
+  const btnDelete = document.getElementById("btnDelete");
+  const btnUndo = document.getElementById("btnUndo");
+  const btnSave = document.getElementById("btnSave");
+  const btnReset = document.getElementById("btnReset");
+  const tableBody = document.querySelector(".table-responsive table tbody");
 
-	const editButtons = document.querySelectorAll(".btn-edit");
+  // Add click listeners to form buttons
+  if (btnAdd) btnAdd.addEventListener("click", handleLocalAdd);
+  if (btnUpdate) btnUpdate.addEventListener("click", handleLocalUpdate);
+  if (btnDelete) btnDelete.addEventListener("click", handleLocalDelete);
+  if (btnUndo) btnUndo.addEventListener("click", handleUndo);
+  if (btnSave) btnSave.addEventListener("click", handleSave);
+  if (btnReset) btnReset.addEventListener("click", resetForm);
 
-	editButtons.forEach(button => {
-		button.addEventListener("click", function () {
-			const row = this.closest("tr");
-			// save current form state for undo
-			_lastClassroomState = getClassroomState();
-			const b = document.getElementById('btnUndo'); if (b) b.disabled = false;
-			fillFormFromRow(row);
-		});
-	});
+  // Use event delegation on table body for Edit button
+  if (tableBody) {
+    tableBody.addEventListener("click", function (e) {
+      const editBtn = e.target.closest(".btn-edit");
+      if (editBtn) {
+        const row = editBtn.closest("tr");
+        fillFormFromRow(row);
+        enableActionButtons();
+        hideClientError();
+      }
+    });
+  }
 
-	function submitForm(action) {
-
-        const form = document.getElementById("classRoomForm");
-
-        form.action =
-            "${pageContext.request.contextPath}/classRoom/"
-            + action;
+  // Warn about unsaved changes when navigating away
+  window.addEventListener("beforeunload", function (e) {
+    if (pendingActions.length > 0) {
+      e.preventDefault();
+      e.returnValue = "Bạn có thay đổi chưa được ghi xuống CSDL. Bạn có chắc chắn muốn rời đi?";
+      return e.returnValue;
     }
-	
-	function resetForm() {
-	    document.getElementById("classRoomForm").reset();
+  });
+});
 
-	    document.getElementById("classId").readOnly = false;
-	}
+let pendingActions = [];
+let activeRow = null;
 
-	// Undo support: save previous form state before filling from a row
-	let _lastClassroomState = null;
+function findRowById(classId) {
+  const rows = document.querySelectorAll(".table-responsive table tbody tr");
+  for (let row of rows) {
+    const cells = row.querySelectorAll("td");
+    if (cells.length > 0 && cells[0].innerText.trim() === classId) {
+      return row;
+    }
+  }
+  return null;
+}
 
-	function getClassroomState() {
-		return {
-			classId: document.getElementById("classId").value,
-			className: document.getElementById("className").value,
-			readOnly: document.getElementById("classId").readOnly
-		};
-	}
+function fillFormFromRow(row) {
+  const cells = row.querySelectorAll("td");
+  const classId = cells[0].innerText.trim();
+  const className = cells[1].innerText.trim();
 
-	function restoreClassroomState(state) {
-		if (!state) return;
-		document.getElementById("classId").value = state.classId;
-		document.getElementById("className").value = state.className;
-		document.getElementById("classId").readOnly = state.readOnly;
-	}
+  document.getElementById("classId").value = classId;
+  document.getElementById("className").value = className;
+  document.getElementById("classId").readOnly = true;
+  setActiveRow(row);
+}
 
-	// (undo capture handled in the main edit button listener above)
+function setActiveRow(row) {
+  if (activeRow) {
+    activeRow.classList.remove("table-primary");
+  }
+  activeRow = row;
+  row.classList.add("table-primary");
+}
 
-	const _btnUndo = document.getElementById('btnUndo');
-	if (_btnUndo) {
-		_btnUndo.addEventListener('click', function () {
-			restoreClassroomState(_lastClassroomState);
-			_lastClassroomState = null;
-			this.disabled = true;
-		});
-	}
+function enableActionButtons() {
+  const btnUpdate = document.getElementById("btnUpdate");
+  const btnDelete = document.getElementById("btnDelete");
+  if (btnUpdate) btnUpdate.disabled = false;
+  if (btnDelete) btnDelete.disabled = false;
+}
 
-	// clear undo state when form is submitted (so can't undo after save)
-	const _classForm = document.getElementById('classRoomForm');
-	if (_classForm) {
-		_classForm.addEventListener('submit', function () {
-			_lastClassroomState = null;
-			const b = document.getElementById('btnUndo'); if (b) b.disabled = true;
-		});
-	}
+function resetForm() {
+  const form = document.getElementById("classRoomForm");
+  if (form) form.reset();
+
+  const classIdInput = document.getElementById("classId");
+  if (classIdInput) {
+    classIdInput.readOnly = false;
+  }
+
+  if (activeRow) {
+    activeRow.classList.remove("table-primary");
+    activeRow = null;
+  }
+
+  const btnUpdate = document.getElementById("btnUpdate");
+  const btnDelete = document.getElementById("btnDelete");
+  if (btnUpdate) btnUpdate.disabled = true;
+  if (btnDelete) btnDelete.disabled = true;
+
+  hideClientError();
+}
+
+function showClientError(msg) {
+  const alertDiv = document.getElementById("clientAlert");
+  if (alertDiv) {
+    alertDiv.innerText = msg;
+    alertDiv.classList.remove("d-none");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+}
+
+function hideClientError() {
+  const alertDiv = document.getElementById("clientAlert");
+  if (alertDiv) {
+    alertDiv.classList.add("d-none");
+  }
+}
+
+function updateUIState() {
+  const unsavedChangesAlert = document.getElementById("unsavedChangesAlert");
+  const unsavedCount = document.getElementById("unsavedCount");
+  const btnUndo = document.getElementById("btnUndo");
+  const btnSave = document.getElementById("btnSave");
+
+  if (unsavedCount) unsavedCount.innerText = pendingActions.length;
+
+  if (pendingActions.length > 0) {
+    if (unsavedChangesAlert) unsavedChangesAlert.classList.remove("d-none");
+    if (btnUndo) btnUndo.disabled = false;
+    if (btnSave) btnSave.disabled = false;
+  } else {
+    if (unsavedChangesAlert) unsavedChangesAlert.classList.add("d-none");
+    if (btnUndo) btnUndo.disabled = true;
+    if (btnSave) btnSave.disabled = true;
+  }
+}
+
+function handleLocalAdd() {
+  const classIdInput = document.getElementById("classId");
+  const classNameInput = document.getElementById("className");
+
+  const classId = classIdInput.value.trim();
+  const className = classNameInput.value.trim();
+
+  // Client-side Validations
+  if (!classId) {
+    showClientError("Mã lớp không được để trống");
+    return;
+  }
+  if (!className) {
+    showClientError("Tên lớp không được để trống");
+    return;
+  }
+
+  // Check duplicate ID in active rows
+  const existingRow = findRowById(classId);
+  if (existingRow && existingRow.style.display !== "none") {
+    showClientError("Mã lớp đã tồn tại");
+    return;
+  }
+
+  hideClientError();
+
+  // Stage ADD action
+  pendingActions.push({
+    type: "ADD",
+    classId: classId,
+    className: className
+  });
+
+  // Update DOM: Insert new row at the top
+  const tableBody = document.querySelector(".table-responsive table tbody");
+  if (tableBody) {
+    const tr = document.createElement("tr");
+    tr.classList.add("table-success");
+    tr.setAttribute("data-local-added", "true");
+    tr.innerHTML = `
+      <td>${classId}</td>
+      <td>${className}</td>
+      <td class="text-end pe-4">
+        <button class="btn btn-sm btn-outline-secondary me-2 btn-edit">
+          <i class="bi bi-pencil"></i>
+        </button>
+      </td>
+    `;
+    tableBody.insertBefore(tr, tableBody.firstChild);
+  }
+
+  resetForm();
+  updateUIState();
+}
+
+function handleLocalUpdate() {
+  const classId = document.getElementById("classId").value.trim();
+  const className = document.getElementById("className").value.trim();
+
+  if (!className) {
+    showClientError("Tên lớp không được để trống");
+    return;
+  }
+
+  const row = findRowById(classId);
+  if (!row) {
+    showClientError("Không tìm thấy dòng lớp tương ứng");
+    return;
+  }
+
+  hideClientError();
+
+  const cells = row.querySelectorAll("td");
+  const oldClassName = cells[1].innerText.trim();
+
+  if (className === oldClassName) {
+    resetForm();
+    return; // No change
+  }
+
+  // Stage UPDATE action
+  pendingActions.push({
+    type: "UPDATE",
+    classId: classId,
+    className: className,
+    oldClassName: oldClassName
+  });
+
+  // Update DOM
+  cells[1].innerText = className;
+  if (!row.hasAttribute("data-local-added")) {
+    row.classList.add("table-warning");
+  }
+
+  resetForm();
+  updateUIState();
+}
+
+function handleLocalDelete() {
+  const classId = document.getElementById("classId").value.trim();
+  const row = findRowById(classId);
+  if (!row) return;
+
+  const cells = row.querySelectorAll("td");
+  const className = cells[1].innerText.trim();
+
+  if (!confirm("Bạn có chắc chắn muốn xóa lớp " + className + "?")) {
+    return;
+  }
+
+  // Stage DELETE action
+  pendingActions.push({
+    type: "DELETE",
+    classId: classId,
+    className: className
+  });
+
+  // Update DOM
+  row.style.display = "none";
+
+  resetForm();
+  updateUIState();
+}
+
+function handleUndo() {
+  if (pendingActions.length === 0) return;
+
+  const action = pendingActions.pop();
+  const row = findRowById(action.classId);
+
+  if (action.type === "ADD") {
+    if (row && row.hasAttribute("data-local-added")) {
+      row.remove();
+    }
+  } else if (action.type === "UPDATE") {
+    if (row) {
+      const cells = row.querySelectorAll("td");
+      cells[1].innerText = action.oldClassName;
+
+      let hasOtherUpdates = false;
+      for (let act of pendingActions) {
+        if (act.classId === action.classId && act.type === "UPDATE") {
+          hasOtherUpdates = true;
+          break;
+        }
+      }
+      if (!hasOtherUpdates && !row.hasAttribute("data-local-added")) {
+        row.classList.remove("table-warning");
+      }
+    }
+  } else if (action.type === "DELETE") {
+    if (row) {
+      row.style.display = "";
+    }
+  }
+
+  updateUIState();
+  hideClientError();
+}
+
+function handleSave() {
+  if (pendingActions.length === 0) return;
+
+  // Serialize to simple text format: type:::classId:::className\n
+  let dataStr = "";
+  pendingActions.forEach(function (act) {
+    dataStr += act.type + ":::" + act.classId + ":::" + act.className + "\n";
+  });
+
+  const actionsDataInput = document.getElementById("actionsDataInput");
+  const saveForm = document.getElementById("saveForm");
+
+  if (actionsDataInput && saveForm) {
+    pendingActions = []; // Clear pending actions
+    actionsDataInput.value = dataStr;
+    saveForm.submit();
+  }
+}
 </script>
 
 <%@ include file="../Shared/_LayoutEnd.jsp"%>

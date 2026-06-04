@@ -4,6 +4,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
 
 <%
 request.setAttribute("pageTitle", "Student Management");
@@ -22,6 +24,19 @@ request.setAttribute("customJs", "student-management.js");
 	<c:if test="${not empty error}">
 		<div class="alert alert-danger">${error}</div>
 	</c:if>
+
+	<c:if test="${not empty successMessage}">
+		<div class="alert alert-success">${successMessage}</div>
+	</c:if>
+
+	<c:if test="${not empty errorMessage}">
+		<div class="alert alert-danger">${errorMessage}</div>
+	</c:if>
+
+	<div id="clientAlert" class="alert alert-danger d-none mb-3"></div>
+	<div id="unsavedChangesAlert" class="alert alert-warning d-none mb-3">
+		<i class="bi bi-exclamation-circle-fill me-2"></i>Bạn có <span id="unsavedCount" class="fw-bold">0</span> thay đổi chưa lưu xuống Database. Hãy nhấn nút <strong>Ghi</strong> để lưu thay đổi.
+	</div>
 
 	<div class="border rounded-3 bg-white p-4 mb-4 form-section">
 
@@ -136,26 +151,31 @@ request.setAttribute("customJs", "student-management.js");
 			</div>
 
 			<div class="d-flex gap-2 mt-4">
+				<button type="button" class="btn btn-dark px-4" id="btnAdd">Thêm</button>
 
-				<button type="submit" class="btn btn-dark px-4"
-					onclick="submitForm('/students/add')">Add</button>
+				<button type="button" class="btn btn-outline-secondary px-4" id="btnUpdate" disabled>Chỉnh sửa</button>
 
-				<button type="submit" class="btn btn-outline-secondary px-4"
-					onclick="submitForm('/students/update')">Update</button>
+				<button type="button" class="btn btn-outline-danger px-4" id="btnDelete" disabled>Xóa</button>
+				
+				<button type="button" class="btn btn-outline-secondary" id="btnUndo" disabled>
+					<i class="bi bi-arrow-counterclockwise me-1"></i> Undo
+				</button>
 
-				<button type="submit" class="btn btn-outline-danger px-4"
-					onclick="submitForm('/students/delete')">Delete</button>
+				<button type="button" class="btn btn-primary px-4" id="btnSave" disabled>
+					<i class="bi bi-save me-1"></i> Ghi
+				</button>
 
-			<button type="button" class="btn btn-outline-secondary" id="btnUndo" disabled>Undo</button>
-
-			<button type="button" class="btn btn-outline-dark"
-				onclick="resetForm()">Reset</button>
-
+				<button type="button" class="btn btn-outline-secondary px-4" id="btnReset">Xóa dữ liệu</button>
 			</div>
-
 		</form:form>
-
 	</div>
+
+	<form id="saveForm" action="${pageContext.request.contextPath}/students/save" method="post" class="d-none">
+		<input type="hidden" name="page" value="${currentPage}" />
+		<input type="hidden" name="keyword" value="${keyword}" />
+		<input type="hidden" name="filterClassId" value="${classId}" />
+		<input type="hidden" name="actionsData" id="actionsDataInput" />
+	</form>
 
 	<div class="card border-0 shadow-sm management-card">
 
@@ -195,7 +215,7 @@ request.setAttribute("customJs", "student-management.js");
 
 							<td>${student.firstName}</td>
 
-							<td>${student.birthDate}</td>
+							<td><fmt:formatDate value="${student.birthDate}" pattern="yyyy-MM-dd" /></td>
 
 							<td>${student.address}</td>
 

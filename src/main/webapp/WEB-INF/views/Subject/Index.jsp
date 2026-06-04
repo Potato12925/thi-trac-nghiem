@@ -53,6 +53,11 @@ request.setAttribute("customJs", "subject-management.js");
 		<div class="alert alert-danger">${errorMessage}</div>
 	</c:if>
 
+	<div id="clientAlert" class="alert alert-danger d-none mb-3"></div>
+	<div id="unsavedChangesAlert" class="alert alert-warning d-none mb-3">
+		<i class="bi bi-exclamation-circle-fill me-2"></i>Bạn có <span id="unsavedCount" class="fw-bold">0</span> thay đổi chưa lưu xuống Database. Hãy nhấn nút <strong>Ghi</strong> để lưu thay đổi.
+	</div>
+
 	<div class="border rounded-3 bg-white p-4 mb-4 form-section">
 
 		<form:form id="subjectForm"
@@ -84,22 +89,30 @@ request.setAttribute("customJs", "subject-management.js");
 			</div>
 
 			<div class="d-flex gap-2 mt-4">
-				<button type="submit" class="btn btn-dark px-4"
-					onclick="submitForm('add')">Thêm</button>
+				<button type="button" class="btn btn-dark px-4" id="btnAdd">Thêm</button>
 
-				<button type="submit" class="btn btn-outline-secondary px-4"
-					onclick="submitForm('update')">Chỉnh sửa</button>
+				<button type="button" class="btn btn-outline-secondary px-4" id="btnUpdate" disabled>Chỉnh sửa</button>
 
-				<button type="submit" class="btn btn-outline-danger px-4"
-					onclick="submitForm('delete')">Xóa</button>
-				<button type="button" class="btn btn-outline-secondary" id="btnUndo"
-					disabled>Undo</button>
+				<button type="button" class="btn btn-outline-danger px-4" id="btnDelete" disabled>Xóa</button>
+				
+				<button type="button" class="btn btn-outline-secondary" id="btnUndo" disabled>
+					<i class="bi bi-arrow-counterclockwise me-1"></i> Undo
+				</button>
 
-				<button type="button" class="btn btn-outline-secondary px-4"
-					onclick="resetForm()">Xóa dữ liệu</button>
+				<button type="button" class="btn btn-primary px-4" id="btnSave" disabled>
+					<i class="bi bi-save me-1"></i> Ghi
+				</button>
+
+				<button type="button" class="btn btn-outline-secondary px-4" id="btnReset">Xóa dữ liệu</button>
 			</div>
 		</form:form>
 	</div>
+
+	<form id="saveForm" action="${pageContext.request.contextPath}/subjects/save" method="post" class="d-none">
+		<input type="hidden" name="page" value="${currentPage}" />
+		<input type="hidden" name="search" value="${search}" />
+		<input type="hidden" name="actionsData" id="actionsDataInput" />
+	</form>
 
 	<div class="card border-0 shadow-sm management-card">
 		<div class="table-responsive p-3 management-table-wrapper">

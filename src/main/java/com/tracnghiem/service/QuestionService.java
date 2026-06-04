@@ -1,11 +1,14 @@
 package com.tracnghiem.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.tracnghiem.dao.QuestionDAO;
+import com.tracnghiem.dto.QuestionActionDTO;
 import com.tracnghiem.dto.QuestionDTO;
 import com.tracnghiem.entity.Lecturer;
 import com.tracnghiem.entity.Question;
@@ -127,4 +130,67 @@ public class QuestionService {
         existing.setDeleted(true);
         questionDAO.update(existing);
     }
+
+	@Transactional
+	public void savePendingActions(String actionsData, String role, String userId) {
+		if (actionsData == null || actionsData.trim().isEmpty()) {
+			return;
+		}
+
+		List<QuestionActionDTO> actions = new ArrayList<>();
+		String[] lines = actionsData.split("\n");
+		for (String line : lines) {
+			if (line.trim().isEmpty()) {
+				continue;
+			}
+			String[] parts = line.split(":::", -1);
+			if (parts.length < 2) {
+				continue;
+			}
+			String type = parts[0].trim();
+			String questionId = parts[1].trim();
+			String subjectId = parts.length > 2 ? parts[2].trim() : "";
+			String level = parts.length > 3 ? parts[3].trim() : "";
+			String content = parts.length > 4 ? parts[4].trim() : "";
+			String optionA = parts.length > 5 ? parts[5].trim() : "";
+			String optionB = parts.length > 6 ? parts[6].trim() : "";
+			String optionC = parts.length > 7 ? parts[7].trim() : "";
+			String optionD = parts.length > 8 ? parts[8].trim() : "";
+			String correctAnswer = parts.length > 9 ? parts[9].trim() : "";
+			String lecturerId = parts.length > 10 ? parts[10].trim() : "";
+
+			actions.add(new QuestionActionDTO(type, questionId, subjectId, level, content, optionA, optionB, optionC, optionD, correctAnswer, lecturerId));
+		}
+
+		for (QuestionActionDTO action : actions) {
+			QuestionDTO dto = new QuestionDTO();
+			dto.setQuestionId(parseQuestionId(action.getQuestionId()));
+			dto.setSubjectId(action.getSubjectId());
+			dto.setLevel(action.getLevel());
+			dto.setContent(action.getContent());
+			dto.setOptionA(action.getOptionA());
+			dto.setOptionB(action.getOptionB());
+			dto.setOptionC(action.getOptionC());
+			dto.setOptionD(action.getOptionD());
+			dto.setCorrectAnswer(action.getCorrectAnswer());
+			dto.setLecturerId(action.getLecturerId());
+
+			if ("ADD".equals(action.getType())) {
+				dto.setQuestionId(null);
+				addQuestion(dto, role, userId);
+			} else if ("UPDATE".equals(action.getType())) {
+				updateQuestion(dto, role, userId);
+			} else if ("DELETE".equals(action.getType())) {
+				deleteQuestion(dto, role, userId);
+			}
+		}
+	}
+
+	private Integer parseQuestionId(String idStr) {
+		try {
+			return Integer.parseInt(idStr);
+		} catch (NumberFormatException e) {
+			return null;
+		}
+	}
 }

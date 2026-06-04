@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.tracnghiem.dto.LecturerDTO;
 import com.tracnghiem.entity.Lecturer;
@@ -140,6 +141,29 @@ public class LecturerController {
             return INDEX_VIEW;
         }
     }
+
+	@PostMapping("/save")
+	public String save(@RequestParam(defaultValue = "1") int page,
+			@RequestParam(required = false) String keyword,
+			@RequestParam("actionsData") String actionsData, ModelMap model, RedirectAttributes redirectAttributes) {
+
+		if (actionsData == null || actionsData.trim().isEmpty()) {
+			redirectAttributes.addFlashAttribute("errorMessage", "Không có thay đổi nào để ghi.");
+			return REDIRECT_INDEX + buildQuery(page, keyword);
+		}
+
+		try {
+			lecturerService.savePendingActions(actionsData);
+			redirectAttributes.addFlashAttribute("successMessage", "Ghi các thay đổi xuống CSDL thành công.");
+			return REDIRECT_INDEX + buildQuery(page, keyword);
+		} catch (IllegalArgumentException ex) {
+			redirectAttributes.addFlashAttribute("errorMessage", "Lỗi khi ghi dữ liệu: " + ex.getMessage());
+			return REDIRECT_INDEX + buildQuery(page, keyword);
+		} catch (Exception ex) {
+			redirectAttributes.addFlashAttribute("errorMessage", "Lỗi hệ thống: " + ex.getMessage());
+			return REDIRECT_INDEX + buildQuery(page, keyword);
+		}
+	}
 
     private String buildQuery(int page, String keyword) {
         StringBuilder query = new StringBuilder("?page=").append(page);

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.tracnghiem.dto.QuestionDTO;
 import com.tracnghiem.entity.Question;
@@ -122,6 +123,32 @@ public class QuestionController {
             return renderQuestionPage(model, page, keyword, session);
         }
     }
+
+	@PostMapping("/save")
+	public String save(@RequestParam(defaultValue = "1") int page,
+			@RequestParam(required = false) String keyword,
+			@RequestParam("actionsData") String actionsData, ModelMap model, RedirectAttributes redirectAttributes,
+			HttpSession session) {
+
+		if (actionsData == null || actionsData.trim().isEmpty()) {
+			redirectAttributes.addFlashAttribute("errorMessage", "Không có thay đổi nào để ghi.");
+			return REDIRECT_INDEX + buildQuery(page, keyword);
+		}
+
+		try {
+			String role = (String) session.getAttribute("ROLE");
+			String loggedUser = (String) session.getAttribute("LOGIN_USER");
+			questionService.savePendingActions(actionsData, role, loggedUser);
+			redirectAttributes.addFlashAttribute("successMessage", "Ghi các thay đổi xuống CSDL thành công.");
+			return REDIRECT_INDEX + buildQuery(page, keyword);
+		} catch (IllegalArgumentException ex) {
+			redirectAttributes.addFlashAttribute("errorMessage", "Lỗi khi ghi dữ liệu: " + ex.getMessage());
+			return REDIRECT_INDEX + buildQuery(page, keyword);
+		} catch (Exception ex) {
+			redirectAttributes.addFlashAttribute("errorMessage", "Lỗi hệ thống: " + ex.getMessage());
+			return REDIRECT_INDEX + buildQuery(page, keyword);
+		}
+	}
 
     private void prepareQuestionPage(ModelMap model, int page, String keyword, String role, String loggedUser) {
         int pageSize = 10;
