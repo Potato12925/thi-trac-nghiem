@@ -1,22 +1,40 @@
 package com.tracnghiem.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.tracnghiem.dao.ExamDAO;
 import com.tracnghiem.dao.LecturerDAO;
+import com.tracnghiem.dao.LecturerRegistrationDAO;
+import com.tracnghiem.dao.QuestionDAO;
 import com.tracnghiem.dto.LecturerActionDTO;
 import com.tracnghiem.dto.LecturerDTO;
+import com.tracnghiem.dto.LecturerHomeDTO;
+import com.tracnghiem.dto.LecturerSubjectClassDTO;
+import com.tracnghiem.dto.RecentExamRegistrationDTO;
 import com.tracnghiem.entity.Lecturer;
+import com.tracnghiem.entity.LecturerRegistration;
+import com.tracnghiem.entity.Question;
 
 @Service
 public class LecturerService {
 
     @Autowired
     private LecturerDAO lecturerDAO;
+
+    @Autowired
+    private QuestionDAO questionDAO;
+
+    @Autowired
+    private LecturerRegistrationDAO lecturerRegistrationDAO;
+
+    @Autowired
+    private ExamDAO examDAO;
 
     private Lecturer convertToEntity(LecturerDTO dto) {
         Lecturer lecturer = new Lecturer();
@@ -54,6 +72,78 @@ public class LecturerService {
 
     public Lecturer findLecturerById(String lecturerId) {
         return lecturerDAO.findById(lecturerId);
+    }
+
+    @Transactional(readOnly = true)
+    public Lecturer getDashboardLecturerProfile(String loginUser) {
+        String normalizedLecturerId = normalize(loginUser);
+        if (normalizedLecturerId == null) {
+            return null;
+        }
+
+        Lecturer lecturer = lecturerDAO.findDashboardProfileByLecturerId(normalizedLecturerId);
+        return sanitizeLecturerProfile(lecturer);
+    }
+
+    @Transactional(readOnly = true)
+    public LecturerHomeDTO getLecturerDashboard(String lecturerId) {
+        LecturerHomeDTO dashboard = new LecturerHomeDTO();
+        dashboard.setLatestWorkingSubjectName("Chưa có dữ liệu");
+
+        String normalizedLecturerId = normalize(lecturerId);
+        if (normalizedLecturerId == null) {
+            return dashboard;
+        }
+
+        dashboard.setTotalQuestions(questionDAO.countByLecturer(normalizedLecturerId));
+        dashboard.setTotalRegistrations(lecturerRegistrationDAO.countByLecturer(normalizedLecturerId));
+        dashboard.setTotalRegisteredSubjects(lecturerRegistrationDAO.countDistinctSubjectsByLecturer(normalizedLecturerId));
+        dashboard.setTotalRegisteredClasses(lecturerRegistrationDAO.countDistinctClassesByLecturer(normalizedLecturerId));
+        dashboard.setTotalRelatedExams(examDAO.countByLecturerRegistrations(normalizedLecturerId));
+        dashboard.setLatestWorkingSubjectName(resolveLatestWorkingSubjectName(normalizedLecturerId));
+
+        return dashboard;
+    }
+
+    @Transactional(readOnly = true)
+    public List<RecentExamRegistrationDTO> getRecentExamRegistrations(String lecturerId) {
+        String normalizedLecturerId = normalize(lecturerId);
+        if (normalizedLecturerId == null) {
+            return Collections.emptyList();
+        }
+
+        List<LecturerRegistration> registrations = lecturerRegistrationDAO.findRecentByLecturer(normalizedLecturerId, 5);
+        List<RecentExamRegistrationDTO> result = new ArrayList<>();
+
+        for (LecturerRegistration registration : registrations) {
+            result.add(toRecentExamRegistrationDTO(registration));
+        }
+
+        return result;
+    }
+
+    @Transactional(readOnly = true)
+    public List<LecturerSubjectClassDTO> getRegisteredSubjectClasses(String lecturerId) {
+        String normalizedLecturerId = normalize(lecturerId);
+        if (normalizedLecturerId == null) {
+            return Collections.emptyList();
+        }
+
+        List<Object[]> rows = lecturerRegistrationDAO.findSubjectClassSummaryByLecturer(normalizedLecturerId);
+        List<LecturerSubjectClassDTO> result = new ArrayList<>();
+
+        for (Object[] row : rows) {
+            LecturerSubjectClassDTO dto = new LecturerSubjectClassDTO();
+            dto.setClassId(normalize((String) row[0]));
+            dto.setClassName(normalize((String) row[1]));
+            dto.setSubjectId(normalize((String) row[2]));
+            dto.setSubjectName(normalize((String) row[3]));
+            dto.setLatestExamDate((java.util.Date) row[4]);
+            dto.setRegistrationCount(row[5] == null ? 0L : ((Long) row[5]).longValue());
+            result.add(dto);
+        }
+
+        return result;
     }
 
     public List<Lecturer> findLecturerByKeyword(String keyword) {
@@ -201,4 +291,63 @@ public class LecturerService {
 			addLecturer(cleanDto);
 		}
 	}
+
+    private Lecturer sanitizeLecturerProfile(Lecturer source) {
+        if (source == null) {
+            return null;
+        }
+
+        Lecturer lecturer = new Lecturer();
+        lecturer.setLecturerId(normalize(source.getLecturerId()));
+        lecturer.setLastName(normalize(source.getLastName()));
+        lecturer.setFirstName(normalize(source.getFirstName()));
+        lecturer.setPhoneNumber(normalize(source.getPhoneNumber()));
+        lecturer.setAddress(normalize(source.getAddress()));
+        lecturer.setEmail(normalize(source.getEmail()));
+        lecturer.setDeleted(source.isDeleted());
+        return lecturer;
+    }
+
+    private RecentExamRegistrationDTO toRecentExamRegistrationDTO(LecturerRegistration registration) {
+        RecentExamRegistrationDTO dto = new RecentExamRegistrationDTO();
+        dto.setClassId(registration.getClassRoom() == null ? null : normalize(registration.getClassRoom().getClassId()));
+        dto.setClassName(registration.getClassRoom() == null ? null : normalize(registration.getClassRoom().getClassName()));
+        dto.setSubjectId(registration.getSubject() == null ? null : normalize(registration.getSubject().getSubjectId()));
+        dto.setSubjectName(registration.getSubject() == null ? null : normalize(registration.getSubject().getSubjectName()));
+        dto.setTryNumber(registration.getId() == null ? null : registration.getId().getTryNumber());
+        dto.setLevel(normalize(registration.getLevel()));
+        dto.setExamDate(registration.getExamDate());
+        dto.setNumberOfQuestions(registration.getNumberOfQuestions());
+        dto.setDuration(registration.getDuration());
+        return dto;
+    }
+
+    private String resolveLatestWorkingSubjectName(String lecturerId) {
+        LecturerRegistration latestRegistration = lecturerRegistrationDAO.findLatestByLecturer(lecturerId);
+        if (latestRegistration != null && latestRegistration.getSubject() != null) {
+            String subjectName = normalize(latestRegistration.getSubject().getSubjectName());
+            if (subjectName != null) {
+                return subjectName;
+            }
+        }
+
+        Question latestQuestion = questionDAO.findLatestQuestionByLecturer(lecturerId);
+        if (latestQuestion != null && latestQuestion.getSubject() != null) {
+            String subjectName = normalize(latestQuestion.getSubject().getSubjectName());
+            if (subjectName != null) {
+                return subjectName;
+            }
+        }
+
+        return "Chưa có dữ liệu";
+    }
+
+    private String normalize(String value) {
+        if (value == null) {
+            return null;
+        }
+
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
+    }
 }

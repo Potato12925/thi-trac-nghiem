@@ -79,6 +79,19 @@ public class LecturerDAO extends GenericDAO<Lecturer> {
         return findById(maGV) != null;
     }
 
+    public Lecturer findDashboardProfileByLecturerId(String lecturerId) {
+        String hql = "FROM Lecturer l "
+                + "WHERE l.deleted = false "
+                + "AND function('ltrim', function('rtrim', l.lecturerId)) = :lecturerId";
+
+        List<Lecturer> lecturers = getSession()
+                .createQuery(hql, Lecturer.class)
+                .setParameter("lecturerId", lecturerId)
+                .list();
+
+        return lecturers.isEmpty() ? null : lecturers.get(0);
+    }
+
     public String findEmailByLecturerId(String lecturerId) {
         String hql = "SELECT l.email FROM Lecturer l WHERE l.lecturerId = :lecturerId";
 

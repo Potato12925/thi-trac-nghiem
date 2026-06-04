@@ -15,6 +15,34 @@ public class QuestionDAO extends GenericDAO<Question> {
 		return findById(questionId) != null;
 	}
 
+	public long countByLecturer(String lecturerId) {
+		String hql = "SELECT COUNT(q) FROM Question q "
+				+ "WHERE q.deleted = false AND function('ltrim', function('rtrim', q.lecturer.lecturerId)) = :lecturerId";
+
+		Long count = getSession()
+				.createQuery(hql, Long.class)
+				.setParameter("lecturerId", lecturerId)
+				.uniqueResult();
+
+		return count == null ? 0L : count.longValue();
+	}
+
+	public Question findLatestQuestionByLecturer(String lecturerId) {
+		String hql = "FROM Question q "
+				+ "JOIN FETCH q.subject s "
+				+ "WHERE q.deleted = false "
+				+ "AND function('ltrim', function('rtrim', q.lecturer.lecturerId)) = :lecturerId "
+				+ "ORDER BY q.questionId DESC";
+
+		List<Question> questions = getSession()
+				.createQuery(hql, Question.class)
+				.setParameter("lecturerId", lecturerId)
+				.setMaxResults(1)
+				.list();
+
+		return questions.isEmpty() ? null : questions.get(0);
+	}
+
 	public long countAvailableQuestions(String maMh, String trinhDo) {
 		String hql = "SELECT COUNT(b) FROM Question b WHERE b.deleted = false AND b.subject.subjectId = :maMh AND b.level = :trinhDo";
 		return getSession().createQuery(hql, Long.class).setParameter("maMh", maMh).setParameter("trinhDo", trinhDo)
