@@ -86,4 +86,22 @@ public class ExamDAO extends GenericDAO<Exam> {
 
         return exams.isEmpty() ? null : exams.get(0);
     }
+
+    public long countByLecturerRegistrations(String lecturerId) {
+        String hql = "SELECT COUNT(e) FROM Exam e "
+                + "WHERE EXISTS ("
+                + "    SELECT g.id.classId FROM LecturerRegistration g "
+                + "    WHERE function('ltrim', function('rtrim', g.lecturer.lecturerId)) = :lecturerId "
+                + "    AND function('ltrim', function('rtrim', g.classRoom.classId)) = function('ltrim', function('rtrim', e.classId)) "
+                + "    AND g.subject.subjectId = e.subject.subjectId "
+                + "    AND g.id.tryNumber = e.tryNumber"
+                + ")";
+
+        Long count = getSession()
+                .createQuery(hql, Long.class)
+                .setParameter("lecturerId", lecturerId)
+                .uniqueResult();
+
+        return count == null ? 0L : count.longValue();
+    }
 }
