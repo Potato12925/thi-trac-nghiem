@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -20,141 +19,151 @@ import com.tracnghiem.dao.LecturerDAO;
 import com.tracnghiem.dao.SubjectDAO;
 import com.tracnghiem.dto.LecturerRegistrationDTO;
 import com.tracnghiem.service.LecturerRegistrationService;
+import com.tracnghiem.utils.RoleConstants;
+import com.tracnghiem.utils.RoleNavigationUtils;
 
 @Controller
 @RequestMapping("/lecturer-registration")
 public class LecturerRegistrationController {
 
-    @Autowired
-    private LecturerRegistrationService lecturerRegistrationService;
+	@Autowired
+	private LecturerRegistrationService lecturerRegistrationService;
 
-    @Autowired
-    private ClassroomDAO classroomDAO;
+	@Autowired
+	private ClassroomDAO classroomDAO;
 
-    @Autowired
-    private SubjectDAO subjectDAO;
+	@Autowired
+	private SubjectDAO subjectDAO;
 
-    @Autowired
-    private LecturerDAO lecturerDAO;
+	@Autowired
+	private LecturerDAO lecturerDAO;
 
-    private void prepareFormModel(ModelMap model, HttpSession session) {
-        model.addAttribute("dsLop", classroomDAO.findAll());
-        model.addAttribute("dsMonHoc", subjectDAO.findAll());
+	private void prepareFormModel(ModelMap model, HttpSession session) {
+		model.addAttribute("dsLop", classroomDAO.findAll());
+		model.addAttribute("dsMonHoc", subjectDAO.findAll());
 
-        String role = (String) session.getAttribute("ROLE");
-        if ("PGV".equals(role)) {
-            model.addAttribute("dsGiaoVien", lecturerDAO.findAll());
-        }
-    }
+		String role = (String) session.getAttribute("ROLE");
+		if (RoleConstants.PGV.equals(role)) {
+			model.addAttribute("dsGiaoVien", lecturerDAO.findAll());
+		}
+	}
 
-    private boolean isAuthorized(HttpSession session) {
-        String role = (String) session.getAttribute("ROLE");
-        return role != null && (role.equals("PGV") || role.equals("GIAOVIEN"));
-    }
+	private boolean isAuthorized(HttpSession session) {
+		String role = (String) session.getAttribute("ROLE");
+		return RoleConstants.PGV.equals(role) || RoleConstants.LECTURER.equals(role);
+	}
 
-    @GetMapping
-    public String Index(ModelMap model, HttpSession session) {
-        if (!isAuthorized(session)) {
-            return "redirect:/auth/login";
-        }
+	private String resolveUnauthorizedRedirect(HttpSession session) {
+		String role = (String) session.getAttribute("ROLE");
+		if (RoleNavigationUtils.isAuthenticatedRole(role)) {
+			return RoleNavigationUtils.getHomeRedirect(role);
+		}
+		return "redirect:/auth/login";
+	}
 
-        String role = (String) session.getAttribute("ROLE");
-        String userMaGv = (String) session.getAttribute("LOGIN_USER");
+	@GetMapping
+	public String Index(ModelMap model, HttpSession session) {
+		if (!isAuthorized(session)) {
+			return resolveUnauthorizedRedirect(session);
+		}
 
-        model.addAttribute("registrationDTO", new LecturerRegistrationDTO());
-        prepareFormModel(model, session);
-        model.addAttribute("registrations", lecturerRegistrationService.getRegistrations(userMaGv, role));
+		String role = (String) session.getAttribute("ROLE");
+		String userMaGv = (String) session.getAttribute("LOGIN_USER");
 
-        return "LecturerRegistration/Index";
-    }
+		model.addAttribute("registrationDTO", new LecturerRegistrationDTO());
+		prepareFormModel(model, session);
+		model.addAttribute("registrations", lecturerRegistrationService.getRegistrations(userMaGv, role));
 
-    @PostMapping("/add")
-    public String add(
-            @Validated @ModelAttribute("registrationDTO") LecturerRegistrationDTO dto,
-            BindingResult bindingResult,
-            ModelMap model,
-            HttpSession session,
-            RedirectAttributes redirectAttributes) {
+		return "LecturerRegistration/Index";
+	}
 
-        String role = (String) session.getAttribute("ROLE");
-        String userMaGv = (String) session.getAttribute("LOGIN_USER");
+	@PostMapping("/add")
+	public String add(
+			@Validated @ModelAttribute("registrationDTO") LecturerRegistrationDTO dto,
+			BindingResult bindingResult,
+			ModelMap model,
+			HttpSession session,
+			RedirectAttributes redirectAttributes) {
 
-        if (!isAuthorized(session)) {
-            return "redirect:/auth/login";
-        }
+		String role = (String) session.getAttribute("ROLE");
+		String userMaGv = (String) session.getAttribute("LOGIN_USER");
 
-        if (bindingResult.hasErrors()) {
-            prepareFormModel(model, session);
-            model.addAttribute("registrations", lecturerRegistrationService.getRegistrations(userMaGv, role));
-            return "LecturerRegistration/Index";
-        }
+		if (!isAuthorized(session)) {
+			return resolveUnauthorizedRedirect(session);
+		}
 
-        try {
-            lecturerRegistrationService.registerExam(dto, userMaGv, role);
-            redirectAttributes.addFlashAttribute("successMessage", "Đăng ký thi thành công!");
-            return "redirect:/lecturer-registration";
-        } catch (Exception e) {
-            model.addAttribute("error", e.getMessage());
-            prepareFormModel(model, session);
-            model.addAttribute("registrations", lecturerRegistrationService.getRegistrations(userMaGv, role));
-            return "LecturerRegistration/Index";
-        }
-    }
+		if (bindingResult.hasErrors()) {
+			prepareFormModel(model, session);
+			model.addAttribute("registrations", lecturerRegistrationService.getRegistrations(userMaGv, role));
+			return "LecturerRegistration/Index";
+		}
 
-    @PostMapping("/update")
-    public String update(
-            @Validated @ModelAttribute("registrationDTO") LecturerRegistrationDTO dto,
-            BindingResult bindingResult,
-            ModelMap model,
-            HttpSession session,
-            RedirectAttributes redirectAttributes) {
+		try {
+			lecturerRegistrationService.registerExam(dto, userMaGv, role);
+			redirectAttributes.addFlashAttribute("successMessage", "ÄÄƒng kÃ½ thi thÃ nh cÃ´ng!");
+			return "redirect:/lecturer-registration";
+		} catch (Exception e) {
+			model.addAttribute("error", e.getMessage());
+			prepareFormModel(model, session);
+			model.addAttribute("registrations", lecturerRegistrationService.getRegistrations(userMaGv, role));
+			return "LecturerRegistration/Index";
+		}
+	}
 
-        String role = (String) session.getAttribute("ROLE");
-        String userMaGv = (String) session.getAttribute("LOGIN_USER");
+	@PostMapping("/update")
+	public String update(
+			@Validated @ModelAttribute("registrationDTO") LecturerRegistrationDTO dto,
+			BindingResult bindingResult,
+			ModelMap model,
+			HttpSession session,
+			RedirectAttributes redirectAttributes) {
 
-        if (!isAuthorized(session)) {
-            return "redirect:/auth/login";
-        }
+		String role = (String) session.getAttribute("ROLE");
+		String userMaGv = (String) session.getAttribute("LOGIN_USER");
 
-        if (bindingResult.hasErrors()) {
-            prepareFormModel(model, session);
-            model.addAttribute("registrations", lecturerRegistrationService.getRegistrations(userMaGv, role));
-            return "LecturerRegistration/Index";
-        }
+		if (!isAuthorized(session)) {
+			return resolveUnauthorizedRedirect(session);
+		}
 
-        try {
-            lecturerRegistrationService.updateExam(dto, userMaGv, role);
-            redirectAttributes.addFlashAttribute("successMessage", "Cập nhật lượt đăng ký thi thành công!");
-            return "redirect:/lecturer-registration";
-        } catch (Exception e) {
-            model.addAttribute("error", e.getMessage());
-            prepareFormModel(model, session);
-            model.addAttribute("registrations", lecturerRegistrationService.getRegistrations(userMaGv, role));
-            return "LecturerRegistration/Index";
-        }
-    }
+		if (bindingResult.hasErrors()) {
+			prepareFormModel(model, session);
+			model.addAttribute("registrations", lecturerRegistrationService.getRegistrations(userMaGv, role));
+			return "LecturerRegistration/Index";
+		}
 
-    @DeleteMapping("/delete")
-    public String delete(
-            @ModelAttribute("registrationDTO") LecturerRegistrationDTO dto,
-            HttpSession session,
-            RedirectAttributes redirectAttributes) {
+		try {
+			lecturerRegistrationService.updateExam(dto, userMaGv, role);
+			redirectAttributes.addFlashAttribute("successMessage", "Cáº­p nháº­t lÆ°á»£t Ä‘Äƒng kÃ½ thi thÃ nh cÃ´ng!");
+			return "redirect:/lecturer-registration";
+		} catch (Exception e) {
+			model.addAttribute("error", e.getMessage());
+			prepareFormModel(model, session);
+			model.addAttribute("registrations", lecturerRegistrationService.getRegistrations(userMaGv, role));
+			return "LecturerRegistration/Index";
+		}
+	}
 
-        String role = (String) session.getAttribute("ROLE");
-        String userMaGv = (String) session.getAttribute("LOGIN_USER");
+	@DeleteMapping("/delete")
+	public String delete(
+			@ModelAttribute("registrationDTO") LecturerRegistrationDTO dto,
+			HttpSession session,
+			RedirectAttributes redirectAttributes) {
 
-        if (!isAuthorized(session)) {
-            return "redirect:/auth/login";
-        }
+		String role = (String) session.getAttribute("ROLE");
+		String userMaGv = (String) session.getAttribute("LOGIN_USER");
 
-        try {
-            lecturerRegistrationService.deleteExam(dto.getClassId(), dto.getSubjectId(), dto.getTryNumber(), userMaGv,
-                    role);
-            redirectAttributes.addFlashAttribute("successMessage", "Xóa lượt đăng ký thi thành công!");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-        }
+		if (!isAuthorized(session)) {
+			return resolveUnauthorizedRedirect(session);
+		}
 
-        return "redirect:/lecturer-registration";
-    }
+		try {
+			lecturerRegistrationService.deleteExam(dto.getClassId(), dto.getSubjectId(), dto.getTryNumber(), userMaGv,
+					role);
+			redirectAttributes.addFlashAttribute("successMessage", "XÃ³a lÆ°á»£t Ä‘Äƒng kÃ½ thi thÃ nh cÃ´ng!");
+		} catch (Exception e) {
+			redirectAttributes.addFlashAttribute("error", e.getMessage());
+		}
+
+		return "redirect:/lecturer-registration";
+	}
 }

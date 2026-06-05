@@ -10,8 +10,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.tracnghiem.dto.ChangeEmailDTO;
@@ -27,6 +27,8 @@ import com.tracnghiem.service.AuthService;
 import com.tracnghiem.service.LecturerService;
 import com.tracnghiem.service.PasswordResetService;
 import com.tracnghiem.service.StudentService;
+import com.tracnghiem.utils.RoleConstants;
+import com.tracnghiem.utils.RoleNavigationUtils;
 
 @Controller
 @RequestMapping("/auth")
@@ -54,7 +56,7 @@ public class AuthController {
 
 		model.addAttribute("taiKhoan", new LoginDTO());
 		if (resetSuccess != null) {
-			model.addAttribute("success", "Đặt lại mật khẩu thành công. Vui lòng đăng nhập lại");
+			model.addAttribute("success", "Äáº·t láº¡i máº­t kháº©u thÃ nh cÃ´ng. Vui lÃ²ng Ä‘Äƒng nháº­p láº¡i");
 		}
 
 		return "Account/Login";
@@ -79,21 +81,12 @@ public class AuthController {
 		}
 
 		String role = (String) session.getAttribute("ROLE");
-
-		switch (role) {
-			case "SINHVIEN":
-				return "redirect:/students/home";
-
-			case "GIAOVIEN":
-				return "redirect:/lecturers/home";
-
-			case "PGV":
-				return "redirect:/admin/home";
-
-			default:
-				model.addAttribute("error", "Role không hợp lệ");
-				return "Account/Login";
+		if (!RoleNavigationUtils.isAuthenticatedRole(role)) {
+			model.addAttribute("error", "Role khÃ´ng há»£p lá»‡");
+			return "Account/Login";
 		}
+
+		return RoleNavigationUtils.getHomeRedirect(role);
 	}
 
 	@PostMapping("/logout")
@@ -123,7 +116,7 @@ public class AuthController {
 			ResetPasswordDTO resetPasswordDTO = new ResetPasswordDTO();
 			resetPasswordDTO.setUsername(dto.getUsername().trim());
 			model.addAttribute("resetPasswordForm", resetPasswordDTO);
-			model.addAttribute("success", "Mã OTP đã được gửi tới email đăng ký của bạn");
+			model.addAttribute("success", "MÃ£ OTP Ä‘Ã£ Ä‘Æ°á»£c gá»­i tá»›i email Ä‘Äƒng kÃ½ cá»§a báº¡n");
 			return "Account/ResetPassword";
 		} catch (IllegalArgumentException | IllegalStateException ex) {
 			model.addAttribute("error", ex.getMessage());
@@ -150,7 +143,7 @@ public class AuthController {
 		if (!result.hasFieldErrors("confirmPassword")
 				&& dto.getNewPassword() != null
 				&& !dto.getNewPassword().equals(dto.getConfirmPassword())) {
-			result.rejectValue("confirmPassword", "confirmPassword.mismatch", "Mật khẩu xác nhận không khớp");
+			result.rejectValue("confirmPassword", "confirmPassword.mismatch", "Máº­t kháº©u xÃ¡c nháº­n khÃ´ng khá»›p");
 		}
 
 		if (result.hasErrors()) {
@@ -184,7 +177,7 @@ public class AuthController {
 		if (!result.hasFieldErrors("confirmPassword")
 				&& dto.getNewPassword() != null
 				&& !dto.getNewPassword().equals(dto.getConfirmPassword())) {
-			result.rejectValue("confirmPassword", "confirmPassword.mismatch", "Xác nhận mật khẩu không khớp");
+			result.rejectValue("confirmPassword", "confirmPassword.mismatch", "XÃ¡c nháº­n máº­t kháº©u khÃ´ng khá»›p");
 		}
 
 		if (result.hasErrors()) {
@@ -194,7 +187,7 @@ public class AuthController {
 
 		try {
 			accountSettingsService.changePassword(username, dto.getCurrentPassword(), dto.getNewPassword());
-			redirectAttributes.addFlashAttribute("successMessage", "Đổi mật khẩu thành công");
+			redirectAttributes.addFlashAttribute("successMessage", "Äá»•i máº­t kháº©u thÃ nh cÃ´ng");
 			return "redirect:" + resolveSettingsPath(role);
 		} catch (IllegalArgumentException ex) {
 			model.addAttribute("errorMessage", ex.getMessage());
@@ -207,13 +200,13 @@ public class AuthController {
 		String role = (String) session.getAttribute("ROLE");
 		String username = (String) session.getAttribute("LOGIN_USER");
 
-		if ("SINHVIEN".equals(role)) {
+		if (RoleConstants.STUDENT.equals(role)) {
 			Student student = studentService.getStudentById(username);
-			model.addAttribute("pageTitle", "Cài đặt sinh viên");
+			model.addAttribute("pageTitle", "CÃ i Ä‘áº·t sinh viÃªn");
 			model.addAttribute("studentProfile", student);
-		} else if ("GIAOVIEN".equals(role)) {
+		} else if (RoleConstants.LECTURER.equals(role)) {
 			Lecturer lecturer = lecturerService.findLecturerById(username);
-			model.addAttribute("pageTitle", "Cài đặt giảng viên");
+			model.addAttribute("pageTitle", "CÃ i Ä‘áº·t giáº£ng viÃªn");
 			model.addAttribute("lecturerProfile", lecturer);
 		}
 
@@ -229,11 +222,11 @@ public class AuthController {
 	}
 
 	private String resolveSettingsView(String role) {
-		if ("SINHVIEN".equals(role)) {
+		if (RoleConstants.STUDENT.equals(role)) {
 			return "Student/Settings";
 		}
 
-		if ("GIAOVIEN".equals(role)) {
+		if (RoleConstants.LECTURER.equals(role)) {
 			return "Lecturer/Settings";
 		}
 
@@ -241,11 +234,11 @@ public class AuthController {
 	}
 
 	private String resolveSettingsPath(String role) {
-		if ("SINHVIEN".equals(role)) {
+		if (RoleConstants.STUDENT.equals(role)) {
 			return "/students/settings";
 		}
 
-		if ("GIAOVIEN".equals(role)) {
+		if (RoleConstants.LECTURER.equals(role)) {
 			return "/lecturers/settings";
 		}
 

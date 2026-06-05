@@ -26,6 +26,8 @@ import com.tracnghiem.dto.CreatePgvAccountDTO;
 import com.tracnghiem.dto.UpdateAccountRoleDTO;
 import com.tracnghiem.entity.Account;
 import com.tracnghiem.service.AccountManagementService;
+import com.tracnghiem.utils.RoleConstants;
+import com.tracnghiem.utils.RoleNavigationUtils;
 
 @Controller
 @RequestMapping("/admin/accounts")
@@ -255,19 +257,15 @@ public class AccountManagementController {
 
 	private String validateAdminAccess(HttpSession session) {
 		String role = (String) session.getAttribute("ROLE");
-		if ("PGV".equals(role)) {
+		if (RoleConstants.PGV.equals(role)) {
 			return null;
 		}
 
-		if ("GIAOVIEN".equals(role)) {
-			return "redirect:/lecturers/home";
+		if (RoleNavigationUtils.isAuthenticatedRole(role)) {
+			return RoleNavigationUtils.getHomeRedirect(role);
 		}
 
-		if ("SINHVIEN".equals(role)) {
-			return "redirect:/students/home";
-		}
-
-		return "redirect:/hello";
+		return "redirect:/auth/login";
 	}
 
 	private boolean hasText(String value) {

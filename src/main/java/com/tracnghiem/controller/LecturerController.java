@@ -41,6 +41,8 @@ import com.tracnghiem.dto.LecturerDTO;
 import com.tracnghiem.entity.Lecturer;
 import com.tracnghiem.service.AccountSettingsService;
 import com.tracnghiem.service.LecturerService;
+import com.tracnghiem.utils.RoleConstants;
+import com.tracnghiem.utils.RoleNavigationUtils;
 
 @Controller
 @RequestMapping("/lecturers")
@@ -291,19 +293,15 @@ public class LecturerController {
 
 	private String validateLecturerAccess(HttpSession session) {
 		String role = (String) session.getAttribute("ROLE");
-		if ("GIAOVIEN".equals(role)) {
+		if (RoleConstants.LECTURER.equals(role)) {
 			return null;
 		}
 
-		if ("SINHVIEN".equals(role)) {
-			return "redirect:/students/home";
+		if (RoleNavigationUtils.isAuthenticatedRole(role)) {
+			return RoleNavigationUtils.getHomeRedirect(role);
 		}
 
-		if ("PGV".equals(role)) {
-			return "redirect:/admin/home";
-		}
-
-		return "redirect:/hello";
+		return "redirect:/auth/login";
 	}
 
 	@GetMapping("/export")
