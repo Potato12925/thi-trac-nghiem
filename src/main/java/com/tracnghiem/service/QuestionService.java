@@ -112,9 +112,20 @@ public class QuestionService {
             }
         }
 
-        Question question = mapToEntity(dto);
+        Subject subject = subjectService.getSubjectById(dto.getSubjectId());
+        Lecturer lecturer = lecturerService.findLecturerById(dto.getLecturerId());
 
-        questionDAO.update(question);
+        existing.setSubject(subject);
+        existing.setLevel(dto.getLevel());
+        existing.setContent(dto.getContent());
+        existing.setOptionA(dto.getOptionA());
+        existing.setOptionB(dto.getOptionB());
+        existing.setOptionC(dto.getOptionC());
+        existing.setOptionD(dto.getOptionD());
+        existing.setCorrectAnswer(dto.getCorrectAnswer());
+        existing.setLecturer(lecturer);
+
+        questionDAO.update(existing);
     }
 
     public void deleteQuestion(QuestionDTO dto, String role, String userId) {

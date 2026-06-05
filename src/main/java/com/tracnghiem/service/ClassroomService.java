@@ -61,14 +61,19 @@ public class ClassroomService {
     }
 
     public void updateClassroom(ClassroomDTO dto) {
-        Classroom classRoom = convertToEntity(dto);
-
+        Classroom classRoom = findClassroomById(dto.getClassId());
+        if (classRoom == null) {
+            throw new IllegalArgumentException("Lớp học không tồn tại");
+        }
+        classRoom.setClassName(dto.getClassName());
         classroomDAO.update(classRoom);
     }
 
     public void deleteClassroom(ClassroomDTO dto) {
-        Classroom classRoom = convertToEntity(dto);
-
+        Classroom classRoom = findClassroomById(dto.getClassId());
+        if (classRoom == null) {
+            throw new IllegalArgumentException("Lớp học không tồn tại");
+        }
         classroomDAO.delete(classRoom);
     }
 

@@ -157,7 +157,15 @@ public class LecturerService {
     }
 
     public void updateLecturer(LecturerDTO dto) {
-        Lecturer lecturer = convertToEntity(dto);
+        Lecturer lecturer = findLecturerById(dto.getLecturerId());
+        if (lecturer == null) {
+            throw new IllegalArgumentException("Giảng viên không tồn tại");
+        }
+        lecturer.setLastName(dto.getLastName());
+        lecturer.setFirstName(dto.getFirstName());
+        lecturer.setPhoneNumber(dto.getPhoneNumber());
+        lecturer.setAddress(dto.getAddress());
+        lecturer.setEmail(dto.getEmail());
         lecturerDAO.update(lecturer);
     }
 

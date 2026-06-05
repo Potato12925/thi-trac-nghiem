@@ -80,9 +80,12 @@ public class SubjectService {
 	}
 
 	public void updateSubject(SubjectDTO dto) {
-		ensureSubjectExists(dto.getSubjectId());
+		Subject subject = getSubjectById(dto.getSubjectId());
+		if (subject == null) {
+			throw new IllegalArgumentException("Môn học không tồn tại");
+		}
 
-		Subject subject = mapToEntity(dto);
+		subject.setSubjectName(dto.getSubjectName());
 
 		subjectDAO.update(subject);
 	}

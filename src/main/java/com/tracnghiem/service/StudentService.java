@@ -88,7 +88,19 @@ public class StudentService {
 	}
 
 	public void updateStudent(StudentDTO dto) {
-		Student student = convertToEntity(dto);
+		Student student = getStudentById(dto.getStudentId());
+		if (student == null) {
+			throw new IllegalArgumentException("Sinh viên không tồn tại");
+		}
+		Classroom classRoom = classroomService.findClassroomById(dto.getClassId());
+
+		student.setLastName(dto.getLastName());
+		student.setFirstName(dto.getFirstName());
+		student.setBirthDate(dto.getBirthDate());
+		student.setAddress(dto.getAddress());
+		student.setEmail(dto.getEmail());
+		student.setClassRoom(classRoom);
+
 		studentDAO.update(student);
 	}
 
