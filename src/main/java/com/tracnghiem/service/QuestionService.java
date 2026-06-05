@@ -2,13 +2,16 @@ package com.tracnghiem.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.tracnghiem.dao.QuestionDAO;
+import com.tracnghiem.dto.CachedQuestion;
 import com.tracnghiem.dto.QuestionActionDTO;
 import com.tracnghiem.dto.QuestionDTO;
 import com.tracnghiem.entity.Lecturer;
@@ -19,13 +22,27 @@ import com.tracnghiem.entity.Subject;
 public class QuestionService {
 
     @Autowired
-    QuestionDAO questionDAO;
+    private QuestionDAO questionDAO;
 
     @Autowired
-    SubjectService subjectService;
+    private SubjectService subjectService;
 
     @Autowired
-    LecturerService lecturerService;
+    private LecturerService lecturerService;
+
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
+
+    private void evictQuestionCache(String subjectId) {
+        if (subjectId != null) {
+            String key = "questions:subject:" + subjectId.trim();
+            try {
+                redisTemplate.delete(key);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     public Question findByQuestionId(String questionId) {
         return questionDAO.findById(questionId);
@@ -110,17 +127,68 @@ public class QuestionService {
         return (double) (maxLen - distance) / maxLen;
     }
 
+    @SuppressWarnings("unchecked")
     public List<Question> findPotentialDuplicates(String content, String subjectId, Integer excludeQuestionId) {
-        List<Question> list = questionDAO.findAllQuestions(null);
-        List<Question> duplicates = new ArrayList<>();
-        for (Question q : list) {
-            if (q.isDeleted()) continue;
-            if (excludeQuestionId != null && q.getQuestionId().equals(excludeQuestionId)) continue;
-            if (q.getSubject() != null && q.getSubject().getSubjectId().trim().equals(subjectId.trim())) {
-                double similarity = calculateSimilarity(content, q.getContent());
-                if (similarity >= 0.8) {
-                    duplicates.add(q);
+        if (subjectId == null || subjectId.trim().isEmpty()) {
+            return new ArrayList<>();
+        }
+        String key = "questions:subject:" + subjectId.trim();
+        List<CachedQuestion> cachedList = null;
+        try {
+            List<Object> rawList = (List<Object>) redisTemplate.opsForValue().get(key);
+            if (rawList != null) {
+                cachedList = new ArrayList<>();
+                for (Object obj : rawList) {
+                    if (obj instanceof CachedQuestion) {
+                        cachedList.add((CachedQuestion) obj);
+                    } else if (obj instanceof java.util.Map) {
+                        java.util.Map<?, ?> map = (java.util.Map<?, ?>) obj;
+                        CachedQuestion cq = new CachedQuestion();
+                        cq.setQuestionId((Integer) map.get("questionId"));
+                        cq.setContent((String) map.get("content"));
+                        cq.setLevel((String) map.get("level"));
+                        cq.setSubjectId((String) map.get("subjectId"));
+                        cachedList.add(cq);
+                    }
                 }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (cachedList == null) {
+            List<Question> dbList = questionDAO.findQuestionsBySubject(subjectId);
+            cachedList = new ArrayList<>();
+            for (Question q : dbList) {
+                cachedList.add(new CachedQuestion(
+                    q.getQuestionId(),
+                    q.getContent(),
+                    q.getLevel(),
+                    q.getSubject() != null ? q.getSubject().getSubjectId() : ""
+                ));
+            }
+            try {
+                redisTemplate.opsForValue().set(key, cachedList, 1, TimeUnit.HOURS);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        List<Question> duplicates = new ArrayList<>();
+        for (CachedQuestion cq : cachedList) {
+            if (excludeQuestionId != null && cq.getQuestionId().equals(excludeQuestionId)) continue;
+            double similarity = calculateSimilarity(content, cq.getContent());
+            if (similarity >= 0.8) {
+                Question q = new Question();
+                q.setQuestionId(cq.getQuestionId());
+                q.setContent(cq.getContent());
+                q.setLevel(cq.getLevel());
+                if (cq.getSubjectId() != null) {
+                    Subject sub = new Subject();
+                    sub.setSubjectId(cq.getSubjectId());
+                    q.setSubject(sub);
+                }
+                duplicates.add(q);
             }
         }
         return duplicates;
@@ -180,6 +248,7 @@ public class QuestionService {
         Question question = mapToEntity(dto);
 
         questionDAO.create(question);
+        evictQuestionCache(dto.getSubjectId());
     }
 
     @Transactional
@@ -196,6 +265,8 @@ public class QuestionService {
                 throw new IllegalArgumentException("Giáo viên chỉ được cập nhật câu hỏi do mình soạn");
             }
         }
+
+        String oldSubjectId = existing.getSubject() != null ? existing.getSubject().getSubjectId() : null;
 
         if (dto.getImageFile() != null && !dto.getImageFile().isEmpty() && realPath != null) {
             String imageUrl = saveUploadedImage(dto.getImageFile(), realPath);
@@ -219,6 +290,8 @@ public class QuestionService {
         }
 
         questionDAO.update(existing);
+        evictQuestionCache(oldSubjectId);
+        evictQuestionCache(dto.getSubjectId());
     }
 
     @Transactional
@@ -232,8 +305,11 @@ public class QuestionService {
             throw new IllegalArgumentException("Câu hỏi không tồn tại");
         }
 
+        String subjectId = existing.getSubject() != null ? existing.getSubject().getSubjectId() : null;
+
         existing.setDeleted(true);
         questionDAO.update(existing);
+        evictQuestionCache(subjectId);
     }
 
 	@Transactional

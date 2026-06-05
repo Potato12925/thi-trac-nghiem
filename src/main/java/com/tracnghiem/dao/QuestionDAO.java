@@ -150,4 +150,13 @@ public class QuestionDAO extends GenericDAO<Question> {
 		}
 		return query.list();
 	}
+
+	public List<Question> findQuestionsBySubject(String subjectId) {
+		String hql = "FROM Question q WHERE q.deleted = false "
+				+ "AND function('ltrim', function('rtrim', q.subject.subjectId)) = :subjectId "
+				+ "ORDER BY q.questionId";
+		return getSession().createQuery(hql, Question.class)
+				.setParameter("subjectId", subjectId.trim())
+				.list();
+	}
 }

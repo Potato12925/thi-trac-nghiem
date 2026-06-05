@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,6 +45,9 @@ public class LecturerRegistrationService {
 
     @Autowired
     private ExamDAO examDAO;
+
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
 
     public void registerExam(LecturerRegistrationDTO dto, String userMaGv, String role) throws Exception {
         // 1. Determine Lecturer ID based on role
@@ -137,6 +141,14 @@ public class LecturerRegistrationService {
         }
 
         lecturerRegistrationDAO.update(entity);
+
+        // Xóa cache Redis khi cập nhật lịch thi để tránh dữ liệu cũ
+        String redisKey = "exam_questions:" + dto.getClassId() + ":" + dto.getSubjectId() + ":" + dto.getTryNumber();
+        try {
+            redisTemplate.delete(redisKey);
+        } catch (Exception e) {
+            System.err.println("Failed to evict Redis cache: " + e.getMessage());
+        }
     }
 
     public void deleteExam(String maLop, String maMh, Short lan, String userMaGv, String role) throws Exception {
@@ -152,6 +164,14 @@ public class LecturerRegistrationService {
         }
 
         lecturerRegistrationDAO.delete(entity);
+
+        // Xóa cache Redis khi xóa lịch thi
+        String redisKey = "exam_questions:" + maLop + ":" + maMh + ":" + lan;
+        try {
+            redisTemplate.delete(redisKey);
+        } catch (Exception e) {
+            System.err.println("Failed to evict Redis cache: " + e.getMessage());
+        }
     }
 
     public List<LecturerRegistration> getRegistrations(String lecturerId, String role) {

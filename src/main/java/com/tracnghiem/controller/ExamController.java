@@ -14,6 +14,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.tracnghiem.dao.LecturerRegistrationDAO;
 import com.tracnghiem.dao.StudentDAO;
 import com.tracnghiem.dto.ExamSubmissionDTO;
@@ -30,6 +34,9 @@ import com.tracnghiem.utils.RoleNavigationUtils;
 @Controller
 @RequestMapping("/exam")
 public class ExamController {
+
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
 
     @Autowired
     private ExamService examService;
@@ -140,8 +147,19 @@ public class ExamController {
         
         Short duration = (registration != null) ? registration.getDuration() : 60;
 
+        Map<Object, Object> savedAnswers = null;
+        try {
+            savedAnswers = redisTemplate.opsForHash().entries("exam:progress:" + examId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (savedAnswers == null) {
+            savedAnswers = new HashMap<>();
+        }
+
         model.addAttribute("exam", exam);
         model.addAttribute("durationMinutes", duration);
+        model.addAttribute("savedAnswers", savedAnswers);
         
         return "Exam/TakeExam";
     }
@@ -169,6 +187,11 @@ public class ExamController {
 
         try {
             Exam finishedExam = examService.submitExam(examId, studentAnswers, submission.getIsViolation());
+            try {
+                redisTemplate.delete("exam:progress:" + examId);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             session.removeAttribute("CURRENT_EXAM_ID");
             session.removeAttribute("CURRENT_EXAM_CLASS_ID");
             model.addAttribute("score", finishedExam.getScore());
@@ -180,5 +203,36 @@ public class ExamController {
             model.addAttribute("error", e.getMessage());
             return "Exam/TakeExam"; // Simplified error handling
         }
+    }
+
+    @PostMapping(value = "/save-progress", produces = "application/json; charset=UTF-8")
+    @ResponseBody
+    public Map<String, Object> saveProgress(
+            @RequestParam("questionId") Integer questionId,
+            @RequestParam("answer") String answer,
+            HttpSession session) {
+        
+        Map<String, Object> response = new HashMap<>();
+        Integer examId = (Integer) session.getAttribute("CURRENT_EXAM_ID");
+        if (examId == null) {
+            response.put("success", false);
+            response.put("message", "No active exam session.");
+            return response;
+        }
+
+        try {
+            String key = "exam:progress:" + examId;
+            redisTemplate.opsForHash().put(key, String.valueOf(questionId), answer);
+            
+            // Set TTL to 2 hours
+            redisTemplate.expire(key, 2, java.util.concurrent.TimeUnit.HOURS);
+            
+            response.put("success", true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.put("success", false);
+            response.put("message", e.getMessage());
+        }
+        return response;
     }
 }
