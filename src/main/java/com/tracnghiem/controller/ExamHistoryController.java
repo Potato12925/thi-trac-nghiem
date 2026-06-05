@@ -36,7 +36,7 @@ public class ExamHistoryController {
 			return "redirect:/auth/login";
 		}
 
-		model.addAttribute("pageTitle", "Lá»‹ch Sá»­ Thi");
+		model.addAttribute("pageTitle", "Lịch Sử Thi");
 		model.addAttribute("exams", examHistoryService.getExamsByStudent(studentId));
 		return "ExamHistory/Index";
 	}
@@ -51,8 +51,8 @@ public class ExamHistoryController {
 
 		Exam exam = examHistoryService.getExamDetail(examId);
 		if (exam == null) {
-			redirectAttributes.addFlashAttribute("error", "KhÃ´ng tÃ¬m tháº¥y bÃ i thi.");
-			redirectAttributes.addFlashAttribute("errorMessage", "KhÃ´ng tÃ¬m tháº¥y bÃ i thi.");
+			redirectAttributes.addFlashAttribute("error", "Không tìm thấy bài thi.");
+			redirectAttributes.addFlashAttribute("errorMessage", "Không tìm thấy bài thi.");
 			return RoleConstants.STUDENT.equals(role) ? "redirect:/history" : "redirect:/scores";
 		}
 
@@ -60,8 +60,8 @@ public class ExamHistoryController {
 			String studentId = (String) session.getAttribute("LOGIN_USER");
 			if (studentId == null || exam.getStudent() == null
 					|| !exam.getStudent().getStudentId().trim().equals(studentId.trim())) {
-				redirectAttributes.addFlashAttribute("error", "Báº¡n khÃ´ng cÃ³ quyá»n xem chi tiáº¿t bÃ i thi nÃ y.");
-				redirectAttributes.addFlashAttribute("errorMessage", "Báº¡n khÃ´ng cÃ³ quyá»n xem chi tiáº¿t bÃ i thi nÃ y.");
+				redirectAttributes.addFlashAttribute("error", "Bạn không có quyền xem chi tiết bài thi này.");
+				redirectAttributes.addFlashAttribute("errorMessage", "Bạn không có quyền xem chi tiết bài thi này.");
 				return "redirect:/history";
 			}
 		}
@@ -81,7 +81,7 @@ public class ExamHistoryController {
 			}
 		}
 
-		model.addAttribute("pageTitle", "Chi Tiáº¿t BÃ i Thi");
+		model.addAttribute("pageTitle", "Chi Tiết Bài Thi");
 		model.addAttribute("exam", exam);
 		model.addAttribute("totalQuestions", totalQuestions);
 		model.addAttribute("correctCount", correctCount);

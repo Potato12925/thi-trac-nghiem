@@ -100,7 +100,7 @@ public class LecturerRegistrationController {
 
 		try {
 			lecturerRegistrationService.registerExam(dto, userMaGv, role);
-			redirectAttributes.addFlashAttribute("successMessage", "ÄÄƒng kÃ½ thi thÃ nh cÃ´ng!");
+			redirectAttributes.addFlashAttribute("successMessage", "Đăng ký thi thành công!");
 			return "redirect:/lecturer-registration";
 		} catch (Exception e) {
 			model.addAttribute("error", e.getMessage());
@@ -133,7 +133,7 @@ public class LecturerRegistrationController {
 
 		try {
 			lecturerRegistrationService.updateExam(dto, userMaGv, role);
-			redirectAttributes.addFlashAttribute("successMessage", "Cáº­p nháº­t lÆ°á»£t Ä‘Äƒng kÃ½ thi thÃ nh cÃ´ng!");
+			redirectAttributes.addFlashAttribute("successMessage", "Cập nhật lượt đăng ký thi thành công!");
 			return "redirect:/lecturer-registration";
 		} catch (Exception e) {
 			model.addAttribute("error", e.getMessage());
@@ -159,7 +159,7 @@ public class LecturerRegistrationController {
 		try {
 			lecturerRegistrationService.deleteExam(dto.getClassId(), dto.getSubjectId(), dto.getTryNumber(), userMaGv,
 					role);
-			redirectAttributes.addFlashAttribute("successMessage", "XÃ³a lÆ°á»£t Ä‘Äƒng kÃ½ thi thÃ nh cÃ´ng!");
+			redirectAttributes.addFlashAttribute("successMessage", "Xóa lượt đăng ký thi thành công!");
 		} catch (Exception e) {
 			redirectAttributes.addFlashAttribute("error", e.getMessage());
 		}
