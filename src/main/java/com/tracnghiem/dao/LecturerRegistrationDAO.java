@@ -108,6 +108,19 @@ public class LecturerRegistrationDAO extends GenericDAO<LecturerRegistration> {
                 .list();
     }
 
+    public List<LecturerRegistration> findRecentForAdmin(int limit) {
+        String hql = "SELECT g FROM LecturerRegistration g "
+                + "JOIN FETCH g.subject s "
+                + "JOIN FETCH g.classRoom c "
+                + "JOIN FETCH g.lecturer l "
+                + "ORDER BY g.examDate DESC, g.id.tryNumber DESC";
+
+        return getSession()
+                .createQuery(hql, LecturerRegistration.class)
+                .setMaxResults(limit)
+                .list();
+    }
+
     public LecturerRegistration findLatestByLecturer(String lecturerId) {
         List<LecturerRegistration> registrations = findRecentByLecturer(lecturerId, 1);
         return registrations.isEmpty() ? null : registrations.get(0);

@@ -9,6 +9,13 @@ import com.tracnghiem.entity.Account;
 @Repository
 public class AccountDAO extends GenericDAO<Account> {
 
+    @Override
+    public long countAll() {
+        String hql = "SELECT COUNT(a) FROM Account a";
+        Long count = getSession().createQuery(hql, Long.class).uniqueResult();
+        return count == null ? 0L : count.longValue();
+    }
+
 	public Account findByUsername(String username) {
 		String hql = "FROM Account a WHERE a.username = :username";
 
