@@ -53,6 +53,9 @@ public class Exam {
     @Column(name = "THOIGIANKETTHUC")
     private Date endTime;
 
+    @Column(name = "VIPHAM")
+    private Boolean isViolation;
+
     @OneToMany(mappedBy = "exam")
     private List<ExamDetail> examDetails;
 
@@ -137,5 +140,13 @@ public class Exam {
 
     public void setExamDetails(List<ExamDetail> examDetails) {
         this.examDetails = examDetails;
+    }
+
+    public Boolean getIsViolation() {
+        return isViolation;
+    }
+
+    public void setIsViolation(Boolean isViolation) {
+        this.isViolation = isViolation;
     }
 }

@@ -99,13 +99,19 @@ public class ExamService {
         return exam;
     }
 
-    public Exam submitExam(Integer examId, Map<Integer, String> studentAnswers) throws Exception {
+    public Exam submitExam(Integer examId, Map<Integer, String> studentAnswers, Boolean isViolation) throws Exception {
         Exam exam = examDAO.findById(examId);
         if (exam == null) {
             throw new Exception("Không tìm thấy bài thi.");
         }
 
         exam.setEndTime(new Date());
+        
+        if (isViolation != null) {
+            exam.setIsViolation(isViolation);
+        } else {
+            exam.setIsViolation(false);
+        }
 
         List<ExamDetail> details = exam.getExamDetails();
 

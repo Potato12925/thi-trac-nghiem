@@ -10,6 +10,13 @@ import com.tracnghiem.entity.Exam;
 @Repository
 public class ExamDAO extends GenericDAO<Exam> {
 
+    @Override
+    public long countAll() {
+        String hql = "SELECT COUNT(e) FROM Exam e";
+        Long count = getSession().createQuery(hql, Long.class).uniqueResult();
+        return count == null ? 0L : count.longValue();
+    }
+
     public Exam findExam(String studentId, String subjectId, Short tryNumber) {
         Session session = getSession();
         Query<Exam> query = session.createQuery(

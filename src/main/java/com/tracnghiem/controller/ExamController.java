@@ -166,10 +166,13 @@ public class ExamController {
         }
 
         try {
-            Exam finishedExam = examService.submitExam(examId, studentAnswers);
+            Exam finishedExam = examService.submitExam(examId, studentAnswers, submission.getIsViolation());
             session.removeAttribute("CURRENT_EXAM_ID");
             session.removeAttribute("CURRENT_EXAM_CLASS_ID");
             model.addAttribute("score", finishedExam.getScore());
+            if (Boolean.TRUE.equals(submission.getIsViolation())) {
+                model.addAttribute("violationMessage", "Bài thi của bạn đã bị khóa và nộp tự động do vi phạm quy chế thi quá số lần quy định (rời khỏi tab hoặc thoát toàn màn hình).");
+            }
             return "Exam/Result";
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
