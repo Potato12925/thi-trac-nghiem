@@ -56,7 +56,7 @@ public class AuthController {
 
 		model.addAttribute("taiKhoan", new LoginDTO());
 		if (resetSuccess != null) {
-			model.addAttribute("success", "Äáº·t láº¡i máº­t kháº©u thÃ nh cÃ´ng. Vui lÃ²ng Ä‘Äƒng nháº­p láº¡i");
+			model.addAttribute("success", "Đặt lại mật khẩu thành công. Vui lòng đăng nhập lại");
 		}
 
 		return "Account/Login";
@@ -82,7 +82,7 @@ public class AuthController {
 
 		String role = (String) session.getAttribute("ROLE");
 		if (!RoleNavigationUtils.isAuthenticatedRole(role)) {
-			model.addAttribute("error", "Role khÃ´ng há»£p lá»‡");
+			model.addAttribute("error", "Role không hợp lệ");
 			return "Account/Login";
 		}
 
@@ -116,7 +116,7 @@ public class AuthController {
 			ResetPasswordDTO resetPasswordDTO = new ResetPasswordDTO();
 			resetPasswordDTO.setUsername(dto.getUsername().trim());
 			model.addAttribute("resetPasswordForm", resetPasswordDTO);
-			model.addAttribute("success", "MÃ£ OTP Ä‘Ã£ Ä‘Æ°á»£c gá»­i tá»›i email Ä‘Äƒng kÃ½ cá»§a báº¡n");
+			model.addAttribute("success", "Mã OTP đã được gửi tới email đăng ký của bạn");
 			return "Account/ResetPassword";
 		} catch (IllegalArgumentException | IllegalStateException ex) {
 			model.addAttribute("error", ex.getMessage());
@@ -143,7 +143,7 @@ public class AuthController {
 		if (!result.hasFieldErrors("confirmPassword")
 				&& dto.getNewPassword() != null
 				&& !dto.getNewPassword().equals(dto.getConfirmPassword())) {
-			result.rejectValue("confirmPassword", "confirmPassword.mismatch", "Máº­t kháº©u xÃ¡c nháº­n khÃ´ng khá»›p");
+			result.rejectValue("confirmPassword", "confirmPassword.mismatch", "Mật khẩu xác nhận không khớp");
 		}
 
 		if (result.hasErrors()) {
@@ -177,7 +177,7 @@ public class AuthController {
 		if (!result.hasFieldErrors("confirmPassword")
 				&& dto.getNewPassword() != null
 				&& !dto.getNewPassword().equals(dto.getConfirmPassword())) {
-			result.rejectValue("confirmPassword", "confirmPassword.mismatch", "XÃ¡c nháº­n máº­t kháº©u khÃ´ng khá»›p");
+			result.rejectValue("confirmPassword", "confirmPassword.mismatch", "Xác nhận mật khẩu không khớp");
 		}
 
 		if (result.hasErrors()) {
@@ -187,7 +187,7 @@ public class AuthController {
 
 		try {
 			accountSettingsService.changePassword(username, dto.getCurrentPassword(), dto.getNewPassword());
-			redirectAttributes.addFlashAttribute("successMessage", "Äá»•i máº­t kháº©u thÃ nh cÃ´ng");
+			redirectAttributes.addFlashAttribute("successMessage", "Đổi mật khẩu thành công");
 			return "redirect:" + resolveSettingsPath(role);
 		} catch (IllegalArgumentException ex) {
 			model.addAttribute("errorMessage", ex.getMessage());
@@ -202,11 +202,11 @@ public class AuthController {
 
 		if (RoleConstants.STUDENT.equals(role)) {
 			Student student = studentService.getStudentById(username);
-			model.addAttribute("pageTitle", "CÃ i Ä‘áº·t sinh viÃªn");
+			model.addAttribute("pageTitle", "Cài đặt sinh viên");
 			model.addAttribute("studentProfile", student);
 		} else if (RoleConstants.LECTURER.equals(role)) {
 			Lecturer lecturer = lecturerService.findLecturerById(username);
-			model.addAttribute("pageTitle", "CÃ i Ä‘áº·t giáº£ng viÃªn");
+			model.addAttribute("pageTitle", "Cài đặt giảng viên");
 			model.addAttribute("lecturerProfile", lecturer);
 		}
 
