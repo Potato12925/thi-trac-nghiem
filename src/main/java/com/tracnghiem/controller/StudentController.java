@@ -51,6 +51,8 @@ import com.tracnghiem.entity.Student;
 import com.tracnghiem.service.AccountSettingsService;
 import com.tracnghiem.service.ClassroomService;
 import com.tracnghiem.service.StudentService;
+import com.tracnghiem.utils.RoleConstants;
+import com.tracnghiem.utils.RoleNavigationUtils;
 
 @Controller
 @RequestMapping("/students")
@@ -320,19 +322,15 @@ public class StudentController {
 
 	private String validateStudentAccess(HttpSession session) {
 		String role = (String) session.getAttribute("ROLE");
-		if ("SINHVIEN".equals(role)) {
+		if (RoleConstants.STUDENT.equals(role)) {
 			return null;
 		}
 
-		if ("GIAOVIEN".equals(role)) {
-			return "redirect:/lecturers/home";
+		if (RoleNavigationUtils.isAuthenticatedRole(role)) {
+			return RoleNavigationUtils.getHomeRedirect(role);
 		}
 
-		if ("PGV".equals(role)) {
-			return "redirect:/admin/home";
-		}
-
-		return "redirect:/hello";
+		return "redirect:/auth/login";
 	}
 
 	private String normalize(String value) {

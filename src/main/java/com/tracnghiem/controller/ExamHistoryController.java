@@ -13,77 +13,79 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.tracnghiem.entity.Exam;
 import com.tracnghiem.entity.ExamDetail;
 import com.tracnghiem.service.ExamHistoryService;
+import com.tracnghiem.utils.RoleConstants;
+import com.tracnghiem.utils.RoleNavigationUtils;
 
 @Controller
 @RequestMapping("/history")
 public class ExamHistoryController {
 
-    @Autowired
-    private ExamHistoryService examHistoryService;
+	@Autowired
+	private ExamHistoryService examHistoryService;
 
-    private boolean isAuthorized(HttpSession session) {
-        String role = (String) session.getAttribute("ROLE");
-        return role != null && (role.equals("SINHVIEN") || role.equals("GIAOVIEN") || role.equals("PGV"));
-    }
+	@GetMapping
+	public String index(ModelMap model, HttpSession session, RedirectAttributes redirectAttributes) {
+		String role = (String) session.getAttribute("ROLE");
+		if (!RoleConstants.STUDENT.equals(role)) {
+			redirectAttributes.addFlashAttribute("errorMessage", "Bạn không có quyền truy cập chức năng này");
+			return RoleNavigationUtils.getHomeRedirect(role);
+		}
 
-    @GetMapping
-    public String index(ModelMap model, HttpSession session) {
-        if (!isAuthorized(session)) {
-            return "redirect:/auth/login";
-        }
+		String studentId = (String) session.getAttribute("LOGIN_USER");
+		if (studentId == null) {
+			return "redirect:/auth/login";
+		}
 
-        String studentId = (String) session.getAttribute("LOGIN_USER");
-        if (studentId == null) {
-            return "redirect:/auth/login";
-        }
+		model.addAttribute("pageTitle", "Lá»‹ch Sá»­ Thi");
+		model.addAttribute("exams", examHistoryService.getExamsByStudent(studentId));
+		return "ExamHistory/Index";
+	}
 
-        model.addAttribute("pageTitle", "Lịch Sử Thi");
-        model.addAttribute("exams", examHistoryService.getExamsByStudent(studentId));
-        return "ExamHistory/Index";
-    }
+	@GetMapping("/detail")
+	public String detail(@RequestParam("id") Integer examId, ModelMap model, HttpSession session,
+			RedirectAttributes redirectAttributes) {
+		String role = (String) session.getAttribute("ROLE");
+		if (!RoleNavigationUtils.isAuthenticatedRole(role)) {
+			return "redirect:/auth/login";
+		}
 
-    @GetMapping("/detail")
-    public String detail(@RequestParam("id") Integer examId, ModelMap model, HttpSession session,
-            RedirectAttributes redirectAttributes) {
-        String role = (String) session.getAttribute("ROLE");
-        if (role == null || (!"SINHVIEN".equals(role) && !"GIAOVIEN".equals(role) && !"PGV".equals(role))) {
-            return "redirect:/auth/login";
-        }
+		Exam exam = examHistoryService.getExamDetail(examId);
+		if (exam == null) {
+			redirectAttributes.addFlashAttribute("error", "KhÃ´ng tÃ¬m tháº¥y bÃ i thi.");
+			redirectAttributes.addFlashAttribute("errorMessage", "KhÃ´ng tÃ¬m tháº¥y bÃ i thi.");
+			return RoleConstants.STUDENT.equals(role) ? "redirect:/history" : "redirect:/scores";
+		}
 
-        Exam exam = examHistoryService.getExamDetail(examId);
-        if (exam == null) {
-            redirectAttributes.addFlashAttribute("error", "Không tìm thấy bài thi.");
-            return "SINHVIEN".equals(role) ? "redirect:/history" : "redirect:/scores";
-        }
+		if (RoleConstants.STUDENT.equals(role)) {
+			String studentId = (String) session.getAttribute("LOGIN_USER");
+			if (studentId == null || exam.getStudent() == null
+					|| !exam.getStudent().getStudentId().trim().equals(studentId.trim())) {
+				redirectAttributes.addFlashAttribute("error", "Báº¡n khÃ´ng cÃ³ quyá»n xem chi tiáº¿t bÃ i thi nÃ y.");
+				redirectAttributes.addFlashAttribute("errorMessage", "Báº¡n khÃ´ng cÃ³ quyá»n xem chi tiáº¿t bÃ i thi nÃ y.");
+				return "redirect:/history";
+			}
+		}
 
-        if ("SINHVIEN".equals(role)) {
-            String studentId = (String) session.getAttribute("LOGIN_USER");
-            if (studentId == null || exam.getStudent() == null || !exam.getStudent().getStudentId().trim().equals(studentId.trim())) {
-                redirectAttributes.addFlashAttribute("error", "Bạn không có quyền xem chi tiết bài thi này.");
-                return "redirect:/history";
-            }
-        }
+		int totalQuestions = 0;
+		int correctCount = 0;
+		if (exam.getExamDetails() != null) {
+			totalQuestions = exam.getExamDetails().size();
+			for (ExamDetail d : exam.getExamDetails()) {
+				String correctAns = d.getQuestion().getCorrectAnswer() != null
+						? d.getQuestion().getCorrectAnswer().trim()
+						: "";
+				String studentAns = d.getStudentAnswer() != null ? d.getStudentAnswer().trim() : "";
+				if (!correctAns.isEmpty() && correctAns.equalsIgnoreCase(studentAns)) {
+					correctCount++;
+				}
+			}
+		}
 
-        int totalQuestions = 0;
-        int correctCount = 0;
-        if (exam.getExamDetails() != null) {
-            totalQuestions = exam.getExamDetails().size();
-            for (ExamDetail d : exam.getExamDetails()) {
-                String correctAns = d.getQuestion().getCorrectAnswer() != null
-                        ? d.getQuestion().getCorrectAnswer().trim()
-                        : "";
-                String studentAns = d.getStudentAnswer() != null ? d.getStudentAnswer().trim() : "";
-                if (!correctAns.isEmpty() && correctAns.equalsIgnoreCase(studentAns)) {
-                    correctCount++;
-                }
-            }
-        }
+		model.addAttribute("pageTitle", "Chi Tiáº¿t BÃ i Thi");
+		model.addAttribute("exam", exam);
+		model.addAttribute("totalQuestions", totalQuestions);
+		model.addAttribute("correctCount", correctCount);
 
-        model.addAttribute("pageTitle", "Chi Tiết Bài Thi");
-        model.addAttribute("exam", exam);
-        model.addAttribute("totalQuestions", totalQuestions);
-        model.addAttribute("correctCount", correctCount);
-
-        return "ExamHistory/Detail";
-    }
+		return "ExamHistory/Detail";
+	}
 }
