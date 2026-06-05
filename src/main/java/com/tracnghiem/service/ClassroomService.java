@@ -74,7 +74,8 @@ public class ClassroomService {
         if (classRoom == null) {
             throw new IllegalArgumentException("Lớp học không tồn tại");
         }
-        classroomDAO.delete(classRoom);
+        classRoom.setDeleted(true);
+        classroomDAO.update(classRoom);
     }
 
 	@Transactional

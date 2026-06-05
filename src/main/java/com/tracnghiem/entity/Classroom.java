@@ -22,6 +22,9 @@ public class Classroom {
 	@OneToMany(mappedBy = "classRoom")
 	private List<Student> students;
 
+	@Column(name = "IS_DELETED", nullable = false)
+	private boolean deleted = false;
+
 	public Classroom() {
 		super();
 	}
@@ -55,6 +58,14 @@ public class Classroom {
 
 	public void setStudents(List<Student> students) {
 		this.students = students;
+	}
+
+	public boolean isDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
 	}
 
 	public String getClassDisplayName() {

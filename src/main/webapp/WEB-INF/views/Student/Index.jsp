@@ -67,7 +67,8 @@ request.setAttribute("customJs", "student-management.js");
 					<option value="">All classes</option>
 					<c:forEach var="classroom" items="${classrooms}">
 						<option value="${classroom.classId}"
-							${classroom.classId == classId ? 'selected' : ''}>
+							${classroom.classId==classId
+													? 'selected' : '' }>
 							${classroom.classId}</option>
 					</c:forEach>
 				</select>
@@ -162,7 +163,7 @@ request.setAttribute("customJs", "student-management.js");
 						<option value="">Choose class</option>
 						<c:forEach var="classroom" items="${classrooms}">
 							<option value="${classroom.classId}"
-								${classroom.classId == studentDTO.classId ? 'selected' : ''}>
+								${classroom.classId==studentDTO.classId ? 'selected' : '' }>
 								${classroom.classId}</option>
 						</c:forEach>
 					</select>
@@ -344,13 +345,15 @@ request.setAttribute("customJs", "student-management.js");
 						<div class="alert alert-info py-2 px-3 mb-0 small">
 							<i class="bi bi-info-circle-fill me-1"></i> Tệp Excel nên có tiêu
 							đề ở dòng đầu tiên. <br />Cột 1: Mã sinh viên (8 ký tự) <br />Cột
-							2: Họ sinh viên (tối đa 50 ký tự) <br />Cột 3: Tên sinh viên (tối
-							đa 10 ký tự) <br />Cột 4: Ngày sinh (yyyy-MM-dd hoặc dd/MM/yyyy)
-							<br />Cột 5: Địa chỉ (tối đa 100 ký tự) <br />Cột 6: Mã lớp (phải
-							tồn tại trong hệ thống)
+							2: Họ sinh viên (tối đa 50 ký tự) <br />Cột 3: Tên sinh viên
+							(tối đa 10 ký tự) <br />Cột 4: Ngày sinh (yyyy-MM-dd hoặc
+							dd/MM/yyyy) <br />Cột 5: Địa chỉ (tối đa 100 ký tự) <br />Cột
+							6: Mã lớp (phải tồn tại trong hệ thống)
 							<div class="mt-2">
-								<a href="${pageContext.request.contextPath}/students/import/template" class="text-primary fw-medium text-decoration-none">
-									<i class="bi bi-download me-1"></i>Tải về tệp mẫu cấu trúc
+								<a
+									href="${pageContext.request.contextPath}/students/import/template"
+									class="text-primary fw-medium text-decoration-none"> <i
+									class="bi bi-download me-1"></i>Tải về tệp mẫu cấu trúc
 								</a>
 							</div>
 						</div>
@@ -387,7 +390,8 @@ request.setAttribute("customJs", "student-management.js");
 								style="width: 100px; height: 100px; border: 3px solid #dee2e6;">
 								<i class="bi bi-person text-secondary" style="font-size: 3rem;"></i>
 							</div>
-							<div class="mt-2 fw-semibold text-secondary" id="qvStudentId">SV000000</div>
+							<div class="mt-2 fw-semibold text-secondary" id="qvStudentId">
+								SV000000</div>
 						</div>
 						<div class="col-md-9">
 							<div class="row g-3">
