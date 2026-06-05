@@ -11,14 +11,24 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.tracnghiem.dao.AccountDAO;
+import com.tracnghiem.dao.StudentDAO;
+import com.tracnghiem.dao.LecturerDAO;
 import com.tracnghiem.dto.LoginDTO;
 import com.tracnghiem.entity.Account;
+import com.tracnghiem.entity.Student;
+import com.tracnghiem.entity.Lecturer;
 
 @Service
 public class AuthService {
 
 	@Autowired
 	private AccountDAO accountDAO;
+
+	@Autowired
+	private StudentDAO studentDAO;
+
+	@Autowired
+	private LecturerDAO lecturerDAO;
 
 	@Transactional
 	public String login(LoginDTO dto, HttpSession session) {
@@ -29,6 +39,18 @@ public class AuthService {
 
 		if (user == null) {
 			return "Tên đăng nhập không tồn tại";
+		}
+
+		if ("SINHVIEN".equals(user.getRole())) {
+			Student student = studentDAO.findById(user.getUsername());
+			if (student == null || student.isDeleted()) {
+				return "Tên đăng nhập không tồn tại";
+			}
+		} else if ("GIAOVIEN".equals(user.getRole())) {
+			Lecturer lecturer = lecturerDAO.findById(user.getUsername());
+			if (lecturer == null || lecturer.isDeleted()) {
+				return "Tên đăng nhập không tồn tại";
+			}
 		}
 
 		String inputHash = sha256(dto.getPassword());

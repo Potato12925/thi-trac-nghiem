@@ -392,7 +392,14 @@ function handleSave() {
   // Serialize format: type:::studentId:::lastName:::firstName:::birthDate:::address:::email:::classId\n
   let dataStr = "";
   pendingActions.forEach(function (act) {
-    dataStr += act.type + ":::" + act.studentId + ":::" + act.lastName + ":::" + act.firstName + ":::" + act.birthDate + ":::" + act.address + ":::" + act.email + ":::" + act.classId + "\n";
+    dataStr += (act.type || "") + ":::" +
+               (act.studentId || "") + ":::" +
+               (act.lastName || "") + ":::" +
+               (act.firstName || "") + ":::" +
+               (act.birthDate || "") + ":::" +
+               (act.address || "") + ":::" +
+               (act.email || "") + ":::" +
+               (act.classId || "") + "\n";
   });
 
   const actionsDataInput = document.getElementById("actionsDataInput");

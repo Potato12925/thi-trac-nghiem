@@ -49,8 +49,8 @@ function getCellText(row, index) {
 function findRowById(lecturerId) {
     const rows = document.querySelectorAll(".table-responsive table tbody tr");
     for (let row of rows) {
-        const id = row.getAttribute("data-id") || getCellText(row, 0);
-        if (id === lecturerId) {
+        const id = (row.getAttribute("data-id") || getCellText(row, 0)).trim();
+        if (id === lecturerId.trim()) {
             return row;
         }
     }
@@ -58,12 +58,12 @@ function findRowById(lecturerId) {
 }
 
 function fillFormFromRow(row) {
-    document.getElementById("lecturerId").value = row.getAttribute("data-id") || getCellText(row, 0);
-    document.getElementById("lastName").value = row.getAttribute("data-lastname") || getCellText(row, 1);
-    document.getElementById("firstName").value = row.getAttribute("data-firstname") || getCellText(row, 2);
-    document.getElementById("phoneNumber").value = row.getAttribute("data-phone") || getCellText(row, 3);
-    document.getElementById("address").value = row.getAttribute("data-address") || getCellText(row, 4);
-    document.getElementById("email").value = row.getAttribute("data-email") || getCellText(row, 5);
+    document.getElementById("lecturerId").value = (row.getAttribute("data-id") || getCellText(row, 0)).trim();
+    document.getElementById("lastName").value = (row.getAttribute("data-lastname") || getCellText(row, 1)).trim();
+    document.getElementById("firstName").value = (row.getAttribute("data-firstname") || getCellText(row, 2)).trim();
+    document.getElementById("phoneNumber").value = (row.getAttribute("data-phone") || getCellText(row, 3)).trim();
+    document.getElementById("address").value = (row.getAttribute("data-address") || getCellText(row, 4)).trim();
+    document.getElementById("email").value = (row.getAttribute("data-email") || getCellText(row, 5)).trim();
     document.getElementById("lecturerId").readOnly = true;
     setActiveRow(row);
 }
@@ -305,11 +305,11 @@ function handleLocalUpdate() {
     hideClientError();
 
     const oldState = {
-        lastName: row.getAttribute("data-lastname") || getCellText(row, 1),
-        firstName: row.getAttribute("data-firstname") || getCellText(row, 2),
-        phoneNumber: row.getAttribute("data-phone") || getCellText(row, 3),
-        address: row.getAttribute("data-address") || getCellText(row, 4),
-        email: row.getAttribute("data-email") || getCellText(row, 5)
+        lastName: (row.getAttribute("data-lastname") || getCellText(row, 1)).trim(),
+        firstName: (row.getAttribute("data-firstname") || getCellText(row, 2)).trim(),
+        phoneNumber: (row.getAttribute("data-phone") || getCellText(row, 3)).trim(),
+        address: (row.getAttribute("data-address") || getCellText(row, 4)).trim(),
+        email: (row.getAttribute("data-email") || getCellText(row, 5)).trim()
     };
 
     if (lastName === oldState.lastName && firstName === oldState.firstName &&
@@ -358,8 +358,8 @@ function handleLocalDelete() {
     const row = findRowById(lecturerId);
     if (!row) return;
 
-    const lastName = row.getAttribute("data-lastname") || getCellText(row, 1);
-    const firstName = row.getAttribute("data-firstname") || getCellText(row, 2);
+    const lastName = (row.getAttribute("data-lastname") || getCellText(row, 1)).trim();
+    const firstName = (row.getAttribute("data-firstname") || getCellText(row, 2)).trim();
 
     if (!confirm("Bạn có chắc chắn muốn xóa giảng viên " + lastName + " " + firstName + "?")) {
         return;
@@ -432,7 +432,13 @@ function handleSave() {
     // Serialize format: type:::lecturerId:::lastName:::firstName:::phoneNumber:::address:::email\n
     let dataStr = "";
     pendingActions.forEach(function(act) {
-        dataStr += act.type + ":::" + act.lecturerId + ":::" + act.lastName + ":::" + act.firstName + ":::" + act.phoneNumber + ":::" + act.address + ":::" + act.email + "\n";
+        dataStr += (act.type || "") + ":::" +
+                   (act.lecturerId || "") + ":::" +
+                   (act.lastName || "") + ":::" +
+                   (act.firstName || "") + ":::" +
+                   (act.phoneNumber || "") + ":::" +
+                   (act.address || "") + ":::" +
+                   (act.email || "") + "\n";
     });
 
     const actionsDataInput = document.getElementById("actionsDataInput");

@@ -12,6 +12,9 @@ import com.tracnghiem.entity.Question;
 public class QuestionDAO extends GenericDAO<Question> {
 
 	public boolean existsById(Integer questionId) {
+		if (questionId == null) {
+			return false;
+		}
 		return findById(questionId) != null;
 	}
 

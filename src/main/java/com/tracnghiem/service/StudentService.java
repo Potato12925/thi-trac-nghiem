@@ -113,13 +113,11 @@ public class StudentService {
 		}
 		student.setDeleted(true);
 		studentDAO.update(student);
-
-		authService.deleteAccount(dto.getStudentId());
 	}
 
 	private void ensureStudentNotExists(String studentId) {
 		if (studentDAO.existsById(studentId)) {
-			throw new IllegalArgumentException("MÃ£ sinh viÃªn Ä‘Ã£ tá»“n táº¡i");
+			throw new IllegalArgumentException("Mã sinh viên đã tồn tại");
 		}
 	}
 
@@ -272,7 +270,9 @@ public class StudentService {
 			dto.setStudentId(action.getStudentId());
 			dto.setLastName(action.getLastName());
 			dto.setFirstName(action.getFirstName());
-			dto.setBirthDate(parseBirthDate(action.getBirthDate()));
+			if (!"DELETE".equals(action.getType())) {
+				dto.setBirthDate(parseBirthDate(action.getBirthDate()));
+			}
 			dto.setAddress(action.getAddress());
 			dto.setEmail(action.getEmail());
 			dto.setClassId(action.getClassId());

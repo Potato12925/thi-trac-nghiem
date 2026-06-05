@@ -157,6 +157,9 @@ public class QuestionService {
     }
 
     private void ensureQuestionNotExists(Integer questionId) {
+        if (questionId == null) {
+            return;
+        }
         if (questionDAO.existsById(questionId)) {
             throw new IllegalArgumentException("Mã câu hỏi đã tồn tại");
         }
