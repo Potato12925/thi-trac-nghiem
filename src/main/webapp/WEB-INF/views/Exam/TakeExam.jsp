@@ -64,32 +64,37 @@
 		<form:form id="examForm" action="${pageContext.request.contextPath}/exam/submit" method="post" modelAttribute="exam">
 			<input type="hidden" name="isViolation" id="isViolationInput" value="false" />
 			<c:forEach var="detail" items="${exam.examDetails}" varStatus="status">
+				<c:set var="qIdStr">${detail.question.questionId}</c:set>
 				<div class="question-block">
 					<h5 class="mb-3">Câu ${status.index + 1}: ${detail.question.content}</h5>
 					
 					<div class="form-check mb-2">
-						<input class="form-check-input" type="radio" name="answers[${detail.question.questionId}]" id="q${detail.question.questionId}_A" value="A">
+						<input class="form-check-input" type="radio" name="answers[${detail.question.questionId}]" id="q${detail.question.questionId}_A" value="A"
+							<c:if test="${savedAnswers[qIdStr] == 'A'}">checked</c:if>>
 						<label class="form-check-label" for="q${detail.question.questionId}_A">
 							A. ${detail.question.optionA}
 						</label>
 					</div>
 					
 					<div class="form-check mb-2">
-						<input class="form-check-input" type="radio" name="answers[${detail.question.questionId}]" id="q${detail.question.questionId}_B" value="B">
+						<input class="form-check-input" type="radio" name="answers[${detail.question.questionId}]" id="q${detail.question.questionId}_B" value="B"
+							<c:if test="${savedAnswers[qIdStr] == 'B'}">checked</c:if>>
 						<label class="form-check-label" for="q${detail.question.questionId}_B">
 							B. ${detail.question.optionB}
 						</label>
 					</div>
 					
 					<div class="form-check mb-2">
-						<input class="form-check-input" type="radio" name="answers[${detail.question.questionId}]" id="q${detail.question.questionId}_C" value="C">
+						<input class="form-check-input" type="radio" name="answers[${detail.question.questionId}]" id="q${detail.question.questionId}_C" value="C"
+							<c:if test="${savedAnswers[qIdStr] == 'C'}">checked</c:if>>
 						<label class="form-check-label" for="q${detail.question.questionId}_C">
 							C. ${detail.question.optionC}
 						</label>
 					</div>
 					
 					<div class="form-check mb-2">
-						<input class="form-check-input" type="radio" name="answers[${detail.question.questionId}]" id="q${detail.question.questionId}_D" value="D">
+						<input class="form-check-input" type="radio" name="answers[${detail.question.questionId}]" id="q${detail.question.questionId}_D" value="D"
+							<c:if test="${savedAnswers[qIdStr] == 'D'}">checked</c:if>>
 						<label class="form-check-label" for="q${detail.question.questionId}_D">
 							D. ${detail.question.optionD}
 						</label>
@@ -227,6 +232,34 @@
 			if (!document.fullscreenElement && isExamStarted) {
 				handleViolation("Thoát chế độ toàn màn hình");
 			}
+		});
+
+		// Auto-save answers progress to Redis via AJAX
+		document.querySelectorAll("input[type=radio][name^='answers[']").forEach(function(input) {
+			input.addEventListener("change", function() {
+				var name = this.getAttribute("name");
+				var questionId = name.substring(name.indexOf('[') + 1, name.indexOf(']'));
+				var answer = this.value;
+				
+				var params = new URLSearchParams();
+				params.append("questionId", questionId);
+				params.append("answer", answer);
+				
+				fetch("${pageContext.request.contextPath}/exam/save-progress", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/x-www-form-urlencoded"
+					},
+					body: params.toString()
+				})
+				.then(function(res) { return res.json(); })
+				.then(function(data) {
+					console.log("Auto-save successful:", questionId, answer, data);
+				})
+				.catch(function(err) {
+					console.error("Auto-save error:", err);
+				});
+			});
 		});
 	</script>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
