@@ -55,6 +55,7 @@ public class ScoreService {
             Exam exam = examMap.get(s.getStudentId());
             Float score = (exam != null) ? exam.getScore() : null;
             Integer examId = (exam != null) ? exam.getId() : null;
+            Boolean isViolation = (exam != null) ? exam.getIsViolation() : null;
             String letterGrade = convertToLetterGrade(score);
             list.add(new StudentScoreDTO(
                     s.getStudentId(),
@@ -62,7 +63,8 @@ public class ScoreService {
                     s.getFirstName(),
                     score,
                     letterGrade,
-                    examId
+                    examId,
+                    isViolation
             ));
         }
         return list;
