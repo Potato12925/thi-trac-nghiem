@@ -33,7 +33,8 @@ String activeLecturerRegistration = path.equals("/lecturer-registration")
 		|| path.startsWith("/lecturer-registration/") ? "active" : "";
 String activeScore = path.equals("/score") || path.startsWith("/score/") || path.equals("/scores")
 		|| path.startsWith("/scores/") ? "active" : "";
-String activeAccount = path.equals("/account") || path.startsWith("/account/") ? "active" : "";
+String activeAccount = path.equals("/account") || path.startsWith("/account/")
+		|| path.equals("/admin/accounts") || path.startsWith("/admin/accounts/") ? "active" : "";
 String activeReview = path.equals("/review") || path.startsWith("/review/") ? "active" : "";
 String activeExam = path.equals("/exam") || path.startsWith("/exam/") ? "active" : "";
 String activeHistory = path.equals("/history") || path.startsWith("/history/") ? "active" : "";
@@ -107,7 +108,7 @@ String activeSettings = path.equals("/lecturers/settings") || path.startsWith("/
 			</a></li>
 
 			<li><a class="nav-link <%= activeAccount %>"
-				href="${pageContext.request.contextPath}/account"> <i
+				href="${pageContext.request.contextPath}/admin/accounts"> <i
 					class="bi bi-person-lock"></i> <span>Tài khoản</span>
 			</a></li>
 			<%
