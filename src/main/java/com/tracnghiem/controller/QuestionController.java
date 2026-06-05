@@ -294,6 +294,49 @@ public class QuestionController {
 		}
 	}
 
+	@GetMapping("/import/template")
+	public void downloadTemplate(HttpServletResponse response) throws IOException {
+		response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+		response.setHeader("Content-Disposition", "attachment; filename=\"mau-import-bo-de.xlsx\"");
+
+		try (Workbook workbook = new XSSFWorkbook(); OutputStream out = response.getOutputStream()) {
+			Sheet sheet = workbook.createSheet("Bộ đề");
+
+			// Header
+			Row header = sheet.createRow(0);
+			String[] headers = { "Mã câu hỏi", "Mã môn học", "Trình độ", "Nội dung", "Đáp án A", "Đáp án B", "Đáp án C",
+					"Đáp án D", "Đáp án đúng", "Mã GV" };
+			for (int j = 0; j < headers.length; j++) {
+				Cell cell = header.createCell(j);
+				cell.setCellValue(headers[j]);
+				CellStyle headerStyle = workbook.createCellStyle();
+				Font font = workbook.createFont();
+				font.setBold(true);
+				headerStyle.setFont(font);
+				cell.setCellStyle(headerStyle);
+			}
+
+			// Sample row
+			Row sampleRow = sheet.createRow(1);
+			sampleRow.createCell(0).setCellValue(""); // Mã câu hỏi (bỏ trống vì tự sinh)
+			sampleRow.createCell(1).setCellValue("CSDL");
+			sampleRow.createCell(2).setCellValue("A");
+			sampleRow.createCell(3).setCellValue("Hệ quản trị CSDL là gì?");
+			sampleRow.createCell(4).setCellValue("Một phần mềm quản lý dữ liệu");
+			sampleRow.createCell(5).setCellValue("Một thiết bị lưu trữ");
+			sampleRow.createCell(6).setCellValue("Một ngôn ngữ lập trình");
+			sampleRow.createCell(7).setCellValue("Một hệ điều hành");
+			sampleRow.createCell(8).setCellValue("A");
+			sampleRow.createCell(9).setCellValue("GV001");
+
+			for (int j = 0; j < headers.length; j++) {
+				sheet.autoSizeColumn(j);
+			}
+
+			workbook.write(out);
+		}
+	}
+
 	@PostMapping("/import")
 	public String importFromExcel(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes,
 			HttpSession session) {

@@ -319,6 +319,40 @@ public class ClassroomController {
 		}
 	}
 
+	@GetMapping("/import/template")
+	public void downloadTemplate(HttpServletResponse response) throws IOException {
+		response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+		response.setHeader("Content-Disposition", "attachment; filename=\"mau-import-lop-hoc.xlsx\"");
+
+		try (Workbook workbook = new XSSFWorkbook(); OutputStream out = response.getOutputStream()) {
+			Sheet sheet = workbook.createSheet("Lớp học");
+
+			// Header
+			Row header = sheet.createRow(0);
+			Cell cell0 = header.createCell(0);
+			cell0.setCellValue("Mã lớp");
+			Cell cell1 = header.createCell(1);
+			cell1.setCellValue("Tên lớp");
+
+			CellStyle headerStyle = workbook.createCellStyle();
+			Font font = workbook.createFont();
+			font.setBold(true);
+			headerStyle.setFont(font);
+			cell0.setCellStyle(headerStyle);
+			cell1.setCellStyle(headerStyle);
+
+			// Sample row
+			Row sampleRow = sheet.createRow(1);
+			sampleRow.createCell(0).setCellValue("D18CQCN01");
+			sampleRow.createCell(1).setCellValue("Lớp Công nghệ thông tin 1 khóa 2018");
+
+			sheet.autoSizeColumn(0);
+			sheet.autoSizeColumn(1);
+
+			workbook.write(out);
+		}
+	}
+
 	@PostMapping("/import")
 	public String importFromExcel(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
 		if (file.isEmpty()) {

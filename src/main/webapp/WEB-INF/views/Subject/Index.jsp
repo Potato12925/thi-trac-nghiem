@@ -234,6 +234,11 @@ request.setAttribute("customJs", "subject-management.js");
 							<i class="bi bi-info-circle-fill me-1"></i> Tệp Excel nên có tiêu
 							đề ở dòng đầu tiên. Cột 1: Mã môn học (tối đa 5 ký tự), Cột 2:
 							Tên môn học.
+							<div class="mt-2">
+								<a href="${pageContext.request.contextPath}/subjects/import/template" class="text-primary fw-medium text-decoration-none">
+									<i class="bi bi-download me-1"></i>Tải về tệp mẫu cấu trúc
+								</a>
+							</div>
 						</div>
 					</div>
 					<div class="modal-footer bg-light">

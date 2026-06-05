@@ -348,6 +348,11 @@ request.setAttribute("customJs", "student-management.js");
 							đa 10 ký tự) <br />Cột 4: Ngày sinh (yyyy-MM-dd hoặc dd/MM/yyyy)
 							<br />Cột 5: Địa chỉ (tối đa 100 ký tự) <br />Cột 6: Mã lớp (phải
 							tồn tại trong hệ thống)
+							<div class="mt-2">
+								<a href="${pageContext.request.contextPath}/students/import/template" class="text-primary fw-medium text-decoration-none">
+									<i class="bi bi-download me-1"></i>Tải về tệp mẫu cấu trúc
+								</a>
+							</div>
 						</div>
 					</div>
 					<div class="modal-footer bg-light">

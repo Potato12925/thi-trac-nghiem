@@ -347,6 +347,43 @@ public class LecturerController {
 		}
 	}
 
+	@GetMapping("/import/template")
+	public void downloadTemplate(HttpServletResponse response) throws IOException {
+		response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+		response.setHeader("Content-Disposition", "attachment; filename=\"mau-import-giang-vien.xlsx\"");
+
+		try (Workbook workbook = new XSSFWorkbook(); OutputStream out = response.getOutputStream()) {
+			Sheet sheet = workbook.createSheet("Giảng viên");
+
+			// Header
+			Row header = sheet.createRow(0);
+			String[] headers = { "Mã giảng viên", "Họ", "Tên", "Số điện thoại", "Địa chỉ" };
+			for (int j = 0; j < headers.length; j++) {
+				Cell cell = header.createCell(j);
+				cell.setCellValue(headers[j]);
+				CellStyle headerStyle = workbook.createCellStyle();
+				Font font = workbook.createFont();
+				font.setBold(true);
+				headerStyle.setFont(font);
+				cell.setCellStyle(headerStyle);
+			}
+
+			// Sample row
+			Row sampleRow = sheet.createRow(1);
+			sampleRow.createCell(0).setCellValue("GV001");
+			sampleRow.createCell(1).setCellValue("Nguyễn Văn");
+			sampleRow.createCell(2).setCellValue("Bình");
+			sampleRow.createCell(3).setCellValue("0912345678");
+			sampleRow.createCell(4).setCellValue("97 Man Thiện, Quận 9");
+
+			for (int j = 0; j < headers.length; j++) {
+				sheet.autoSizeColumn(j);
+			}
+
+			workbook.write(out);
+		}
+	}
+
 	@PostMapping("/import")
 	public String importFromExcel(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
 		if (file.isEmpty()) {

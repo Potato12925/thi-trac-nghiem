@@ -433,6 +433,11 @@ request.setAttribute("customJs", "question-management.js");
 									5: Đáp án A <br />Cột 6: Đáp án B <br />Cột 7: Đáp án C <br />Cột
 									8: Đáp án D <br />Cột 9: Đáp án đúng (A, B, C hoặc D) <br />Cột
 									10: Mã giảng viên (phải tồn tại)
+									<div class="mt-2">
+										<a href="${pageContext.request.contextPath}/questions/import/template" class="text-primary fw-medium text-decoration-none">
+											<i class="bi bi-download me-1"></i>Tải về tệp mẫu cấu trúc
+										</a>
+									</div>
 								</div>
 							</div>
 							<div class="modal-footer bg-light">
