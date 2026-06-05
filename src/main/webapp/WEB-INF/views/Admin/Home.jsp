@@ -1,4 +1,4 @@
-﻿<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -6,136 +6,337 @@
 
 <%@ include file="../Shared/_LayoutStart.jsp" %>
 
-<c:set var="managerName" value="${empty pgvProfile ? sessionScope.LOGIN_USER : pgvProfile.ho}" />
-<c:set var="managerId" value="${empty pgvProfile.maGV ? sessionScope.LOGIN_USER : pgvProfile.maGV}" />
+<c:set var="accountIdValue" value="${empty accountId ? sessionScope.LOGIN_USER : accountId}" />
+<c:set var="accountRoleValue" value="${empty accountRole ? sessionScope.ROLE : accountRole}" />
+<c:set var="displayNameValue" value="${empty accountIdValue ? 'Quản lý đào tạo' : accountIdValue}" />
+<c:set var="roleLabelValue" value="${empty accountRoleValue ? 'PGV' : accountRoleValue}" />
 
 <c:set var="totalClassroomsValue" value="${empty totalClassrooms ? 0 : totalClassrooms}" />
 <c:set var="totalStudentsValue" value="${empty totalStudents ? 0 : totalStudents}" />
 <c:set var="totalLecturersValue" value="${empty totalLecturers ? 0 : totalLecturers}" />
 <c:set var="totalSubjectsValue" value="${empty totalSubjects ? 0 : totalSubjects}" />
+<c:set var="totalQuestionsValue" value="${empty totalQuestions ? 0 : totalQuestions}" />
+<c:set var="totalExamsValue" value="${empty totalExams ? 0 : totalExams}" />
+<c:set var="totalAccountsValue" value="${empty totalAccounts ? 0 : totalAccounts}" />
 
 <style>
-    body { background: #f4f7fb; }
-    .pgv-dashboard { display: grid; gap: 1.5rem; }
-    .profile-card {
-        border-radius: 28px;
-        overflow: hidden;
-        border: 0;
-        background: linear-gradient(135deg, #1d4ed8, #0284c7);
-        box-shadow: 0 20px 45px rgba(2, 132, 199, 0.2);
-        color: white;
-    }
-    .profile-top { display: flex; align-items: center; gap: 1.5rem; padding: 2rem; }
-    .avatar-box {
-        width: 95px; height: 95px; border-radius: 50%;
-        background: rgba(255,255,255,0.18);
-        display: flex; align-items: center; justify-content: center;
-        font-size: 2.2rem; font-weight: 700; flex-shrink: 0;
-        backdrop-filter: blur(12px); border: 2px solid rgba(255,255,255,0.2);
-    }
-    .manager-name { font-size: 2rem; font-weight: 700; margin-bottom: 0.4rem; }
-    .manager-meta { font-size: 0.95rem; opacity: 0.92; margin-bottom: 0.25rem; }
-    .info-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; padding: 0 2rem 2rem; }
-    .info-item {
-        background: rgba(255,255,255,0.12);
-        border-radius: 22px;
-        padding: 1rem;
-        backdrop-filter: blur(14px);
-        transition: 0.25s ease;
-    }
-    .info-item:hover { transform: translateY(-3px); background: rgba(255,255,255,0.18); }
-    .info-label { font-size: 0.82rem; opacity: 0.85; margin-bottom: 0.45rem; }
-    .info-value { font-size: 1.5rem; font-weight: 700; }
-    .summary-card { border: 0; border-radius: 28px; background: white; box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06); }
-    .summary-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-    .summary-title { font-size: 1.25rem; font-weight: 700; color: #0f172a; }
-    .table { margin-bottom: 0; }
-    .table thead th { border: 0; background: #f8fafc; color: #64748b; font-size: 0.85rem; font-weight: 600; padding: 1rem; }
-    .table tbody td { padding: 1rem; vertical-align: middle; border-color: #f1f5f9; }
-    .badge-soft { background: #eff6ff; color: #1d4ed8; padding: 0.5rem 0.8rem; border-radius: 999px; font-size: 0.78rem; font-weight: 600; }
-    .empty-state { padding: 2rem !important; color: #94a3b8; }
-    @media (max-width: 992px) { .info-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-    @media (max-width: 576px) {
-        .profile-top { flex-direction: column; text-align: center; }
-        .manager-name { font-size: 1.6rem; }
-        .info-grid { grid-template-columns: 1fr; }
-        .summary-header { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
-    }
+.admin-dashboard .hero-card {
+    border: 0;
+    border-radius: 1.5rem;
+    color: #fff;
+    background: linear-gradient(135deg, #0b5ed7 0%, #1d4ed8 55%, #0ea5e9 100%);
+    box-shadow: 0 1rem 2.5rem rgba(13, 110, 253, 0.18);
+}
+
+.admin-dashboard .stats-card,
+.admin-dashboard .table-card {
+    border: 0;
+    border-radius: 1.25rem;
+    box-shadow: 0 0.75rem 2rem rgba(15, 23, 42, 0.08);
+}
+
+.admin-dashboard .avatar-box {
+    width: 5.5rem;
+    height: 5.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.16);
+    border: 2px solid rgba(255, 255, 255, 0.24);
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.admin-dashboard .stat-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.admin-dashboard .stat-label {
+    color: #64748b;
+    font-size: 0.92rem;
+}
+
+.admin-dashboard .metric-icon {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    background: #e7f1ff;
+    color: #0b5ed7;
+}
 </style>
 
-<div class="container-fluid pgv-dashboard">
+<div class="container-fluid admin-dashboard">
+    <div class="card hero-card mb-4">
+        <div class="card-body p-4 p-lg-5">
+            <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-4">
+                <div class="avatar-box">
+                    <c:choose>
+                        <c:when test="${not empty accountIdValue}">
+                            ${fn:substring(fn:toUpperCase(accountIdValue), 0, 1)}
+                        </c:when>
+                        <c:otherwise>P</c:otherwise>
+                    </c:choose>
+                </div>
 
-    <section class="profile-card">
-        <div class="profile-top">
-            <div class="avatar-box">
-                <c:choose>
-                    <c:when test="${not empty pgvProfile.ten}">${fn:substring(pgvProfile.ten,0,1)}</c:when>
-                    <c:otherwise>P</c:otherwise>
-                </c:choose>
+                <div class="flex-grow-1">
+                    <h1 class="h2 mb-2">${displayNameValue}</h1>
+
+                    <div class="row g-2 text-white-50">
+                        <div class="col-md-6">
+                            <i class="bi bi-person-badge me-2"></i> Tài khoản:
+                            <span class="fw-semibold text-white">
+                                <c:choose>
+                                    <c:when test="${not empty accountIdValue}">${accountIdValue}</c:when>
+                                    <c:otherwise>Chưa có dữ liệu</c:otherwise>
+                                </c:choose>
+                            </span>
+                        </div>
+                        <div class="col-md-6">
+                            <i class="bi bi-shield-check me-2"></i> Vai trò:
+                            <span class="fw-semibold text-white">${roleLabelValue}</span>
+                        </div>
+                        <div class="col-md-6">
+                            <i class="bi bi-window-sidebar me-2"></i> Khu vực:
+                            <span class="fw-semibold text-white">Bảng điều khiển quản lý đào tạo</span>
+                        </div>
+                        <div class="col-md-6">
+                            <i class="bi bi-calendar-event me-2"></i> Hôm nay:
+                            <span class="fw-semibold text-white">
+                                <fmt:formatDate value="${today}" pattern="dd/MM/yyyy" />
+                            </span>
+                        </div>
+                    </div>
+                </div>
             </div>
+        </div>
+    </div>
 
-            <div>
-                <div class="manager-name">${managerName}</div>
-                <div class="manager-meta"><i class="bi bi-person-badge"></i> Ma can bo: ${managerId}</div>
-                <div class="manager-meta"><i class="bi bi-diagram-3"></i> Vai tro: PGV</div>
-                <div class="manager-meta"><i class="bi bi-calendar-event"></i> Hom nay: <fmt:formatDate value="${today}" pattern="dd/MM/yyyy" /></div>
+    <div class="row g-4 mb-4">
+        <div class="col-12 col-md-6 col-xl-4 col-xxl-3">
+            <div class="card stats-card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="stat-label">Tổng lớp học</div>
+                        <span class="metric-icon"><i class="bi bi-mortarboard"></i></span>
+                    </div>
+                    <div class="stat-value">${totalClassroomsValue}</div>
+                </div>
             </div>
         </div>
 
-        <div class="info-grid">
-            <div class="info-item">
-                <div class="info-label">Tong lop hoc</div>
-                <div class="info-value">${totalClassroomsValue}</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Tong sinh vien</div>
-                <div class="info-value">${totalStudentsValue}</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Tong giang vien</div>
-                <div class="info-value">${totalLecturersValue}</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Tong mon hoc</div>
-                <div class="info-value">${totalSubjectsValue}</div>
+        <div class="col-12 col-md-6 col-xl-4 col-xxl-3">
+            <div class="card stats-card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="stat-label">Tổng sinh viên</div>
+                        <span class="metric-icon"><i class="bi bi-people"></i></span>
+                    </div>
+                    <div class="stat-value">${totalStudentsValue}</div>
+                </div>
             </div>
         </div>
-    </section>
 
-    <section class="card summary-card">
+        <div class="col-12 col-md-6 col-xl-4 col-xxl-3">
+            <div class="card stats-card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="stat-label">Tổng giảng viên</div>
+                        <span class="metric-icon"><i class="bi bi-person-badge"></i></span>
+                    </div>
+                    <div class="stat-value">${totalLecturersValue}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-xl-4 col-xxl-3">
+            <div class="card stats-card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="stat-label">Tổng môn học</div>
+                        <span class="metric-icon"><i class="bi bi-book"></i></span>
+                    </div>
+                    <div class="stat-value">${totalSubjectsValue}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-xl-4 col-xxl-3">
+            <div class="card stats-card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="stat-label">Tổng câu hỏi</div>
+                        <span class="metric-icon"><i class="bi bi-patch-question"></i></span>
+                    </div>
+                    <div class="stat-value">${totalQuestionsValue}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-xl-4 col-xxl-3">
+            <div class="card stats-card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="stat-label">Tổng bài thi</div>
+                        <span class="metric-icon"><i class="bi bi-journal-check"></i></span>
+                    </div>
+                    <div class="stat-value">${totalExamsValue}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-xl-4 col-xxl-3">
+            <div class="card stats-card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="stat-label">Tổng tài khoản</div>
+                        <span class="metric-icon"><i class="bi bi-person-lock"></i></span>
+                    </div>
+                    <div class="stat-value">${totalAccountsValue}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card table-card">
         <div class="card-body p-4">
-            <div class="summary-header">
-                <div class="summary-title">Tong hop xu ly gan day</div>
-                <span class="badge text-bg-primary">Quan tri dao tao</span>
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-4">
+                <div>
+                    <h2 class="h5 mb-1">Bài kiểm tra được giáo viên đăng ký gần nhất</h2>
+                    <p class="text-muted mb-0">Danh sách 7 đợt đăng ký thi mới nhất từ dữ liệu thực trong hệ thống.</p>
+                </div>
+                <span class="badge text-bg-primary">Dữ liệu từ GIAOVIEN_DANGKY</span>
             </div>
 
             <div class="table-responsive">
-                <table class="table align-middle">
-                    <thead>
+                <table class="table align-middle mb-0">
+                    <thead class="table-light">
                         <tr>
-                            <th>Nghiep vu</th>
-                            <th>Doi tuong</th>
-                            <th>So luong</th>
-                            <th>Cap nhat luc</th>
-                            <th>Trang thai</th>
+                            <th>Môn học</th>
+                            <th>Lớp</th>
+                            <th>Giáo viên đăng ký</th>
+                            <th>Trình độ</th>
+                            <th>Lần thi</th>
+                            <th>Số câu hỏi</th>
+                            <th>Thời gian làm bài</th>
+                            <th>Ngày thi</th>
                         </tr>
                     </thead>
                     <tbody>
                         <c:choose>
-                            <c:when test="${not empty pgvActivities}">
-                                <c:forEach var="item" items="${pgvActivities}">
+                            <c:when test="${not empty recentExamRegistrations}">
+                                <c:forEach var="registration" items="${recentExamRegistrations}">
                                     <tr>
-                                        <td class="fw-semibold">${item.operationName}</td>
-                                        <td>${item.targetGroup}</td>
-                                        <td>${item.quantity}</td>
-                                        <td>${item.updatedAt}</td>
-                                        <td><span class="badge-soft">${empty item.status ? 'On dinh' : item.status}</span></td>
+                                        <td>
+                                            <div class="fw-semibold">
+                                                <c:choose>
+                                                    <c:when test="${not empty registration.subjectName}">
+                                                        ${registration.subjectName}
+                                                    </c:when>
+                                                    <c:otherwise>Chưa có dữ liệu</c:otherwise>
+                                                </c:choose>
+                                            </div>
+                                            <div class="text-muted small">
+                                                <c:choose>
+                                                    <c:when test="${not empty registration.subjectId}">
+                                                        ${registration.subjectId}
+                                                    </c:when>
+                                                    <c:otherwise>N/A</c:otherwise>
+                                                </c:choose>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="fw-semibold">
+                                                <c:choose>
+                                                    <c:when test="${not empty registration.className}">
+                                                        ${registration.className}
+                                                    </c:when>
+                                                    <c:otherwise>Chưa có dữ liệu</c:otherwise>
+                                                </c:choose>
+                                            </div>
+                                            <div class="text-muted small">
+                                                <c:choose>
+                                                    <c:when test="${not empty registration.classId}">
+                                                        ${registration.classId}
+                                                    </c:when>
+                                                    <c:otherwise>N/A</c:otherwise>
+                                                </c:choose>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="fw-semibold">
+                                                <c:choose>
+                                                    <c:when test="${not empty registration.lecturerName}">
+                                                        ${registration.lecturerName}
+                                                    </c:when>
+                                                    <c:otherwise>Chưa có dữ liệu</c:otherwise>
+                                                </c:choose>
+                                            </div>
+                                            <div class="text-muted small">
+                                                <c:choose>
+                                                    <c:when test="${not empty registration.lecturerId}">
+                                                        ${registration.lecturerId}
+                                                    </c:when>
+                                                    <c:otherwise>N/A</c:otherwise>
+                                                </c:choose>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge rounded-pill text-bg-light border">
+                                                <c:choose>
+                                                    <c:when test="${not empty registration.level}">
+                                                        ${registration.level}
+                                                    </c:when>
+                                                    <c:otherwise>Chưa có dữ liệu</c:otherwise>
+                                                </c:choose>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <c:choose>
+                                                <c:when test="${not empty registration.attempt}">
+                                                    Lần ${registration.attempt}
+                                                </c:when>
+                                                <c:otherwise>Chưa có dữ liệu</c:otherwise>
+                                            </c:choose>
+                                        </td>
+                                        <td>
+                                            <c:choose>
+                                                <c:when test="${not empty registration.questionCount}">
+                                                    ${registration.questionCount} câu
+                                                </c:when>
+                                                <c:otherwise>Chưa có dữ liệu</c:otherwise>
+                                            </c:choose>
+                                        </td>
+                                        <td>
+                                            <c:choose>
+                                                <c:when test="${not empty registration.duration}">
+                                                    ${registration.duration} phút
+                                                </c:when>
+                                                <c:otherwise>Chưa có dữ liệu</c:otherwise>
+                                            </c:choose>
+                                        </td>
+                                        <td>
+                                            <c:choose>
+                                                <c:when test="${not empty registration.examDate}">
+                                                    <fmt:formatDate value="${registration.examDate}" pattern="dd/MM/yyyy" />
+                                                </c:when>
+                                                <c:otherwise>Chưa có dữ liệu</c:otherwise>
+                                            </c:choose>
+                                        </td>
                                     </tr>
                                 </c:forEach>
                             </c:when>
                             <c:otherwise>
                                 <tr>
-                                    <td colspan="5" class="text-center empty-state">Chua co du lieu tong hop gan day.</td>
+                                    <td colspan="8" class="text-center py-4 text-muted">
+                                        Chưa có bài kiểm tra nào được giáo viên đăng ký.
+                                    </td>
                                 </tr>
                             </c:otherwise>
                         </c:choose>
@@ -143,7 +344,7 @@
                 </table>
             </div>
         </div>
-    </section>
+    </div>
 </div>
 
 <%@ include file="../Shared/_LayoutEnd.jsp" %>

@@ -4,17 +4,35 @@ import java.util.Date;
 
 public class RecentExamRegistrationDTO {
 
+    private String lecturerId;
+    private String lecturerName;
     private String classId;
     private String className;
     private String subjectId;
     private String subjectName;
-    private Short tryNumber;
+    private Short attempt;
     private String level;
     private Date examDate;
-    private Short numberOfQuestions;
+    private Short questionCount;
     private Short duration;
 
     public RecentExamRegistrationDTO() {
+    }
+
+    public String getLecturerId() {
+        return lecturerId;
+    }
+
+    public void setLecturerId(String lecturerId) {
+        this.lecturerId = lecturerId;
+    }
+
+    public String getLecturerName() {
+        return lecturerName;
+    }
+
+    public void setLecturerName(String lecturerName) {
+        this.lecturerName = lecturerName;
     }
 
     public String getClassId() {
@@ -49,12 +67,12 @@ public class RecentExamRegistrationDTO {
         this.subjectName = subjectName;
     }
 
-    public Short getTryNumber() {
-        return tryNumber;
+    public Short getAttempt() {
+        return attempt;
     }
 
-    public void setTryNumber(Short tryNumber) {
-        this.tryNumber = tryNumber;
+    public void setAttempt(Short attempt) {
+        this.attempt = attempt;
     }
 
     public String getLevel() {
@@ -73,12 +91,12 @@ public class RecentExamRegistrationDTO {
         this.examDate = examDate;
     }
 
-    public Short getNumberOfQuestions() {
-        return numberOfQuestions;
+    public Short getQuestionCount() {
+        return questionCount;
     }
 
-    public void setNumberOfQuestions(Short numberOfQuestions) {
-        this.numberOfQuestions = numberOfQuestions;
+    public void setQuestionCount(Short questionCount) {
+        this.questionCount = questionCount;
     }
 
     public Short getDuration() {
@@ -87,5 +105,21 @@ public class RecentExamRegistrationDTO {
 
     public void setDuration(Short duration) {
         this.duration = duration;
+    }
+
+    public Short getTryNumber() {
+        return attempt;
+    }
+
+    public void setTryNumber(Short tryNumber) {
+        this.attempt = tryNumber;
+    }
+
+    public Short getNumberOfQuestions() {
+        return questionCount;
+    }
+
+    public void setNumberOfQuestions(Short numberOfQuestions) {
+        this.questionCount = numberOfQuestions;
     }
 }
