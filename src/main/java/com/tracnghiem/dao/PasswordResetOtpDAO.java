@@ -45,4 +45,13 @@ public class PasswordResetOtpDAO extends GenericDAO<PasswordResetOtp> {
 
 		return otps.isEmpty() ? null : otps.get(0);
 	}
+
+	public void deleteByAccountId(String accountId) {
+		String hql = "DELETE FROM PasswordResetOtp p WHERE p.accountId = :accountId";
+
+		getSession()
+				.createQuery(hql)
+				.setParameter("accountId", accountId)
+				.executeUpdate();
+	}
 }
