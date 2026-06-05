@@ -52,9 +52,16 @@ public class AuthController {
 	@GetMapping("/login")
 	public String loginForm(
 			@RequestParam(value = "resetSuccess", required = false) String resetSuccess,
+			@RequestParam(value = "sessionExpired", required = false) String sessionExpired,
 			Model model) {
 
 		model.addAttribute("taiKhoan", new LoginDTO());
+		if (!model.containsAttribute("error") && model.containsAttribute("errorMessage")) {
+			model.addAttribute("error", model.asMap().get("errorMessage"));
+		}
+		if (!model.containsAttribute("error") && sessionExpired != null) {
+			model.addAttribute("error", "Phiên đăng nhập của bạn đã hết hiệu lực hoặc đã được đăng xuất.");
+		}
 		if (resetSuccess != null) {
 			model.addAttribute("success", "Đặt lại mật khẩu thành công. Vui lòng đăng nhập lại");
 		}

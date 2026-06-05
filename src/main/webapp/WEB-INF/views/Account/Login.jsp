@@ -169,11 +169,11 @@ body {
 									tục</p>
 							</div>
 
-							<c:if test="${not empty error}">
+							<c:if test="${not empty error or not empty errorMessage}">
 								<div
 									class="alert alert-danger border-0 mb-4 py-3 d-flex align-items-center gap-2">
 									<i class="bi bi-exclamation-triangle-fill"></i> <span
-										class="small fw-medium">${error}</span>
+										class="small fw-medium">${not empty error ? error : errorMessage}</span>
 								</div>
 							</c:if>
 

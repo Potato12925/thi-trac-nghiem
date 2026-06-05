@@ -3,6 +3,8 @@ package com.tracnghiem.service;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 import javax.servlet.http.HttpSession;
 
@@ -11,15 +13,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.tracnghiem.dao.AccountDAO;
-import com.tracnghiem.dao.StudentDAO;
 import com.tracnghiem.dao.LecturerDAO;
+import com.tracnghiem.dao.StudentDAO;
 import com.tracnghiem.dto.LoginDTO;
 import com.tracnghiem.entity.Account;
-import com.tracnghiem.entity.Student;
 import com.tracnghiem.entity.Lecturer;
+import com.tracnghiem.entity.Student;
 
 @Service
 public class AuthService {
+
+	private static final Duration SESSION_STALE_DURATION = Duration.ofMinutes(30);
 
 	@Autowired
 	private AccountDAO accountDAO;
@@ -32,10 +36,8 @@ public class AuthService {
 
 	@Transactional
 	public String login(LoginDTO dto, HttpSession session) {
-
 		String normalizedUsername = dto.getUsername().trim();
-
-		Account user = accountDAO.findByUsername(normalizedUsername);
+		Account user = accountDAO.findByUsernameForUpdate(normalizedUsername);
 
 		if (user == null) {
 			return "Tên đăng nhập không tồn tại";
@@ -54,40 +56,78 @@ public class AuthService {
 		}
 
 		String inputHash = sha256(dto.getPassword());
-
 		if (!inputHash.equalsIgnoreCase(user.getPasswordHash())) {
 			return "Mật khẩu không chính xác";
 		}
 
+		String currentSessionId = session.getId();
+		if (hasActiveSessionElsewhere(user, currentSessionId)) {
+			return "Tài khoản này đang được đăng nhập ở nơi khác.";
+		}
+
+		LocalDateTime now = LocalDateTime.now();
+		user.setCurrentSessionId(currentSessionId);
+		user.setLoginAt(now);
+		user.setLastActiveAt(now);
+
 		session.setAttribute("LOGIN_USER", user.getUsername());
 		session.setAttribute("ROLE", user.getRole());
-
 		return null;
 	}
 
+	@Transactional
 	public void logout(HttpSession session) {
+		if (session == null) {
+			return;
+		}
+
+		String username = (String) session.getAttribute("LOGIN_USER");
+		if (username != null) {
+			clearLoginSession(username, session.getId());
+		}
+
 		session.invalidate();
 	}
 
-	public String sha256(String raw) {
+	@Transactional(readOnly = true)
+	public boolean isCurrentSessionValid(String username, String sessionId) {
+		Account account = accountDAO.findByUsername(username);
+		if (account == null) {
+			return false;
+		}
 
+		return sessionId != null && sessionId.equals(account.getCurrentSessionId());
+	}
+
+	@Transactional
+	public void touchCurrentSession(String username, String sessionId) {
+		if (username == null || sessionId == null) {
+			return;
+		}
+
+		accountDAO.updateLastActiveAt(username, sessionId, LocalDateTime.now());
+	}
+
+	@Transactional
+	public void clearLoginSession(String username, String sessionId) {
+		if (username == null || sessionId == null) {
+			return;
+		}
+
+		accountDAO.clearCurrentSession(username, sessionId);
+	}
+
+	public String sha256(String raw) {
 		try {
-			// chọn thuật toán băm
 			MessageDigest digest = MessageDigest.getInstance("SHA-256");
-			
-			// biến các kí tự raw thành list mã UTF_8 sau đó băm
 			byte[] hash = digest.digest(raw.getBytes(StandardCharsets.UTF_8));
-			
-			// hash tạo ra 32 byte, x2 tạo chỗ trống cho 64 kí tư
 			StringBuilder sb = new StringBuilder(hash.length * 2);
-			
-			// chuyển byte sang hex
+
 			for (byte b : hash) {
 				sb.append(String.format("%02x", b));
 			}
 
 			return sb.toString();
-
 		} catch (NoSuchAlgorithmException e) {
 			throw new IllegalStateException("SHA-256 algorithm not available", e);
 		}
@@ -98,7 +138,6 @@ public class AuthService {
 		account.setUsername(username);
 
 		String passwordHash = sha256(username);
-
 		account.setPasswordHash(passwordHash);
 		account.setRole("SINHVIEN");
 
@@ -123,11 +162,31 @@ public class AuthService {
 	@Transactional
 	public void updatePassword(String username, String rawPassword) {
 		Account account = accountDAO.findByUsername(username);
-
 		if (account == null) {
 			throw new IllegalArgumentException("Tài khoản không tồn tại");
 		}
 
 		account.setPasswordHash(sha256(rawPassword));
+	}
+
+	private boolean hasActiveSessionElsewhere(Account account, String currentSessionId) {
+		String storedSessionId = account.getCurrentSessionId();
+		if (storedSessionId == null || storedSessionId.trim().isEmpty()) {
+			return false;
+		}
+
+		if (storedSessionId.equals(currentSessionId)) {
+			return false;
+		}
+
+		return !isSessionStale(account.getLastActiveAt());
+	}
+
+	private boolean isSessionStale(LocalDateTime lastActiveAt) {
+		if (lastActiveAt == null) {
+			return true;
+		}
+
+		return lastActiveAt.plus(SESSION_STALE_DURATION).isBefore(LocalDateTime.now());
 	}
 }

@@ -1,7 +1,9 @@
 package com.tracnghiem.dao;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
+import org.hibernate.LockMode;
 import org.springframework.stereotype.Repository;
 
 import com.tracnghiem.entity.Account;
@@ -25,6 +27,14 @@ public class AccountDAO extends GenericDAO<Account> {
 				.list();
 
 		return accounts.isEmpty() ? null : accounts.get(0);
+	}
+
+	public Account findByUsernameForUpdate(String username) {
+		if (username == null) {
+			return null;
+		}
+
+		return getSession().get(Account.class, username, LockMode.PESSIMISTIC_WRITE);
 	}
 
 	public boolean existsByUsername(String username) {
@@ -65,6 +75,31 @@ public class AccountDAO extends GenericDAO<Account> {
 		}
 
 		return query.list();
+	}
+
+	public void clearCurrentSession(String username, String sessionId) {
+		String hql = "UPDATE Account a "
+				+ "SET a.currentSessionId = null, a.loginAt = null, a.lastActiveAt = null "
+				+ "WHERE a.username = :username AND a.currentSessionId = :sessionId";
+
+		getSession()
+				.createQuery(hql)
+				.setParameter("username", username)
+				.setParameter("sessionId", sessionId)
+				.executeUpdate();
+	}
+
+	public void updateLastActiveAt(String username, String sessionId, LocalDateTime lastActiveAt) {
+		String hql = "UPDATE Account a "
+				+ "SET a.lastActiveAt = :lastActiveAt "
+				+ "WHERE a.username = :username AND a.currentSessionId = :sessionId";
+
+		getSession()
+				.createQuery(hql)
+				.setParameter("lastActiveAt", lastActiveAt)
+				.setParameter("username", username)
+				.setParameter("sessionId", sessionId)
+				.executeUpdate();
 	}
 
 	private String normalize(String value) {
