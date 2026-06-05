@@ -24,6 +24,8 @@ import com.tracnghiem.entity.Student;
 import com.tracnghiem.entity.Subject;
 import com.tracnghiem.entity.id.LecturerRegistrationId;
 import com.tracnghiem.service.ExamService;
+import com.tracnghiem.utils.RoleConstants;
+import com.tracnghiem.utils.RoleNavigationUtils;
 
 @Controller
 @RequestMapping("/exam")
@@ -41,8 +43,8 @@ public class ExamController {
     @GetMapping
     public String prepare(ModelMap model, HttpSession session) {
         String role = (String) session.getAttribute("ROLE");
-        if (!"SINHVIEN".equals(role)) {
-            return "redirect:/auth/login";
+        if (!RoleConstants.STUDENT.equals(role)) {
+            return RoleNavigationUtils.getHomeRedirect(role);
         }
 
         String studentId = (String) session.getAttribute("LOGIN_USER");
@@ -71,8 +73,8 @@ public class ExamController {
         String role = (String) session.getAttribute("ROLE");
         String userId = (String) session.getAttribute("LOGIN_USER");
 
-        if (!"SINHVIEN".equals(role)) {
-            return "redirect:/auth/login";
+        if (!RoleConstants.STUDENT.equals(role)) {
+            return RoleNavigationUtils.getHomeRedirect(role);
         }
 
         Student student = studentDAO.findById(userId);
@@ -111,8 +113,8 @@ public class ExamController {
         Integer examId = (Integer) session.getAttribute("CURRENT_EXAM_ID");
         String classId = (String) session.getAttribute("CURRENT_EXAM_CLASS_ID");
 
-        if (!"SINHVIEN".equals(role)) {
-            return "redirect:/auth/login";
+        if (!RoleConstants.STUDENT.equals(role)) {
+            return RoleNavigationUtils.getHomeRedirect(role);
         }
 
         if (examId == null) {
@@ -152,8 +154,8 @@ public class ExamController {
         String role = (String) session.getAttribute("ROLE");
         Integer examId = (Integer) session.getAttribute("CURRENT_EXAM_ID");
 
-        if (!"SINHVIEN".equals(role)) {
-            return "redirect:/auth/login";
+        if (!RoleConstants.STUDENT.equals(role)) {
+            return RoleNavigationUtils.getHomeRedirect(role);
         }
 
         if (examId == null) {

@@ -20,6 +20,7 @@
 
 	<!-- STATIC RESOURCES -->
 	<mvc:resources mapping="/assets/**" location="/assets/" />
+	<mvc:resources mapping="/uploads/**" location="/uploads/" />
 
 	<!-- Transaction -->
 	<tx:annotation-driven />
@@ -30,8 +31,11 @@
 		p:prefix="/WEB-INF/views/" p:suffix=".jsp" />
 
 	<!-- Interceptor Bean -->
-	<bean id="loginInterceptor"
-		class="com.tracnghiem.interceptor.LoginInterceptor" />
+	<bean id="authInterceptor"
+		class="com.tracnghiem.interceptor.AuthInterceptor" />
+
+	<bean id="roleInterceptor"
+		class="com.tracnghiem.interceptor.RoleInterceptor" />
 
 	<!-- Email Bean -->
 	<bean id="mailSender"
@@ -70,13 +74,31 @@
 			<mvc:exclude-mapping path="/" />
 			<mvc:exclude-mapping path="/hello" />
 			<mvc:exclude-mapping path="/auth/login" />
+			<mvc:exclude-mapping path="/auth/logout" />
 			<mvc:exclude-mapping path="/auth/forgot-password" />
-			<mvc:exclude-mapping
-				path="/auth/forgot-password/otp" />
+			<mvc:exclude-mapping path="/auth/forgot-password/otp" />
 			<mvc:exclude-mapping path="/auth/reset-password" />
 			<mvc:exclude-mapping path="/assets/**" />
+			<mvc:exclude-mapping path="/uploads/**" />
 
-			<ref bean="loginInterceptor" />
+			<ref bean="authInterceptor" />
+		</mvc:interceptor>
+
+		<mvc:interceptor>
+
+			<mvc:mapping path="/**" />
+
+			<mvc:exclude-mapping path="/" />
+			<mvc:exclude-mapping path="/hello" />
+			<mvc:exclude-mapping path="/auth/login" />
+			<mvc:exclude-mapping path="/auth/logout" />
+			<mvc:exclude-mapping path="/auth/forgot-password" />
+			<mvc:exclude-mapping path="/auth/forgot-password/otp" />
+			<mvc:exclude-mapping path="/auth/reset-password" />
+			<mvc:exclude-mapping path="/assets/**" />
+			<mvc:exclude-mapping path="/uploads/**" />
+
+			<ref bean="roleInterceptor" />
 
 		</mvc:interceptor>
 

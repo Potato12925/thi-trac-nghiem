@@ -1,2 +1,0 @@
-ALTER TABLE SINHVIEN
-ADD Email varchar(255)
