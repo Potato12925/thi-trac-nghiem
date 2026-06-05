@@ -8,7 +8,7 @@
 <c:set var="isLecturer" value="${sessionScope.ROLE eq 'GIAOVIEN'}" />
 
 <%
-request.setAttribute("pageTitle", "Question Management");
+request.setAttribute("pageTitle", "Quản lý Bộ đề");
 request.setAttribute("customCss", "question-management.css");
 request.setAttribute("customJs", "question-management.js");
 %>
@@ -30,7 +30,7 @@ request.setAttribute("customJs", "question-management.js");
 	<div
 		class="d-flex justify-content-between align-items-center page-title-section mb-4">
 
-		<h1 class="h3 mb-0">Question Management</h1>
+		<h1 class="h3 mb-0">Quản lý Bộ đề</h1>
 		<div class="d-flex gap-2">
 			<a href="${pageContext.request.contextPath}/questions/export"
 				class="btn btn-outline-success d-flex align-items-center gap-2">
@@ -73,13 +73,12 @@ request.setAttribute("customJs", "question-management.js");
 			action="${pageContext.request.contextPath}/questions"
 			class="row g-3 mb-4">
 			<div class="col-md-9">
-				<label class="form-label small text-secondary"> Search
-					keyword </label> <input type="text" name="keyword" class="form-control"
+				<label class="form-label small text-secondary"> Từ khóa tìm kiếm </label> <input type="text" name="keyword" class="form-control"
 					value="${keyword}"
-					placeholder="Search content, level, subject, lecturer" />
+					placeholder="Tìm kiếm nội dung, trình độ, môn học, giảng viên" />
 			</div>
 			<div class="col-md-3 d-flex align-items-end">
-				<button type="submit" class="btn btn-outline-secondary w-100">Search</button>
+				<button type="submit" class="btn btn-outline-secondary w-100">Tìm kiếm</button>
 			</div>
 		</form>
 
@@ -91,7 +90,7 @@ request.setAttribute("customJs", "question-management.js");
 
 			<div class="row g-4">
 				<div class="col-lg-3 col-md-6">
-					<label class="form-label small text-secondary"> Question ID
+					<label class="form-label small text-secondary"> Mã câu hỏi
 					</label>
 
 					<form:input path="questionId" id="questionId"
@@ -102,7 +101,7 @@ request.setAttribute("customJs", "question-management.js");
 				</div>
 
 				<div class="col-lg-3 col-md-6">
-					<label class="form-label small text-secondary"> Subject ID
+					<label class="form-label small text-secondary"> Mã môn học
 					</label>
 
 					<form:input path="subjectId" id="subjectId" cssClass="form-control" />
@@ -112,12 +111,12 @@ request.setAttribute("customJs", "question-management.js");
 				</div>
 
 				<div class="col-lg-3 col-md-6">
-					<label class="form-label small text-secondary"> Level </label>
+					<label class="form-label small text-secondary"> Trình độ </label>
 
 					<form:select path="level" id="level" cssClass="form-select">
 
 						<form:option value="">
-												Select level
+												Chọn trình độ
 											</form:option>
 
 						<form:option value="A">
@@ -138,14 +137,13 @@ request.setAttribute("customJs", "question-management.js");
 				</div>
 
 				<div class="col-lg-3 col-md-6">
-					<label class="form-label small text-secondary"> Correct
-						Answer </label>
+					<label class="form-label small text-secondary"> Đáp án đúng </label>
 
 					<form:select path="correctAnswer" id="correctAnswer"
 						cssClass="form-select">
 
 						<form:option value="">
-												Select answer
+												Chọn đáp án
 											</form:option>
 
 						<form:option value="A">
@@ -171,8 +169,7 @@ request.setAttribute("customJs", "question-management.js");
 				</div>
 
 				<div class="col-12">
-					<label class="form-label small text-secondary"> Question
-						Content </label>
+					<label class="form-label small text-secondary"> Nội dung câu hỏi </label>
 
 					<form:textarea path="content" id="content" rows="3"
 						cssClass="form-control" />
@@ -194,7 +191,7 @@ request.setAttribute("customJs", "question-management.js");
 				</div>
 
 				<div class="col-lg-6">
-					<label class="form-label small text-secondary"> Option A </label>
+					<label class="form-label small text-secondary"> Lựa chọn A </label>
 
 					<form:input path="optionA" id="optionA" cssClass="form-control" />
 
@@ -203,7 +200,7 @@ request.setAttribute("customJs", "question-management.js");
 				</div>
 
 				<div class="col-lg-6">
-					<label class="form-label small text-secondary"> Option B </label>
+					<label class="form-label small text-secondary"> Lựa chọn B </label>
 
 					<form:input path="optionB" id="optionB" cssClass="form-control" />
 
@@ -212,7 +209,7 @@ request.setAttribute("customJs", "question-management.js");
 				</div>
 
 				<div class="col-lg-6">
-					<label class="form-label small text-secondary"> Option C </label>
+					<label class="form-label small text-secondary"> Lựa chọn C </label>
 
 					<form:input path="optionC" id="optionC" cssClass="form-control" />
 
@@ -221,7 +218,7 @@ request.setAttribute("customJs", "question-management.js");
 				</div>
 
 				<div class="col-lg-6">
-					<label class="form-label small text-secondary"> Option D </label>
+					<label class="form-label small text-secondary"> Lựa chọn D </label>
 
 					<form:input path="optionD" id="optionD" cssClass="form-control" />
 
@@ -230,7 +227,7 @@ request.setAttribute("customJs", "question-management.js");
 				</div>
 
 				<div class="col-lg-6">
-					<label class="form-label small text-secondary"> Lecturer ID
+					<label class="form-label small text-secondary"> Mã giảng viên
 					</label>
 
 					<form:input path="lecturerId" id="lecturerId"
@@ -270,7 +267,7 @@ request.setAttribute("customJs", "question-management.js");
 
 				<button type="button" class="btn btn-outline-secondary" id="btnUndo"
 					disabled>
-					<i class="bi bi-arrow-counterclockwise me-1"></i> Undo
+					<i class="bi bi-arrow-counterclockwise me-1"></i> Hoàn tác
 				</button>
 
 				<button type="button" class="btn btn-primary px-4" id="btnSave"
@@ -297,15 +294,15 @@ request.setAttribute("customJs", "question-management.js");
 			<table class="table table-hover align-middle mb-0 question-table">
 				<thead class="table-light">
 					<tr>
-						<th>ID</th>
+						<th>Mã CH</th>
 
-						<th>Subject</th>
+						<th>Môn học</th>
 
-						<th>Level</th>
+						<th>Trình độ</th>
 
-						<th>Content</th>
+						<th>Nội dung</th>
 
-						<th>Image</th>
+						<th>Hình ảnh</th>
 
 						<th>A</th>
 
@@ -315,11 +312,11 @@ request.setAttribute("customJs", "question-management.js");
 
 						<th>D</th>
 
-						<th>Answer</th>
+						<th>Đáp án</th>
 
-						<th>Lecturer</th>
+						<th>Giảng viên</th>
 
-						<th class="text-end pe-4">Actions</th>
+						<th class="text-end pe-4">Hành động</th>
 					</tr>
 				</thead>
 
@@ -369,7 +366,7 @@ request.setAttribute("customJs", "question-management.js");
 		<div class="pagination-wrapper">
 			<c:if test="${currentPage > 1}">
 				<a class="pagination-item"
-					href="questions?page=1&keyword=${keyword}"> First </a>
+					href="questions?page=1&keyword=${keyword}"> Đầu </a>
 
 				<a class="pagination-item"
 					href="questions?page=${currentPage - 1}&keyword=${keyword}">
@@ -398,7 +395,7 @@ request.setAttribute("customJs", "question-management.js");
 					&raquo; </a>
 
 				<a class="pagination-item"
-					href="questions?page=${totalPages}&keyword=${keyword}"> Last </a>
+					href="questions?page=${totalPages}&keyword=${keyword}"> Cuối </a>
 			</c:if>
 		</div>
 		<!-- Import Excel Modal -->

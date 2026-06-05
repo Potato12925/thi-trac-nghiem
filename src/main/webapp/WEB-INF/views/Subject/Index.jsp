@@ -96,7 +96,7 @@ request.setAttribute("customJs", "subject-management.js");
 				<button type="button" class="btn btn-outline-danger px-4" id="btnDelete" disabled>Xóa</button>
 				
 				<button type="button" class="btn btn-outline-secondary" id="btnUndo" disabled>
-					<i class="bi bi-arrow-counterclockwise me-1"></i> Undo
+					<i class="bi bi-arrow-counterclockwise me-1"></i> Hoàn tác
 				</button>
 
 				<button type="button" class="btn btn-primary px-4" id="btnSave" disabled>
@@ -153,7 +153,7 @@ request.setAttribute("customJs", "subject-management.js");
 		<div class="pagination-wrapper">
 			<c:if test="${currentPage > 1}">
 				<a class="pagination-item" href="subjects?page=1&search=${search}">
-					First </a>
+					Đầu </a>
 				<a class="pagination-item"
 					href="subjects?page=${currentPage - 1}&search=${search}">
 					&laquo; </a>
@@ -180,7 +180,7 @@ request.setAttribute("customJs", "subject-management.js");
 					href="subjects?page=${currentPage + 1}&search=${search}">
 					&raquo; </a>
 				<a class="pagination-item"
-					href="subjects?page=${totalPages}&search=${search}"> Last </a>
+					href="subjects?page=${totalPages}&search=${search}"> Cuối </a>
 			</c:if>
 		</div>
 	</div>

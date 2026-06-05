@@ -8,7 +8,7 @@
 
 
 <%
-request.setAttribute("pageTitle", "Student Management");
+request.setAttribute("pageTitle", "Quản lý Sinh viên");
 request.setAttribute("customCss", "management.css");
 request.setAttribute("customJs", "student-management.js");
 %>
@@ -18,7 +18,7 @@ request.setAttribute("customJs", "student-management.js");
 <div class="container-fluid page-wrapper">
 
 	<div class="d-flex justify-content-between align-items-center mb-4">
-		<h1 class="h3 mb-0">Student Management</h1>
+		<h1 class="h3 mb-0">Quản lý Sinh viên</h1>
 		<div class="d-flex gap-2">
 			<a href="${pageContext.request.contextPath}/students/export"
 				class="btn btn-outline-success d-flex align-items-center gap-2">
@@ -57,14 +57,13 @@ request.setAttribute("customJs", "student-management.js");
 			action="${pageContext.request.contextPath}/students"
 			class="row g-3 mb-4">
 			<div class="col-md-6">
-				<label class="form-label small text-secondary"> Search
-					keyword </label> <input type="text" name="keyword" class="form-control"
-					value="${keyword}" placeholder="ID, last name, first name" />
+				<label class="form-label small text-secondary"> Từ khóa tìm kiếm </label> <input type="text" name="keyword" class="form-control"
+					value="${keyword}" placeholder="Mã sinh viên, họ, tên" />
 			</div>
 			<div class="col-md-4">
-				<label class="form-label small text-secondary"> Class Filter
+				<label class="form-label small text-secondary"> Lọc theo lớp
 				</label> <select name="filterClassId" class="form-select">
-					<option value="">All classes</option>
+					<option value="">Tất cả các lớp</option>
 					<c:forEach var="classroom" items="${classrooms}">
 						<option value="${classroom.classId}"
 							${classroom.classId==classId
@@ -74,7 +73,7 @@ request.setAttribute("customJs", "student-management.js");
 				</select>
 			</div>
 			<div class="col-md-2 d-flex align-items-end">
-				<button type="submit" class="btn btn-outline-secondary w-100">Search</button>
+				<button type="submit" class="btn btn-outline-secondary w-100">Tìm kiếm</button>
 			</div>
 		</form>
 
@@ -89,7 +88,7 @@ request.setAttribute("customJs", "student-management.js");
 
 				<div class="col-md-3">
 
-					<label class="form-label small text-secondary"> Student ID
+					<label class="form-label small text-secondary"> Mã sinh viên
 					</label>
 
 					<form:input path="studentId" id="studentId" cssClass="form-control" />
@@ -101,7 +100,7 @@ request.setAttribute("customJs", "student-management.js");
 
 				<div class="col-md-4">
 
-					<label class="form-label small text-secondary"> Last Name </label>
+					<label class="form-label small text-secondary"> Họ </label>
 
 					<form:input path="lastName" id="lastName" cssClass="form-control" />
 
@@ -112,7 +111,7 @@ request.setAttribute("customJs", "student-management.js");
 
 				<div class="col-md-2">
 
-					<label class="form-label small text-secondary"> First Name
+					<label class="form-label small text-secondary"> Tên
 					</label>
 
 					<form:input path="firstName" id="firstName" cssClass="form-control" />
@@ -124,7 +123,7 @@ request.setAttribute("customJs", "student-management.js");
 
 				<div class="col-md-3">
 
-					<label class="form-label small text-secondary"> Birth Date
+					<label class="form-label small text-secondary"> Ngày sinh
 					</label>
 
 					<form:input type="date" path="birthDate" id="birthDate"
@@ -137,7 +136,7 @@ request.setAttribute("customJs", "student-management.js");
 
 				<div class="col-md-8">
 
-					<label class="form-label small text-secondary"> Address </label>
+					<label class="form-label small text-secondary"> Địa chỉ </label>
 
 					<form:input path="address" id="address" cssClass="form-control" />
 
@@ -158,9 +157,9 @@ request.setAttribute("customJs", "student-management.js");
 
 				<div class="col-md-4">
 
-					<label class="form-label small text-secondary"> Class ID </label> <select
+					<label class="form-label small text-secondary"> Mã lớp </label> <select
 						id="classId" name="classId" class="form-select">
-						<option value="">Choose class</option>
+						<option value="">Chọn lớp học</option>
 						<c:forEach var="classroom" items="${classrooms}">
 							<option value="${classroom.classId}"
 								${classroom.classId==studentDTO.classId ? 'selected' : '' }>
@@ -186,7 +185,7 @@ request.setAttribute("customJs", "student-management.js");
 
 				<button type="button" class="btn btn-outline-secondary" id="btnUndo"
 					disabled>
-					<i class="bi bi-arrow-counterclockwise me-1"></i> Undo
+					<i class="bi bi-arrow-counterclockwise me-1"></i> Hoàn tác
 				</button>
 
 				<button type="button" class="btn btn-primary px-4" id="btnSave"
@@ -218,21 +217,21 @@ request.setAttribute("customJs", "student-management.js");
 				<thead class="table-light">
 
 					<tr>
-						<th>Student ID</th>
+						<th>Mã sinh viên</th>
 
-						<th>Last Name</th>
+						<th>Họ</th>
 
-						<th>First Name</th>
+						<th>Tên</th>
 
-						<th>Birth Date</th>
+						<th>Ngày sinh</th>
 
-						<th>Address</th>
+						<th>Địa chỉ</th>
 
 						<th>Email</th>
 
-						<th>Class ID</th>
+						<th>Mã lớp</th>
 
-						<th class="text-end">Actions</th>
+						<th class="text-end">Hành động</th>
 					</tr>
 
 				</thead>
@@ -286,7 +285,7 @@ request.setAttribute("customJs", "student-management.js");
 			<c:if test="${currentPage > 1}">
 				<a class="pagination-item"
 					href="students?page=1&keyword=${keyword}&filterClassId=${classId}">
-					First </a>
+					Đầu </a>
 				<a class="pagination-item"
 					href="students?page=${currentPage - 1}&keyword=${keyword}&filterClassId=${classId}">
 					&laquo; </a>
@@ -315,7 +314,7 @@ request.setAttribute("customJs", "student-management.js");
 					&raquo; </a>
 				<a class="pagination-item"
 					href="students?page=${totalPages}&keyword=${keyword}&filterClassId=${classId}">
-					Last </a>
+					Cuối </a>
 			</c:if>
 		</div>
 	</div>
