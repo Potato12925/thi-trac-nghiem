@@ -5,8 +5,10 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +29,9 @@ import com.tracnghiem.entity.id.LecturerRegistrationId;
 @Service
 @Transactional
 public class ExamService {
+
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
 
     @Autowired
     private ExamDAO examDAO;
@@ -63,16 +68,38 @@ public class ExamService {
         }
 
         LecturerRegistrationId regId = new LecturerRegistrationId(classId, subjectId, tryNumber);
-        LecturerRegistration registration = lecturerRegistrationDAO.findById(regId);
-        if (registration == null) {
-            throw new Exception("Không tìm thấy đăng ký thi cho lớp, môn và lần thi này.");
+        String redisKey = "exam_questions:" + classId + ":" + subjectId + ":" + tryNumber;
+        
+        List<Question> cachedQuestions = null;
+        try {
+            cachedQuestions = (List<Question>) redisTemplate.opsForValue().get(redisKey);
+        } catch (Exception e) {
+            System.err.println("Redis connection error, falling back to database: " + e.getMessage());
         }
 
-        List<Question> questions = registration.getQuestions();
-        if (questions == null || questions.isEmpty()) {
-            throw new Exception("Bộ đề chưa có câu hỏi nào.");
+        if (cachedQuestions == null) {
+            LecturerRegistration registration = lecturerRegistrationDAO.findById(regId);
+            if (registration == null) {
+                throw new Exception("Không tìm thấy đăng ký thi cho lớp, môn và lần thi này.");
+            }
+
+            List<Question> dbQuestions = registration.getQuestions();
+            if (dbQuestions == null || dbQuestions.isEmpty()) {
+                throw new Exception("Bộ đề chưa có câu hỏi nào.");
+            }
+            
+            org.hibernate.Hibernate.initialize(dbQuestions);
+            cachedQuestions = new ArrayList<>(dbQuestions);
+            
+            try {
+                // Cache trong Redis trong vòng 2 giờ (120 phút)
+                redisTemplate.opsForValue().set(redisKey, cachedQuestions, 120, TimeUnit.MINUTES);
+            } catch (Exception e) {
+                System.err.println("Failed to cache in Redis: " + e.getMessage());
+            }
         }
 
+        List<Question> questions = new ArrayList<>(cachedQuestions);
         Collections.shuffle(questions);
 
         Exam exam = new Exam();
