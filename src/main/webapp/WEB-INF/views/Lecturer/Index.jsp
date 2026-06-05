@@ -6,7 +6,7 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 
 <%
-request.setAttribute("pageTitle", "Lecturer Management");
+request.setAttribute("pageTitle", "Quản lý Giảng viên");
 request.setAttribute("customCss", "management.css");
 request.setAttribute("customJs", "lecturer-management.js");
 %>
@@ -15,7 +15,7 @@ request.setAttribute("customJs", "lecturer-management.js");
 
 <div class="container-fluid page-wrapper">
 	<div class="d-flex justify-content-between align-items-center mb-4">
-		<h1 class="h3 mb-0">Lecturer Management</h1>
+		<h1 class="h3 mb-0">Quản lý Giảng viên</h1>
 		<div class="d-flex gap-2">
 			<a href="${pageContext.request.contextPath}/lecturers/export"
 				class="btn btn-outline-success d-flex align-items-center gap-2">
@@ -49,11 +49,11 @@ request.setAttribute("customJs", "lecturer-management.js");
 	<div class="border rounded-3 bg-white p-4 mb-4 form-section">
 		<form method="get" action="${pageContext.request.contextPath}/lecturers" class="row g-3 mb-4">
 			<div class="col-md-8">
-				<label class="form-label small text-secondary"> Search keyword </label>
-				<input type="text" name="keyword" class="form-control" value="${keyword}" placeholder="ID, last name, first name" />
+				<label class="form-label small text-secondary"> Từ khóa tìm kiếm </label>
+				<input type="text" name="keyword" class="form-control" value="${keyword}" placeholder="Mã giảng viên, họ, tên" />
 			</div>
 			<div class="col-md-4 d-flex align-items-end">
-				<button type="submit" class="btn btn-outline-secondary w-100">Search</button>
+				<button type="submit" class="btn btn-outline-secondary w-100">Tìm kiếm</button>
 			</div>
 		</form>
 
@@ -65,7 +65,7 @@ request.setAttribute("customJs", "lecturer-management.js");
 
 			<div class="row g-3">
 				<div class="col-md-2">
-					<label class="form-label small text-secondary"> Lecturer ID
+					<label class="form-label small text-secondary"> Mã giảng viên
 					</label>
 
 					<form:input path="lecturerId" id="lecturerId"
@@ -76,7 +76,7 @@ request.setAttribute("customJs", "lecturer-management.js");
 				</div>
 
 				<div class="col-md-3">
-					<label class="form-label small text-secondary"> Last Name </label>
+					<label class="form-label small text-secondary"> Họ </label>
 
 					<form:input path="lastName" id="lastName" cssClass="form-control" />
 
@@ -85,7 +85,7 @@ request.setAttribute("customJs", "lecturer-management.js");
 				</div>
 
 				<div class="col-md-2">
-					<label class="form-label small text-secondary"> First Name
+					<label class="form-label small text-secondary"> Tên
 					</label>
 
 					<form:input path="firstName" id="firstName" cssClass="form-control" />
@@ -95,8 +95,7 @@ request.setAttribute("customJs", "lecturer-management.js");
 				</div>
 
 				<div class="col-md-2">
-					<label class="form-label small text-secondary"> Phone
-						Number </label>
+					<label class="form-label small text-secondary"> Số điện thoại </label>
 
 					<form:input path="phoneNumber" id="phoneNumber"
 						cssClass="form-control" />
@@ -106,7 +105,7 @@ request.setAttribute("customJs", "lecturer-management.js");
 				</div>
 
 				<div class="col-md-3">
-					<label class="form-label small text-secondary"> Address </label>
+					<label class="form-label small text-secondary"> Địa chỉ </label>
 
 					<form:input path="address" id="address" cssClass="form-control" />
 
@@ -132,7 +131,7 @@ request.setAttribute("customJs", "lecturer-management.js");
 				<button type="button" class="btn btn-outline-danger px-4" id="btnDelete" disabled>Xóa</button>
 				
 				<button type="button" class="btn btn-outline-secondary" id="btnUndo" disabled>
-					<i class="bi bi-arrow-counterclockwise me-1"></i> Undo
+					<i class="bi bi-arrow-counterclockwise me-1"></i> Hoàn tác
 				</button>
 
 				<button type="button" class="btn btn-primary px-4" id="btnSave" disabled>
@@ -155,19 +154,19 @@ request.setAttribute("customJs", "lecturer-management.js");
 			<table class="table table-hover align-middle mb-0 management-table">
 				<thead class="table-light">
 					<tr>
-						<th>Lecturer ID</th>
+						<th>Mã giảng viên</th>
 
-						<th>Last Name</th>
+						<th>Họ</th>
 
-						<th>First Name</th>
+						<th>Tên</th>
 
-						<th>Phone Number</th>
+						<th>Số điện thoại</th>
 
-						<th>Address</th>
+						<th>Địa chỉ</th>
 
 						<th>Email</th>
 
-						<th class="text-end">Actions</th>
+						<th class="text-end">Hành động</th>
 					</tr>
 				</thead>
 
@@ -203,8 +202,7 @@ request.setAttribute("customJs", "lecturer-management.js");
 
 						<c:if test="${empty lecturers}">
 							<tr>
-								<td colspan="6" class="text-center text-muted py-4">No
-									lecturers found</td>
+								<td colspan="6" class="text-center text-muted py-4">Không tìm thấy giảng viên</td>
 							</tr>
 						</c:if>
 					</c:forEach>
@@ -214,7 +212,7 @@ request.setAttribute("customJs", "lecturer-management.js");
 
 		<div class="pagination-wrapper">
 			<c:if test="${currentPage > 1}">
-				<a class="pagination-item" href="lecturers?page=1&keyword=${keyword}"> First </a>
+				<a class="pagination-item" href="lecturers?page=1&keyword=${keyword}"> Đầu </a>
 				<a class="pagination-item" href="lecturers?page=${currentPage - 1}&keyword=${keyword}">
 					&laquo; </a>
 			</c:if>
@@ -239,7 +237,7 @@ request.setAttribute("customJs", "lecturer-management.js");
 				<a class="pagination-item" href="lecturers?page=${currentPage + 1}&keyword=${keyword}">
 					&raquo; </a>
 				<a class="pagination-item" href="lecturers?page=${totalPages}&keyword=${keyword}">
-					Last </a>
+					Cuối </a>
 			</c:if>
 		</div>
 	</div>

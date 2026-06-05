@@ -16,7 +16,7 @@ request.setAttribute("customJs", "classroom-analytics.js");
 
 <div class="container-fluid page-wrapper">
 	<div class="d-flex justify-content-between align-items-center mb-4">
-		<h1 class="h3 mb-0">Class Room Management</h1>
+		<h1 class="h3 mb-0">Quản lý Lớp học</h1>
 		<div class="d-flex gap-2">
 			<a href="${pageContext.request.contextPath}/classrooms/export"
 				class="btn btn-outline-success d-flex align-items-center gap-2">
@@ -61,7 +61,7 @@ request.setAttribute("customJs", "classroom-analytics.js");
 
 				<div class="col-md-3">
 
-					<label class="form-label small text-secondary"> Class ID </label>
+					<label class="form-label small text-secondary"> Mã lớp </label>
 
 					<form:input path="classId" cssClass="form-control" />
 					<form:errors path="classId"
@@ -70,7 +70,7 @@ request.setAttribute("customJs", "classroom-analytics.js");
 
 				<div class="col-md-5">
 
-					<label class="form-label small text-secondary"> Class Name
+					<label class="form-label small text-secondary"> Tên lớp
 					</label>
 
 					<form:input path="className" cssClass="form-control" />
@@ -90,7 +90,7 @@ request.setAttribute("customJs", "classroom-analytics.js");
 
 				<button type="button" class="btn btn-outline-secondary" id="btnUndo"
 					disabled>
-					<i class="bi bi-arrow-counterclockwise me-1"></i> Undo
+					<i class="bi bi-arrow-counterclockwise me-1"></i> Hoàn tác
 				</button>
 
 				<button type="button" class="btn btn-primary px-4" id="btnSave"
@@ -116,11 +116,11 @@ request.setAttribute("customJs", "classroom-analytics.js");
 			<table class="table table-hover align-middle mb-0 management-table">
 				<thead class="table-light">
 					<tr>
-						<th scope="col">Class ID</th>
+						<th scope="col">Mã lớp</th>
 
-						<th scope="col">Class Name</th>
+						<th scope="col">Tên lớp</th>
 
-						<th scope="col" class="text-end">Actions</th>
+						<th scope="col" class="text-end">Hành động</th>
 					</tr>
 				</thead>
 
@@ -151,7 +151,7 @@ request.setAttribute("customJs", "classroom-analytics.js");
 
 		<div class="pagination-wrapper">
 			<c:if test="${currentPage > 1}">
-				<a class="pagination-item" href="classrooms?page=1"> First </a>
+				<a class="pagination-item" href="classrooms?page=1"> Đầu </a>
 
 				<a class="pagination-item" href="classrooms?page=${currentPage - 1}">
 					&laquo; </a>
@@ -178,7 +178,7 @@ request.setAttribute("customJs", "classroom-analytics.js");
 					&raquo; </a>
 
 				<a class="pagination-item" href="classrooms?page=${totalPages}">
-					Last </a>
+					Cuối </a>
 			</c:if>
 		</div>
 	</div>
