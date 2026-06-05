@@ -5,9 +5,14 @@
 
 <%
 request.setAttribute("pageTitle", "Quản lý Lớp");
+request.setAttribute("customCss", "management.css");
+request.setAttribute("customJs", "classroom-analytics.js");
 %>
 
 <%@ include file="../Shared/_LayoutStart.jsp"%>
+
+<!-- Chart.js CDN for data visualization -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <div class="container-fluid page-wrapper">
 	<div class="d-flex justify-content-between align-items-center mb-4">
@@ -39,10 +44,12 @@ request.setAttribute("pageTitle", "Quản lý Lớp");
 
 	<div id="clientAlert" class="alert alert-danger d-none mb-3"></div>
 	<div id="unsavedChangesAlert" class="alert alert-warning d-none mb-3">
-		<i class="bi bi-exclamation-circle-fill me-2"></i>Bạn có <span id="unsavedCount" class="fw-bold">0</span> thay đổi chưa lưu xuống Database. Hãy nhấn nút <strong>Ghi</strong> để lưu thay đổi.
+		<i class="bi bi-exclamation-circle-fill me-2"></i>Bạn có <span
+			id="unsavedCount" class="fw-bold">0</span> thay đổi chưa lưu xuống
+		Database. Hãy nhấn nút <strong>Ghi</strong> để lưu thay đổi.
 	</div>
 
-	<div class="border rounded-3 bg-white p-4 mb-4">
+	<div class="border rounded-3 bg-white p-4 mb-4 form-section">
 
 		<form:form id="classRoomForm"
 			action="${pageContext.request.contextPath}/classrooms/add"
@@ -75,31 +82,38 @@ request.setAttribute("pageTitle", "Quản lý Lớp");
 			<div class="d-flex gap-2 mt-4">
 				<button type="button" class="btn btn-dark px-4" id="btnAdd">Thêm</button>
 
-				<button type="button" class="btn btn-outline-secondary px-4" id="btnUpdate" disabled>Chỉnh sửa</button>
+				<button type="button" class="btn btn-outline-secondary px-4"
+					id="btnUpdate" disabled>Chỉnh sửa</button>
 
-				<button type="button" class="btn btn-outline-danger px-4" id="btnDelete" disabled>Xóa</button>
-				
-				<button type="button" class="btn btn-outline-secondary" id="btnUndo" disabled>
+				<button type="button" class="btn btn-outline-danger px-4"
+					id="btnDelete" disabled>Xóa</button>
+
+				<button type="button" class="btn btn-outline-secondary" id="btnUndo"
+					disabled>
 					<i class="bi bi-arrow-counterclockwise me-1"></i> Undo
 				</button>
 
-				<button type="button" class="btn btn-primary px-4" id="btnSave" disabled>
+				<button type="button" class="btn btn-primary px-4" id="btnSave"
+					disabled>
 					<i class="bi bi-save me-1"></i> Ghi
 				</button>
 
-				<button type="button" class="btn btn-outline-dark px-4" id="btnReset">Xóa dữ liệu</button>
+				<button type="button" class="btn btn-outline-dark px-4"
+					id="btnReset">Xóa dữ liệu</button>
 			</div>
 		</form:form>
 	</div>
 
-	<form id="saveForm" action="${pageContext.request.contextPath}/classrooms/save" method="post" class="d-none">
-		<input type="hidden" name="page" value="${currentPage}" />
-		<input type="hidden" name="actionsData" id="actionsDataInput" />
+	<form id="saveForm"
+		action="${pageContext.request.contextPath}/classrooms/save"
+		method="post" class="d-none">
+		<input type="hidden" name="page" value="${currentPage}" /> <input
+			type="hidden" name="actionsData" id="actionsDataInput" />
 	</form>
 
-	<div class="card border-0 shadow-sm">
-		<div class="table-responsive p-3">
-			<table class="table table-hover align-middle mb-0">
+	<div class="card border-0 shadow-sm management-card">
+		<div class="table-responsive p-3 management-table-wrapper">
+			<table class="table table-hover align-middle mb-0 management-table">
 				<thead class="table-light">
 					<tr>
 						<th scope="col">Class ID</th>
@@ -120,7 +134,11 @@ request.setAttribute("pageTitle", "Quản lý Lớp");
 							<td>${cr.className}</td>
 
 							<td class="text-end pe-4">
-
+								<button type="button"
+									class="btn btn-sm btn-outline-primary me-2 btn-analytics"
+									data-class-id="${cr.classId}" data-class-name="${cr.className}">
+									<i class="bi bi-bar-chart-line"></i> Phân tích
+								</button>
 								<button class="btn btn-sm btn-outline-secondary me-2 btn-edit">
 									<i class="bi bi-pencil"></i>
 								</button>
@@ -173,7 +191,8 @@ request.setAttribute("pageTitle", "Quản lý Lớp");
 					method="post" enctype="multipart/form-data">
 					<div class="modal-header bg-success text-white">
 						<h5 class="modal-title fw-semibold" id="classroomImportModalLabel">
-							<i class="bi bi-file-earmark-excel me-2"></i> Nhập dữ liệu từ Excel
+							<i class="bi bi-file-earmark-excel me-2"></i> Nhập dữ liệu từ
+							Excel
 						</h5>
 						<button type="button" class="btn-close btn-close-white"
 							data-bs-dismiss="modal" aria-label="Đóng"></button>
@@ -181,26 +200,28 @@ request.setAttribute("pageTitle", "Quản lý Lớp");
 					<div class="modal-body">
 						<div class="mb-3">
 							<label for="excelFile"
-								class="form-label fw-medium text-secondary">Chọn tệp Excel (.xlsx, .xls)</label>
-							<input class="form-control" type="file"
+								class="form-label fw-medium text-secondary">Chọn tệp
+								Excel (.xlsx, .xls)</label> <input class="form-control" type="file"
 								id="excelFile" name="file" accept=".xlsx, .xls" required />
 						</div>
 						<div class="alert alert-info py-2 px-3 mb-0 small">
-							<i class="bi bi-info-circle-fill me-1"></i> Tệp Excel nên có tiêu đề ở dòng đầu tiên.
-							Cột 1: Mã lớp (tối đa 15 ký tự), Cột 2: Tên lớp.
+							<i class="bi bi-info-circle-fill me-1"></i> Tệp Excel nên có tiêu
+							đề ở dòng đầu tiên. Cột 1: Mã lớp (tối đa 15 ký tự), Cột 2: Tên
+							lớp.
 						</div>
 					</div>
 					<div class="modal-footer bg-light">
 						<button type="button" class="btn btn-secondary"
 							data-bs-dismiss="modal">Hủy</button>
-						<button type="submit" class="btn btn-success">Nhập dữ liệu</button>
+						<button type="submit" class="btn btn-success">Nhập dữ
+							liệu</button>
 					</div>
 				</form>
 			</div>
 		</div>
 	</div>
 
-<script>
+	<script>
 document.addEventListener("DOMContentLoaded", function () {
   const btnAdd = document.getElementById("btnAdd");
   const btnUpdate = document.getElementById("btnUpdate");
@@ -518,4 +539,134 @@ function handleSave() {
 }
 </script>
 
-<%@ include file="../Shared/_LayoutEnd.jsp"%>
+	<!-- Classroom Analytics Modal -->
+	<div class="modal fade" id="classroomAnalyticsModal" tabindex="-1"
+		aria-labelledby="classroomAnalyticsModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-xl modal-dialog-centered">
+			<div class="modal-content border-0 shadow">
+				<div class="modal-header bg-dark text-white">
+					<h5 class="modal-title fw-semibold"
+						id="classroomAnalyticsModalLabel">
+						<i class="bi bi-bar-chart-line-fill me-2"></i> Phân tích kết quả
+						học tập lớp: <span id="anClassNameHeader">Lớp</span>
+					</h5>
+					<button type="button" class="btn-close btn-close-white"
+						data-bs-dismiss="modal" aria-label="Đóng"></button>
+				</div>
+				<div class="modal-body p-4">
+					<div class="row g-3 mb-4">
+						<div class="col-md-5">
+							<label class="form-label small text-secondary fw-semibold">Chọn
+								Môn Học</label> <select id="anSubjectSelect" class="form-select"></select>
+						</div>
+						<div class="col-md-3">
+							<label class="form-label small text-secondary fw-semibold">Chọn
+								Lần Thi</label> <select id="anTryNumberSelect" class="form-select">
+								<option value="1">Lần 1</option>
+								<option value="2">Lần 2</option>
+							</select>
+						</div>
+						<div class="col-md-4 d-flex align-items-end">
+							<button type="button" class="btn btn-primary w-100"
+								id="btnQueryAnalytics">
+								<i class="bi bi-search me-1"></i> Xem thống kê
+							</button>
+						</div>
+					</div>
+
+					<!-- Analytics Content Area -->
+					<div id="analyticsContent" class="d-none">
+						<!-- KPI cards -->
+						<div class="row g-3 mb-4 text-center">
+							<div class="col-6 col-lg-3">
+								<div class="p-3 border rounded bg-light">
+									<div class="text-secondary small">Sĩ số lớp</div>
+									<div class="fs-3 fw-bold text-dark" id="anTotalStudents">0</div>
+								</div>
+							</div>
+							<div class="col-6 col-lg-3">
+								<div class="p-3 border rounded bg-light">
+									<div class="text-secondary small">Đã thi / Chưa thi</div>
+									<div class="fs-3 fw-bold text-primary">
+										<span id="anAttempted">0</span> / <span id="anNotAttempted">0</span>
+									</div>
+								</div>
+							</div>
+							<div class="col-6 col-lg-3">
+								<div class="p-3 border rounded bg-light">
+									<div class="text-secondary small">Điểm trung bình</div>
+									<div class="fs-3 fw-bold text-success" id="anAverageScore">0.0</div>
+								</div>
+							</div>
+							<div class="col-6 col-lg-3">
+								<div class="p-3 border rounded bg-light">
+									<div class="text-secondary small">Tỷ lệ Đạt (>=4.0)</div>
+									<div class="fs-3 fw-bold text-info" id="anPassRate">0%</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="row g-4">
+							<!-- Chart Column -->
+							<div class="col-lg-7">
+								<div class="card border rounded p-3 h-100 mb-0">
+									<h6 class="fw-bold mb-3">
+										<i class="bi bi-graph-up me-1"></i> Phân phối phổ điểm chữ
+									</h6>
+									<div style="position: relative; height: 300px;">
+										<canvas id="gradeDistributionChart"></canvas>
+									</div>
+								</div>
+							</div>
+
+							<!-- Ranking Column -->
+							<div class="col-lg-5">
+								<div class="card border rounded p-3 h-100 mb-0">
+									<h6 class="fw-bold mb-3 text-warning">
+										<i class="bi bi-trophy me-1"></i> Top 5 sinh viên điểm cao
+										nhất
+									</h6>
+									<div class="table-responsive">
+										<table class="table table-sm table-hover align-middle">
+											<thead class="table-light">
+												<tr>
+													<th>Hạng</th>
+													<th>Mã SV</th>
+													<th>Họ và tên</th>
+													<th class="text-end">Điểm</th>
+												</tr>
+											</thead>
+											<tbody id="anTopStudentsBody">
+												<tr>
+													<td colspan="4" class="text-center text-muted">Chưa có
+														dữ liệu thi.</td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Loading Spinner -->
+					<div id="analyticsLoading" class="text-center py-5 d-none">
+						<div class="spinner-border text-primary" role="status">
+							<span class="visually-hidden">Loading...</span>
+						</div>
+						<div class="text-secondary mt-2">Đang xử lý dữ liệu học
+							tập...</div>
+					</div>
+
+					<!-- Error Alert -->
+					<div id="analyticsError" class="alert alert-danger mt-3 d-none"></div>
+				</div>
+				<div class="modal-footer bg-light">
+					<button type="button" class="btn btn-secondary"
+						data-bs-dismiss="modal">Đóng</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<%@ include file="../Shared/_LayoutEnd.jsp"%>

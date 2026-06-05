@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
@@ -371,5 +373,38 @@ public class StudentService {
 
 			addStudentWithAccount(cleanDto);
 		}
+	}
+
+	@Transactional
+	public Map<String, Object> getStudentQuickViewData(String studentId) {
+		Student student = studentDAO.findById(studentId);
+		if (student == null) {
+			throw new IllegalArgumentException("Sinh viên không tồn tại");
+		}
+		
+		Map<String, Object> map = new HashMap<>();
+		map.put("studentId", student.getStudentId().trim());
+		map.put("lastName", student.getLastName() != null ? student.getLastName().trim() : "");
+		map.put("firstName", student.getFirstName() != null ? student.getFirstName().trim() : "");
+		map.put("birthDate", student.getBirthDate() != null ? new SimpleDateFormat("yyyy-MM-dd").format(student.getBirthDate()) : "");
+		map.put("address", student.getAddress() != null ? student.getAddress().trim() : "");
+		map.put("email", student.getEmail() != null ? student.getEmail().trim() : "");
+		map.put("classId", student.getClassRoom() != null ? student.getClassRoom().getClassId().trim() : "");
+		map.put("className", student.getClassRoom() != null ? student.getClassRoom().getClassName().trim() : "");
+		
+		List<Exam> exams = examDAO.findByStudent(studentId);
+		List<Map<String, Object>> examList = new ArrayList<>();
+		for (Exam e : exams) {
+			Map<String, Object> em = new HashMap<>();
+			em.put("subjectId", e.getSubject() != null ? e.getSubject().getSubjectId().trim() : "");
+			em.put("subjectName", e.getSubject() != null ? e.getSubject().getSubjectName().trim() : "");
+			em.put("tryNumber", e.getAttempt());
+			em.put("score", e.getScore());
+			em.put("examDate", e.getExamDate() != null ? new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(e.getExamDate()) : "");
+			examList.add(em);
+		}
+		map.put("exams", examList);
+		
+		return map;
 	}
 }

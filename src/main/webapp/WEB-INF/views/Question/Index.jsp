@@ -15,6 +15,15 @@ request.setAttribute("customJs", "question-management.js");
 
 <%@ include file="../Shared/_LayoutStart.jsp"%>
 
+<!-- KaTeX CDN for mathematical formulas -->
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+<script defer
+	src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+<script defer
+	src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
+	onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+
 
 <div class="container-fluid page-wrapper">
 
@@ -48,20 +57,26 @@ request.setAttribute("customJs", "question-management.js");
 
 	<div id="clientAlert" class="alert alert-danger d-none mb-3"></div>
 	<div id="unsavedChangesAlert" class="alert alert-warning d-none mb-3">
-		<i class="bi bi-exclamation-circle-fill me-2"></i>Bạn có <span id="unsavedCount" class="fw-bold">0</span> thay đổi chưa lưu xuống Database. Hãy nhấn nút <strong>Ghi</strong> để lưu thay đổi.
+		<i class="bi bi-exclamation-circle-fill me-2"></i>Bạn có <span
+			id="unsavedCount" class="fw-bold">0</span> thay đổi chưa lưu xuống
+		Database. Hãy nhấn nút <strong>Ghi</strong> để lưu thay đổi.
 	</div>
 
 	<c:if test="${isLecturer}">
-		<div class="alert alert-info">Giáo viên chỉ được xem và cập nhật câu hỏi do mình soạn.</div>
+		<div class="alert alert-info">Giáo viên chỉ được xem và cập nhật
+			câu hỏi do mình soạn.</div>
 	</c:if>
 
 	<div class="border bg-white mb-4 shadow-sm form-section">
 
-		<form method="get" action="${pageContext.request.contextPath}/questions" class="row g-3 mb-4">
+		<form method="get"
+			action="${pageContext.request.contextPath}/questions"
+			class="row g-3 mb-4">
 			<div class="col-md-9">
-				<label class="form-label small text-secondary"> Search keyword </label>
-				<input type="text" name="keyword" class="form-control"
-					value="${keyword}" placeholder="Search content, level, subject, lecturer" />
+				<label class="form-label small text-secondary"> Search
+					keyword </label> <input type="text" name="keyword" class="form-control"
+					value="${keyword}"
+					placeholder="Search content, level, subject, lecturer" />
 			</div>
 			<div class="col-md-3 d-flex align-items-end">
 				<button type="submit" class="btn btn-outline-secondary w-100">Search</button>
@@ -102,20 +117,20 @@ request.setAttribute("customJs", "question-management.js");
 					<form:select path="level" id="level" cssClass="form-select">
 
 						<form:option value="">
-							Select level
-						</form:option>
+												Select level
+											</form:option>
 
 						<form:option value="A">
-							A
-						</form:option>
+												A
+											</form:option>
 
 						<form:option value="B">
-							B
-						</form:option>
+												B
+											</form:option>
 
 						<form:option value="C">
-							C
-						</form:option>
+												C
+											</form:option>
 
 					</form:select>
 
@@ -130,24 +145,24 @@ request.setAttribute("customJs", "question-management.js");
 						cssClass="form-select">
 
 						<form:option value="">
-							Select answer
-						</form:option>
+												Select answer
+											</form:option>
 
 						<form:option value="A">
-							A
-						</form:option>
+												A
+											</form:option>
 
 						<form:option value="B">
-							B
-						</form:option>
+												B
+											</form:option>
 
 						<form:option value="C">
-							C
-						</form:option>
+												C
+											</form:option>
 
 						<form:option value="D">
-							D
-						</form:option>
+												D
+											</form:option>
 
 					</form:select>
 
@@ -164,6 +179,18 @@ request.setAttribute("customJs", "question-management.js");
 
 					<form:errors path="content"
 						cssClass="text-danger small mt-1 d-block" />
+
+					<div class="mt-2 p-2 border rounded bg-light"
+						style="min-height: 40px;">
+
+						<div id="latexPreview" class="mt-1"></div>
+					</div>
+
+					<div id="duplicateAlert" class="alert alert-warning mt-2 d-none">
+						<i class="bi bi-exclamation-triangle-fill me-2"></i><strong>Cảnh
+							báo câu hỏi trùng lặp:</strong>
+						<ul id="duplicateList" class="mb-0 mt-1 small"></ul>
+					</div>
 				</div>
 
 				<div class="col-lg-6">
@@ -202,7 +229,7 @@ request.setAttribute("customJs", "question-management.js");
 						cssClass="text-danger small mt-1 d-block" />
 				</div>
 
-				<div class="col-lg-4">
+				<div class="col-lg-6">
 					<label class="form-label small text-secondary"> Lecturer ID
 					</label>
 
@@ -212,6 +239,20 @@ request.setAttribute("customJs", "question-management.js");
 					<form:errors path="lecturerId"
 						cssClass="text-danger small mt-1 d-block" />
 				</div>
+
+				<div class="col-lg-6">
+					<label class="form-label small text-secondary"> Hình ảnh
+						câu hỏi </label> <input type="file" id="imageFileInput"
+						class="form-control" accept="image/*" />
+					<div id="imagePreviewContainer" class="mt-2 d-none">
+						<img id="imagePreview" src="" alt="Preview" class="img-thumbnail"
+							style="max-height: 80px;" />
+						<button type="button"
+							class="btn btn-sm btn-outline-danger mt-1 d-block"
+							id="btnRemoveImage">Xóa ảnh</button>
+					</div>
+					<input type="hidden" id="imageUrlInput" />
+				</div>
 			</div>
 
 			<div class="d-flex gap-2 mt-4 flex-wrap">
@@ -219,29 +260,36 @@ request.setAttribute("customJs", "question-management.js");
 					<button type="button" class="btn btn-dark px-4" id="btnAdd">Thêm</button>
 				</c:if>
 
-				<button type="button" class="btn btn-outline-secondary px-4" id="btnUpdate" disabled>Chỉnh sửa</button>
+				<button type="button" class="btn btn-outline-secondary px-4"
+					id="btnUpdate" disabled>Chỉnh sửa</button>
 
 				<c:if test="${not isLecturer}">
-					<button type="button" class="btn btn-outline-danger px-4" id="btnDelete" disabled>Xóa</button>
+					<button type="button" class="btn btn-outline-danger px-4"
+						id="btnDelete" disabled>Xóa</button>
 				</c:if>
-				
-				<button type="button" class="btn btn-outline-secondary" id="btnUndo" disabled>
+
+				<button type="button" class="btn btn-outline-secondary" id="btnUndo"
+					disabled>
 					<i class="bi bi-arrow-counterclockwise me-1"></i> Undo
 				</button>
 
-				<button type="button" class="btn btn-primary px-4" id="btnSave" disabled>
+				<button type="button" class="btn btn-primary px-4" id="btnSave"
+					disabled>
 					<i class="bi bi-save me-1"></i> Ghi
 				</button>
 
-				<button type="button" class="btn btn-outline-secondary px-4" id="btnReset">Xóa dữ liệu</button>
+				<button type="button" class="btn btn-outline-secondary px-4"
+					id="btnReset">Xóa dữ liệu</button>
 			</div>
 		</form:form>
 	</div>
 
-	<form id="saveForm" action="${pageContext.request.contextPath}/questions/save" method="post" class="d-none">
-		<input type="hidden" name="page" value="${currentPage}" />
-		<input type="hidden" name="keyword" value="${keyword}" />
-		<input type="hidden" name="actionsData" id="actionsDataInput" />
+	<form id="saveForm"
+		action="${pageContext.request.contextPath}/questions/save"
+		method="post" class="d-none">
+		<input type="hidden" name="page" value="${currentPage}" /> <input
+			type="hidden" name="keyword" value="${keyword}" /> <input
+			type="hidden" name="actionsData" id="actionsDataInput" />
 	</form>
 
 	<div class="card border-0 shadow-sm question-table-card">
@@ -257,6 +305,8 @@ request.setAttribute("customJs", "question-management.js");
 
 						<th>Content</th>
 
+						<th>Image</th>
+
 						<th>A</th>
 
 						<th>B</th>
@@ -269,7 +319,7 @@ request.setAttribute("customJs", "question-management.js");
 
 						<th>Lecturer</th>
 
-						<th class="text-end">Actions</th>
+						<th class="text-end pe-4">Actions</th>
 					</tr>
 				</thead>
 
@@ -283,6 +333,13 @@ request.setAttribute("customJs", "question-management.js");
 							<td>${question.level}</td>
 
 							<td>${question.content}</td>
+
+							<td><c:if test="${not empty question.imageUrl}">
+									<img
+										src="${pageContext.request.contextPath}${question.imageUrl}"
+										alt="Question Image" class="img-thumbnail"
+										style="max-height: 40px;" />
+								</c:if></td>
 
 							<td>${question.optionA}</td>
 
@@ -311,9 +368,11 @@ request.setAttribute("customJs", "question-management.js");
 
 		<div class="pagination-wrapper">
 			<c:if test="${currentPage > 1}">
-				<a class="pagination-item" href="questions?page=1&keyword=${keyword}"> First </a>
+				<a class="pagination-item"
+					href="questions?page=1&keyword=${keyword}"> First </a>
 
-				<a class="pagination-item" href="questions?page=${currentPage - 1}&keyword=${keyword}">
+				<a class="pagination-item"
+					href="questions?page=${currentPage - 1}&keyword=${keyword}">
 					&laquo; </a>
 			</c:if>
 
@@ -334,63 +393,63 @@ request.setAttribute("customJs", "question-management.js");
 			</c:if>
 
 			<c:if test="${currentPage < totalPages}">
-				<a class="pagination-item" href="questions?page=${currentPage + 1}&keyword=${keyword}">
+				<a class="pagination-item"
+					href="questions?page=${currentPage + 1}&keyword=${keyword}">
 					&raquo; </a>
 
-				<a class="pagination-item" href="questions?page=${totalPages}&keyword=${keyword}">
-					Last </a>
+				<a class="pagination-item"
+					href="questions?page=${totalPages}&keyword=${keyword}"> Last </a>
 			</c:if>
 		</div>
-	<!-- Import Excel Modal -->
-	<c:if test="${not isLecturer}">
-		<div class="modal fade" id="questionImportModal" tabindex="-1"
-			aria-labelledby="questionImportModalLabel" aria-hidden="true">
-			<div class="modal-dialog modal-dialog-centered">
-				<div class="modal-content border-0 shadow">
-					<form action="${pageContext.request.contextPath}/questions/import"
-						method="post" enctype="multipart/form-data">
-						<div class="modal-header bg-success text-white">
-							<h5 class="modal-title fw-semibold" id="questionImportModalLabel">
-								<i class="bi bi-file-earmark-excel me-2"></i> Nhập dữ liệu từ Excel
-							</h5>
-							<button type="button" class="btn-close btn-close-white"
-								data-bs-dismiss="modal" aria-label="Đóng"></button>
-						</div>
-						<div class="modal-body">
-							<div class="mb-3">
-								<label for="excelFile"
-									class="form-label fw-medium text-secondary">Chọn tệp Excel (.xlsx, .xls)</label>
-								<input class="form-control" type="file"
-									id="excelFile" name="file" accept=".xlsx, .xls" required />
+		<!-- Import Excel Modal -->
+		<c:if test="${not isLecturer}">
+			<div class="modal fade" id="questionImportModal" tabindex="-1"
+				aria-labelledby="questionImportModalLabel" aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered">
+					<div class="modal-content border-0 shadow">
+						<form action="${pageContext.request.contextPath}/questions/import"
+							method="post" enctype="multipart/form-data">
+							<div class="modal-header bg-success text-white">
+								<h5 class="modal-title fw-semibold"
+									id="questionImportModalLabel">
+									<i class="bi bi-file-earmark-excel me-2"></i> Nhập dữ liệu từ
+									Excel
+								</h5>
+								<button type="button" class="btn-close btn-close-white"
+									data-bs-dismiss="modal" aria-label="Đóng"></button>
 							</div>
-							<div class="alert alert-info py-2 px-3 mb-0 small">
-								<i class="bi bi-info-circle-fill me-1"></i> Tệp Excel nên có tiêu đề ở dòng đầu tiên.
-								<br/>Cột 1: Mã câu hỏi (sẽ bị bỏ qua vì tự sinh)
-								<br/>Cột 2: Mã môn học (phải tồn tại)
-								<br/>Cột 3: Trình độ (A, B hoặc C)
-								<br/>Cột 4: Nội dung câu hỏi
-								<br/>Cột 5: Đáp án A
-								<br/>Cột 6: Đáp án B
-								<br/>Cột 7: Đáp án C
-								<br/>Cột 8: Đáp án D
-								<br/>Cột 9: Đáp án đúng (A, B, C hoặc D)
-								<br/>Cột 10: Mã giảng viên (phải tồn tại)
+							<div class="modal-body">
+								<div class="mb-3">
+									<label for="excelFile"
+										class="form-label fw-medium text-secondary">Chọn tệp
+										Excel (.xlsx, .xls)</label> <input class="form-control" type="file"
+										id="excelFile" name="file" accept=".xlsx, .xls" required />
+								</div>
+								<div class="alert alert-info py-2 px-3 mb-0 small">
+									<i class="bi bi-info-circle-fill me-1"></i> Tệp Excel nên có
+									tiêu đề ở dòng đầu tiên. <br />Cột 1: Mã câu hỏi (sẽ bị bỏ qua
+									vì tự sinh) <br />Cột 2: Mã môn học (phải tồn tại) <br />Cột
+									3: Trình độ (A, B hoặc C) <br />Cột 4: Nội dung câu hỏi <br />Cột
+									5: Đáp án A <br />Cột 6: Đáp án B <br />Cột 7: Đáp án C <br />Cột
+									8: Đáp án D <br />Cột 9: Đáp án đúng (A, B, C hoặc D) <br />Cột
+									10: Mã giảng viên (phải tồn tại)
+								</div>
 							</div>
-						</div>
-						<div class="modal-footer bg-light">
-							<button type="button" class="btn btn-secondary"
-								data-bs-dismiss="modal">Hủy</button>
-							<button type="submit" class="btn btn-success">Nhập dữ liệu</button>
-						</div>
-					</form>
+							<div class="modal-footer bg-light">
+								<button type="button" class="btn btn-secondary"
+									data-bs-dismiss="modal">Hủy</button>
+								<button type="submit" class="btn btn-success">Nhập dữ
+									liệu</button>
+							</div>
+						</form>
+					</div>
 				</div>
 			</div>
-		</div>
-	</c:if>
+		</c:if>
 
-</div>
-<script>
-	window.LOGGED_LECTURER_ID = "${loggedLecturerId}";
-</script>
+	</div>
+	<script>
+		window.LOGGED_LECTURER_ID = "${loggedLecturerId}";
+	</script>
 
-<%@ include file="../Shared/_LayoutEnd.jsp"%>
+	<%@ include file="../Shared/_LayoutEnd.jsp"%>

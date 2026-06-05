@@ -50,7 +50,18 @@ public class Question {
     @Column(name = "IS_DELETED", nullable = false)
     private boolean deleted = false;
 
+    @Column(name = "HINH_ANH")
+    private String imageUrl;
+
     public Question() {
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public Integer getQuestionId() {

@@ -30,8 +30,12 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import com.tracnghiem.dto.QuestionDTO;
 import com.tracnghiem.entity.Question;
@@ -41,107 +45,146 @@ import com.tracnghiem.service.QuestionService;
 @RequestMapping("/questions")
 public class QuestionController {
 
-    private static final String INDEX_VIEW = "Question/Index";
-    private static final String REDIRECT_INDEX = "redirect:/questions";
+	private static final String INDEX_VIEW = "Question/Index";
+	private static final String REDIRECT_INDEX = "redirect:/questions";
 
-    @Autowired
-    private QuestionService questionService;
+	@Autowired
+	private QuestionService questionService;
 
-    @GetMapping
-    public String showQuestionPage(@RequestParam(defaultValue = "1") int page,
-            @RequestParam(required = false) String keyword,
-            ModelMap model,
-            HttpSession session) {
-        String role = (String) session.getAttribute("ROLE");
-        String loggedUser = (String) session.getAttribute("LOGIN_USER");
-        boolean isLecturer = "GIAOVIEN".equals(role);
+	@GetMapping
+	public String showQuestionPage(@RequestParam(defaultValue = "1") int page,
+			@RequestParam(required = false) String keyword, ModelMap model, HttpSession session) {
+		String role = (String) session.getAttribute("ROLE");
+		String loggedUser = (String) session.getAttribute("LOGIN_USER");
+		boolean isLecturer = "GIAOVIEN".equals(role);
 
-        prepareQuestionPage(model, page, keyword, role, loggedUser);
+		prepareQuestionPage(model, page, keyword, role, loggedUser);
 
-        QuestionDTO questionDTO = new QuestionDTO();
-        if (isLecturer) {
-            questionDTO.setLecturerId(loggedUser);
-        }
-        model.addAttribute("questionDTO", questionDTO);
-        model.addAttribute("keyword", keyword);
-        model.addAttribute("isLecturer", isLecturer);
-        model.addAttribute("loggedLecturerId", loggedUser);
+		QuestionDTO questionDTO = new QuestionDTO();
+		if (isLecturer) {
+			questionDTO.setLecturerId(loggedUser);
+		}
+		model.addAttribute("questionDTO", questionDTO);
+		model.addAttribute("keyword", keyword);
+		model.addAttribute("isLecturer", isLecturer);
+		model.addAttribute("loggedLecturerId", loggedUser);
 
-        return INDEX_VIEW;
-    }
+		return INDEX_VIEW;
+	}
 
-    @PostMapping("/add")
-    public String createQuestion(@RequestParam(defaultValue = "1") int page,
-            @RequestParam(required = false) String keyword,
-            @Validated @ModelAttribute("questionDTO") QuestionDTO questionForm,
-            BindingResult validationResult,
-            ModelMap model,
-            HttpSession session) {
+	@PostMapping("/add")
+	public String createQuestion(@RequestParam(defaultValue = "1") int page,
+			@RequestParam(required = false) String keyword,
+			@Validated @ModelAttribute("questionDTO") QuestionDTO questionForm, BindingResult validationResult,
+			ModelMap model, HttpSession session) {
 
-        if (validationResult.hasErrors()) {
-            return renderQuestionPage(model, page, keyword, session);
-        }
+		if (validationResult.hasErrors()) {
+			return renderQuestionPage(model, page, keyword, session);
+		}
 
-        try {
-            String role = (String) session.getAttribute("ROLE");
-            String loggedUser = (String) session.getAttribute("LOGIN_USER");
-            questionService.addQuestion(questionForm, role, loggedUser);
-            return REDIRECT_INDEX + buildQuery(page, keyword);
-        } catch (IllegalArgumentException exception) {
-            model.addAttribute("errorMessage", exception.getMessage());
-            return renderQuestionPage(model, page, keyword, session);
-        }
-    }
+		try {
+			String role = (String) session.getAttribute("ROLE");
+			String loggedUser = (String) session.getAttribute("LOGIN_USER");
+			String realPath = session.getServletContext().getRealPath("/uploads/questions");
+			questionService.addQuestion(questionForm, role, loggedUser, realPath);
+			return REDIRECT_INDEX + buildQuery(page, keyword);
+		} catch (IllegalArgumentException exception) {
+			model.addAttribute("errorMessage", exception.getMessage());
+			return renderQuestionPage(model, page, keyword, session);
+		}
+	}
 
-    @PostMapping("/update")
-    public String editQuestion(@RequestParam(defaultValue = "1") int page,
-            @RequestParam(required = false) String keyword,
-            @Validated @ModelAttribute("questionDTO") QuestionDTO questionForm,
-            BindingResult validationResult,
-            ModelMap model,
-            HttpSession session) {
+	@PostMapping("/update")
+	public String editQuestion(@RequestParam(defaultValue = "1") int page,
+			@RequestParam(required = false) String keyword,
+			@Validated @ModelAttribute("questionDTO") QuestionDTO questionForm, BindingResult validationResult,
+			ModelMap model, HttpSession session) {
 
-        if (validationResult.hasErrors()) {
-            return renderQuestionPage(model, page, keyword, session);
-        }
+		if (validationResult.hasErrors()) {
+			return renderQuestionPage(model, page, keyword, session);
+		}
 
-        try {
-            String role = (String) session.getAttribute("ROLE");
-            String loggedUser = (String) session.getAttribute("LOGIN_USER");
-            questionService.updateQuestion(questionForm, role, loggedUser);
-            return REDIRECT_INDEX + buildQuery(page, keyword);
-        } catch (IllegalArgumentException exception) {
-            model.addAttribute("errorMessage", exception.getMessage());
-            return renderQuestionPage(model, page, keyword, session);
-        }
-    }
+		try {
+			String role = (String) session.getAttribute("ROLE");
+			String loggedUser = (String) session.getAttribute("LOGIN_USER");
+			String realPath = session.getServletContext().getRealPath("/uploads/questions");
+			questionService.updateQuestion(questionForm, role, loggedUser, realPath);
+			return REDIRECT_INDEX + buildQuery(page, keyword);
+		} catch (IllegalArgumentException exception) {
+			model.addAttribute("errorMessage", exception.getMessage());
+			return renderQuestionPage(model, page, keyword, session);
+		}
+	}
 
-    @PostMapping("/delete")
-    public String removeQuestion(@RequestParam(defaultValue = "1") int page,
-            @RequestParam(required = false) String keyword,
-            @Validated @ModelAttribute("questionDTO") QuestionDTO questionForm,
-            BindingResult validationResult,
-            ModelMap model,
-            HttpSession session) {
+	@GetMapping(value = "/check-duplicate", produces = "application/json; charset=UTF-8")
+	@ResponseBody
+	public List<Map<String, Object>> checkDuplicate(@RequestParam("content") String content,
+			@RequestParam("subjectId") String subjectId,
+			@RequestParam(value = "excludeId", required = false) Integer excludeId) {
 
-        if (validationResult.hasErrors()) {
-            return renderQuestionPage(model, page, keyword, session);
-        }
+		List<Question> duplicates = questionService.findPotentialDuplicates(content, subjectId, excludeId);
+		List<Map<String, Object>> result = new ArrayList<>();
+		for (Question q : duplicates) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("questionId", q.getQuestionId());
+			map.put("content", q.getContent());
+			map.put("level", q.getLevel());
+			map.put("subjectId", q.getSubject() != null ? q.getSubject().getSubjectId() : "");
+			map.put("similarity", Math.round(questionService.calculateSimilarity(content, q.getContent()) * 100));
+			result.add(map);
+		}
+		return result;
+	}
 
-        try {
-            String role = (String) session.getAttribute("ROLE");
-            String loggedUser = (String) session.getAttribute("LOGIN_USER");
-            questionService.deleteQuestion(questionForm, role, loggedUser);
-            return REDIRECT_INDEX + buildQuery(page, keyword);
-        } catch (IllegalArgumentException exception) {
-            model.addAttribute("errorMessage", exception.getMessage());
-            return renderQuestionPage(model, page, keyword, session);
-        }
-    }
+	@PostMapping(value = "/upload-image", produces = "application/json; charset=UTF-8")
+	@ResponseBody
+	public Map<String, Object> uploadImage(@RequestParam("file") MultipartFile file, HttpSession session) {
+		Map<String, Object> response = new HashMap<>();
+		if (file.isEmpty()) {
+			response.put("success", false);
+			response.put("message", "File is empty");
+			return response;
+		}
+		try {
+			String realPath = session.getServletContext().getRealPath("/uploads/questions");
+			String imageUrl = questionService.saveUploadedImage(file, realPath);
+			if (imageUrl != null) {
+				response.put("success", true);
+				response.put("imageUrl", imageUrl);
+			} else {
+				response.put("success", false);
+				response.put("message", "Failed to save file");
+			}
+		} catch (Exception e) {
+			response.put("success", false);
+			response.put("message", e.getMessage());
+		}
+		return response;
+	}
+
+	@PostMapping("/delete")
+	public String removeQuestion(@RequestParam(defaultValue = "1") int page,
+			@RequestParam(required = false) String keyword,
+			@Validated @ModelAttribute("questionDTO") QuestionDTO questionForm, BindingResult validationResult,
+			ModelMap model, HttpSession session) {
+
+		if (validationResult.hasErrors()) {
+			return renderQuestionPage(model, page, keyword, session);
+		}
+
+		try {
+			String role = (String) session.getAttribute("ROLE");
+			String loggedUser = (String) session.getAttribute("LOGIN_USER");
+			questionService.deleteQuestion(questionForm, role, loggedUser);
+			return REDIRECT_INDEX + buildQuery(page, keyword);
+		} catch (IllegalArgumentException exception) {
+			model.addAttribute("errorMessage", exception.getMessage());
+			return renderQuestionPage(model, page, keyword, session);
+		}
+	}
 
 	@PostMapping("/save")
-	public String save(@RequestParam(defaultValue = "1") int page,
-			@RequestParam(required = false) String keyword,
+	public String save(@RequestParam(defaultValue = "1") int page, @RequestParam(required = false) String keyword,
 			@RequestParam("actionsData") String actionsData, ModelMap model, RedirectAttributes redirectAttributes,
 			HttpSession session) {
 
@@ -165,38 +208,38 @@ public class QuestionController {
 		}
 	}
 
-    private void prepareQuestionPage(ModelMap model, int page, String keyword, String role, String loggedUser) {
-        int pageSize = 10;
+	private void prepareQuestionPage(ModelMap model, int page, String keyword, String role, String loggedUser) {
+		int pageSize = 10;
 
-        List<Question> questions = questionService.getQuestions(page, pageSize, keyword, role, loggedUser);
+		List<Question> questions = questionService.getQuestions(page, pageSize, keyword, role, loggedUser);
 
-        long totalQuestions = questionService.countQuestion(keyword, role, loggedUser);
+		long totalQuestions = questionService.countQuestion(keyword, role, loggedUser);
 
-        int totalPages = (int) Math.ceil((double) totalQuestions / pageSize);
+		int totalPages = (int) Math.ceil((double) totalQuestions / pageSize);
 
-        model.addAttribute("questions", questions);
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", totalPages);
-    }
+		model.addAttribute("questions", questions);
+		model.addAttribute("currentPage", page);
+		model.addAttribute("totalPages", totalPages);
+	}
 
-    private String renderQuestionPage(ModelMap model, int page, String keyword, HttpSession session) {
-        String role = (String) session.getAttribute("ROLE");
-        String loggedUser = (String) session.getAttribute("LOGIN_USER");
-        prepareQuestionPage(model, page, keyword, role, loggedUser);
-        boolean isLecturer = "GIAOVIEN".equals(role);
-        model.addAttribute("keyword", keyword);
-        model.addAttribute("isLecturer", isLecturer);
-        model.addAttribute("loggedLecturerId", loggedUser);
-        return INDEX_VIEW;
-    }
+	private String renderQuestionPage(ModelMap model, int page, String keyword, HttpSession session) {
+		String role = (String) session.getAttribute("ROLE");
+		String loggedUser = (String) session.getAttribute("LOGIN_USER");
+		prepareQuestionPage(model, page, keyword, role, loggedUser);
+		boolean isLecturer = "GIAOVIEN".equals(role);
+		model.addAttribute("keyword", keyword);
+		model.addAttribute("isLecturer", isLecturer);
+		model.addAttribute("loggedLecturerId", loggedUser);
+		return INDEX_VIEW;
+	}
 
-    private String buildQuery(int page, String keyword) {
-        StringBuilder query = new StringBuilder("?page=").append(page);
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            query.append("&keyword=").append(URLEncoder.encode(keyword.trim(), StandardCharsets.UTF_8));
-        }
-        return query.toString();
-    }
+	private String buildQuery(int page, String keyword) {
+		StringBuilder query = new StringBuilder("?page=").append(page);
+		if (keyword != null && !keyword.trim().isEmpty()) {
+			query.append("&keyword=").append(URLEncoder.encode(keyword.trim(), StandardCharsets.UTF_8));
+		}
+		return query.toString();
+	}
 
 	@GetMapping("/export")
 	public void exportToExcel(HttpServletResponse response, HttpSession session) throws IOException {
@@ -213,7 +256,8 @@ public class QuestionController {
 
 			// Header
 			Row header = sheet.createRow(0);
-			String[] headers = {"Mã câu hỏi", "Mã môn học", "Trình độ", "Nội dung", "Đáp án A", "Đáp án B", "Đáp án C", "Đáp án D", "Đáp án đúng", "Mã GV"};
+			String[] headers = { "Mã câu hỏi", "Mã môn học", "Trình độ", "Nội dung", "Đáp án A", "Đáp án B", "Đáp án C",
+					"Đáp án D", "Đáp án đúng", "Mã GV" };
 			for (int j = 0; j < headers.length; j++) {
 				Cell cell = header.createCell(j);
 				cell.setCellValue(headers[j]);
@@ -227,8 +271,10 @@ public class QuestionController {
 			int rowIdx = 1;
 			for (Question question : questions) {
 				Row row = sheet.createRow(rowIdx++);
-				row.createCell(0).setCellValue(question.getQuestionId() != null ? String.valueOf(question.getQuestionId()) : "");
-				row.createCell(1).setCellValue(question.getSubject() != null ? question.getSubject().getSubjectId() : "");
+				row.createCell(0)
+						.setCellValue(question.getQuestionId() != null ? String.valueOf(question.getQuestionId()) : "");
+				row.createCell(1)
+						.setCellValue(question.getSubject() != null ? question.getSubject().getSubjectId() : "");
 				row.createCell(2).setCellValue(question.getLevel());
 				row.createCell(3).setCellValue(question.getContent());
 				row.createCell(4).setCellValue(question.getOptionA());
@@ -236,7 +282,8 @@ public class QuestionController {
 				row.createCell(6).setCellValue(question.getOptionC());
 				row.createCell(7).setCellValue(question.getOptionD());
 				row.createCell(8).setCellValue(question.getCorrectAnswer());
-				row.createCell(9).setCellValue(question.getLecturer() != null ? question.getLecturer().getLecturerId() : "");
+				row.createCell(9)
+						.setCellValue(question.getLecturer() != null ? question.getLecturer().getLecturerId() : "");
 			}
 
 			for (int j = 0; j < headers.length; j++) {
@@ -248,7 +295,8 @@ public class QuestionController {
 	}
 
 	@PostMapping("/import")
-	public String importFromExcel(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes, HttpSession session) {
+	public String importFromExcel(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes,
+			HttpSession session) {
 		String role = (String) session.getAttribute("ROLE");
 		String loggedUser = (String) session.getAttribute("LOGIN_USER");
 
@@ -273,14 +321,14 @@ public class QuestionController {
 				}
 
 				Cell subIdCell = row.getCell(1); // Mã môn
-				Cell lvlCell = row.getCell(2);   // Trình độ
-				Cell cntCell = row.getCell(3);   // Nội dung
-				Cell optACell = row.getCell(4);  // A
-				Cell optBCell = row.getCell(5);  // B
-				Cell optCCell = row.getCell(6);  // C
-				Cell optDCell = row.getCell(7);  // D
-				Cell ansCell = row.getCell(8);   // Đáp án đúng
-				Cell lecCell = row.getCell(9);   // Mã GV
+				Cell lvlCell = row.getCell(2); // Trình độ
+				Cell cntCell = row.getCell(3); // Nội dung
+				Cell optACell = row.getCell(4); // A
+				Cell optBCell = row.getCell(5); // B
+				Cell optCCell = row.getCell(6); // C
+				Cell optDCell = row.getCell(7); // D
+				Cell ansCell = row.getCell(8); // Đáp án đúng
+				Cell lecCell = row.getCell(9); // Mã GV
 
 				if (subIdCell == null && cntCell == null) {
 					continue;
@@ -314,10 +362,12 @@ public class QuestionController {
 			}
 
 			if (dtos.isEmpty()) {
-				redirectAttributes.addFlashAttribute("errorMessage", "Không tìm thấy dữ liệu câu hỏi hợp lệ trong tệp Excel.");
+				redirectAttributes.addFlashAttribute("errorMessage",
+						"Không tìm thấy dữ liệu câu hỏi hợp lệ trong tệp Excel.");
 			} else {
 				questionService.importQuestions(dtos, role, loggedUser);
-				redirectAttributes.addFlashAttribute("successMessage", "Nhập danh sách câu hỏi từ Excel thành công (Đã nhập " + dtos.size() + " câu hỏi).");
+				redirectAttributes.addFlashAttribute("successMessage",
+						"Nhập danh sách câu hỏi từ Excel thành công (Đã nhập " + dtos.size() + " câu hỏi).");
 			}
 
 		} catch (IllegalArgumentException e) {

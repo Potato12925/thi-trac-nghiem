@@ -3,9 +3,12 @@ package com.tracnghiem.dto;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+import org.springframework.web.multipart.MultipartFile;
 
 public class QuestionDTO {
 	private Integer questionId;
+	private String imageUrl;
+	private MultipartFile imageFile;
 
 	@NotBlank(message = "Subject ID is required")
 	@Size(max = 5, message = "Subject ID must contain exactly 5 characters")
@@ -150,5 +153,21 @@ public class QuestionDTO {
 
 	public void setLecturerId(String lecturerId) {
 		this.lecturerId = lecturerId;
+	}
+
+	public String getImageUrl() {
+		return imageUrl;
+	}
+
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
+
+	public MultipartFile getImageFile() {
+		return imageFile;
+	}
+
+	public void setImageFile(MultipartFile imageFile) {
+		this.imageFile = imageFile;
 	}
 }

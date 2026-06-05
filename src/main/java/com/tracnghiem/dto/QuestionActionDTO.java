@@ -12,12 +12,13 @@ public class QuestionActionDTO {
 	private String optionD;
 	private String correctAnswer;
 	private String lecturerId;
+	private String imageUrl;
 
 	public QuestionActionDTO() {
 	}
 
 	public QuestionActionDTO(String type, String questionId, String subjectId, String level, String content,
-			String optionA, String optionB, String optionC, String optionD, String correctAnswer, String lecturerId) {
+			String optionA, String optionB, String optionC, String optionD, String correctAnswer, String lecturerId, String imageUrl) {
 		this.type = type;
 		this.questionId = questionId;
 		this.subjectId = subjectId;
@@ -29,6 +30,7 @@ public class QuestionActionDTO {
 		this.optionD = optionD;
 		this.correctAnswer = correctAnswer;
 		this.lecturerId = lecturerId;
+		this.imageUrl = imageUrl;
 	}
 
 	public String getType() {
@@ -117,5 +119,13 @@ public class QuestionActionDTO {
 
 	public void setLecturerId(String lecturerId) {
 		this.lecturerId = lecturerId;
+	}
+
+	public String getImageUrl() {
+		return imageUrl;
+	}
+
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
 	}
 }

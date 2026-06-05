@@ -9,7 +9,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -31,219 +33,219 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import com.tracnghiem.dto.ChangeEmailDTO;
-import com.tracnghiem.dto.ChangePasswordDTO;
-import com.tracnghiem.dto.ConfirmEmailChangeDTO;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.tracnghiem.dto.ChangeEmailDTO;
+import com.tracnghiem.dto.ChangePasswordDTO;
+import com.tracnghiem.dto.ConfirmEmailChangeDTO;
 import com.tracnghiem.dto.StudentDTO;
 import com.tracnghiem.dto.StudentDashboardDTO;
 import com.tracnghiem.dto.UpcomingExamDTO;
 import com.tracnghiem.entity.Student;
-import com.tracnghiem.service.ClassroomService;
 import com.tracnghiem.service.AccountSettingsService;
+import com.tracnghiem.service.ClassroomService;
 import com.tracnghiem.service.StudentService;
 
 @Controller
 @RequestMapping("/students")
 public class StudentController {
 
-    private static final String INDEX_VIEW = "Student/Index";
-    private static final String REDIRECT_INDEX = "redirect:/students";
+	private static final String INDEX_VIEW = "Student/Index";
+	private static final String REDIRECT_INDEX = "redirect:/students";
 
-    @Autowired
-    private StudentService studentService;
+	@Autowired
+	private StudentService studentService;
 
-    @Autowired
-    private ClassroomService classroomService;
+	@Autowired
+	private ClassroomService classroomService;
 
-    @Autowired
-    private AccountSettingsService accountSettingsService;
+	@Autowired
+	private AccountSettingsService accountSettingsService;
 
-    @GetMapping
-    public String index(@RequestParam(defaultValue = "1") int page,
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false, name = "filterClassId") String filterClassId,
-            ModelMap model) {
-        populateIndexPageModel(model, page, keyword, filterClassId);
-        model.addAttribute("studentDTO", new StudentDTO());
-        return INDEX_VIEW;
-    }
+	@GetMapping
+	public String index(@RequestParam(defaultValue = "1") int page, @RequestParam(required = false) String keyword,
+			@RequestParam(required = false, name = "filterClassId") String filterClassId, ModelMap model) {
+		populateIndexPageModel(model, page, keyword, filterClassId);
+		model.addAttribute("studentDTO", new StudentDTO());
+		return INDEX_VIEW;
+	}
 
-    @GetMapping("/home")
-    public String home(ModelMap model, HttpSession session) {
-        String redirect = validateStudentAccess(session);
-        if (redirect != null) {
-            return redirect;
-        }
+	@GetMapping(value = "/{studentId}/quick-view", produces = "application/json; charset=UTF-8")
+	@ResponseBody
+	public Map<String, Object> quickView(@PathVariable("studentId") String studentId) {
+		try {
+			return studentService.getStudentQuickViewData(studentId);
+		} catch (Exception e) {
+			Map<String, Object> errorMap = new HashMap<>();
+			errorMap.put("error", e.getMessage());
+			return errorMap;
+		}
+	}
 
-        String studentId = normalize((String) session.getAttribute("LOGIN_USER"));
-        Date today = new Date();        Student student = studentService.getDashboardStudentProfile(studentId);
-        StudentDashboardDTO dashboard = studentService.getStudentDashboardStats(student, today);
-        java.util.List<UpcomingExamDTO> upcomingExams = studentService.getUpcomingExams(student, today);
+	@GetMapping("/home")
+	public String home(ModelMap model, HttpSession session) {
+		String redirect = validateStudentAccess(session);
+		if (redirect != null) {
+			return redirect;
+		}
 
-        model.addAttribute("pageTitle", "Student Home");
-        model.addAttribute("studentProfile", student);
-        model.addAttribute("dashboard", dashboard);
-        model.addAttribute("upcomingExams", upcomingExams);
-        model.addAttribute("today", today);
+		String studentId = normalize((String) session.getAttribute("LOGIN_USER"));
+		Date today = new Date();
+		Student student = studentService.getDashboardStudentProfile(studentId);
+		StudentDashboardDTO dashboard = studentService.getStudentDashboardStats(student, today);
+		java.util.List<UpcomingExamDTO> upcomingExams = studentService.getUpcomingExams(student, today);
 
-        return "Student/Home";
-    }
+		model.addAttribute("pageTitle", "Student Home");
+		model.addAttribute("studentProfile", student);
+		model.addAttribute("dashboard", dashboard);
+		model.addAttribute("upcomingExams", upcomingExams);
+		model.addAttribute("today", today);
 
-    @GetMapping("/settings")
-    public String settings(ModelMap model, HttpSession session) {
-        String redirect = validateStudentAccess(session);
-        if (redirect != null) {
-            return redirect;
-        }
+		return "Student/Home";
+	}
 
-        populateSettingsPageModel(model, session, null, null);
-        return "Student/Settings";
-    }
+	@GetMapping("/settings")
+	public String settings(ModelMap model, HttpSession session) {
+		String redirect = validateStudentAccess(session);
+		if (redirect != null) {
+			return redirect;
+		}
 
-    @PostMapping("/settings/email/send-otp")
-    public String sendEmailOtp(
-            @Validated @ModelAttribute("changeEmailDTO") ChangeEmailDTO changeEmailDTO,
-            BindingResult errors,
-            ModelMap model,
-            HttpSession session) {
+		populateSettingsPageModel(model, session, null, null);
+		return "Student/Settings";
+	}
 
-        String redirect = validateStudentAccess(session);
-        if (redirect != null) {
-            return redirect;
-        }
+	@PostMapping("/settings/email/send-otp")
+	public String sendEmailOtp(@Validated @ModelAttribute("changeEmailDTO") ChangeEmailDTO changeEmailDTO,
+			BindingResult errors, ModelMap model, HttpSession session) {
 
-        if (errors.hasErrors()) {
-            populateSettingsPageModel(model, session, changeEmailDTO.getNewEmail(), null);
-            return "Student/Settings";
-        }
+		String redirect = validateStudentAccess(session);
+		if (redirect != null) {
+			return redirect;
+		}
 
-        try {
-            String studentId = (String) session.getAttribute("LOGIN_USER");
-            String role = (String) session.getAttribute("ROLE");
+		if (errors.hasErrors()) {
+			populateSettingsPageModel(model, session, changeEmailDTO.getNewEmail(), null);
+			return "Student/Settings";
+		}
 
-            accountSettingsService.sendEmailChangeOtp(studentId, role, changeEmailDTO.getNewEmail());
-            populateSettingsPageModel(model, session, changeEmailDTO.getNewEmail(), changeEmailDTO.getNewEmail());
-            model.addAttribute("successMessage", "Mã OTP đã được gửi tới email mới của bạn");
-            return "Student/Settings";
-        } catch (IllegalArgumentException | IllegalStateException ex) {
-            populateSettingsPageModel(model, session, changeEmailDTO.getNewEmail(), null);
-            model.addAttribute("errorMessage", ex.getMessage());
-            return "Student/Settings";
-        }
-    }
+		try {
+			String studentId = (String) session.getAttribute("LOGIN_USER");
+			String role = (String) session.getAttribute("ROLE");
 
-    @PostMapping("/settings/email/confirm")
-    public String confirmEmailChange(
-            @Validated @ModelAttribute("confirmEmailChangeDTO") ConfirmEmailChangeDTO confirmEmailChangeDTO,
-            BindingResult errors,
-            ModelMap model,
-            HttpSession session,
-            RedirectAttributes redirectAttributes) {
+			accountSettingsService.sendEmailChangeOtp(studentId, role, changeEmailDTO.getNewEmail());
+			populateSettingsPageModel(model, session, changeEmailDTO.getNewEmail(), changeEmailDTO.getNewEmail());
+			model.addAttribute("successMessage", "Mã OTP đã được gửi tới email mới của bạn");
+			return "Student/Settings";
+		} catch (IllegalArgumentException | IllegalStateException ex) {
+			populateSettingsPageModel(model, session, changeEmailDTO.getNewEmail(), null);
+			model.addAttribute("errorMessage", ex.getMessage());
+			return "Student/Settings";
+		}
+	}
 
-        String redirect = validateStudentAccess(session);
-        if (redirect != null) {
-            return redirect;
-        }
+	@PostMapping("/settings/email/confirm")
+	public String confirmEmailChange(
+			@Validated @ModelAttribute("confirmEmailChangeDTO") ConfirmEmailChangeDTO confirmEmailChangeDTO,
+			BindingResult errors, ModelMap model, HttpSession session, RedirectAttributes redirectAttributes) {
 
-        if (errors.hasErrors()) {
-            populateSettingsPageModel(model, session, confirmEmailChangeDTO.getNewEmail(), confirmEmailChangeDTO.getNewEmail());
-            return "Student/Settings";
-        }
+		String redirect = validateStudentAccess(session);
+		if (redirect != null) {
+			return redirect;
+		}
 
-        try {
-            String studentId = (String) session.getAttribute("LOGIN_USER");
-            String role = (String) session.getAttribute("ROLE");
+		if (errors.hasErrors()) {
+			populateSettingsPageModel(model, session, confirmEmailChangeDTO.getNewEmail(),
+					confirmEmailChangeDTO.getNewEmail());
+			return "Student/Settings";
+		}
 
-            accountSettingsService.confirmEmailChange(studentId, role, confirmEmailChangeDTO.getNewEmail(),
-                    confirmEmailChangeDTO.getOtpCode());
-            redirectAttributes.addFlashAttribute("successMessage", "Cập nhật email thành công");
-            return "redirect:/students/settings";
-        } catch (IllegalArgumentException ex) {
-            populateSettingsPageModel(model, session, confirmEmailChangeDTO.getNewEmail(), confirmEmailChangeDTO.getNewEmail());
-            model.addAttribute("errorMessage", ex.getMessage());
-            return "Student/Settings";
-        }
-    }
+		try {
+			String studentId = (String) session.getAttribute("LOGIN_USER");
+			String role = (String) session.getAttribute("ROLE");
 
-    @PostMapping("/add")
-    public String addStudent(@RequestParam(defaultValue = "1") int page,
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false, name = "filterClassId") String filterClassId,
-            @Validated @ModelAttribute("studentDTO") StudentDTO studentDTO,
-            BindingResult errors,
-            ModelMap model) {
+			accountSettingsService.confirmEmailChange(studentId, role, confirmEmailChangeDTO.getNewEmail(),
+					confirmEmailChangeDTO.getOtpCode());
+			redirectAttributes.addFlashAttribute("successMessage", "Cập nhật email thành công");
+			return "redirect:/students/settings";
+		} catch (IllegalArgumentException ex) {
+			populateSettingsPageModel(model, session, confirmEmailChangeDTO.getNewEmail(),
+					confirmEmailChangeDTO.getNewEmail());
+			model.addAttribute("errorMessage", ex.getMessage());
+			return "Student/Settings";
+		}
+	}
 
-        if (errors.hasErrors()) {
-            populateIndexPageModel(model, page, keyword, filterClassId);
-            return INDEX_VIEW;
-        }
+	@PostMapping("/add")
+	public String addStudent(@RequestParam(defaultValue = "1") int page, @RequestParam(required = false) String keyword,
+			@RequestParam(required = false, name = "filterClassId") String filterClassId,
+			@Validated @ModelAttribute("studentDTO") StudentDTO studentDTO, BindingResult errors, ModelMap model) {
 
-        try {
-            studentService.addStudentWithAccount(studentDTO);
-            return REDIRECT_INDEX + buildQuery(page, keyword, filterClassId);
-        } catch (IllegalArgumentException e) {
-            model.addAttribute("error", e.getMessage());
-            populateIndexPageModel(model, page, keyword, filterClassId);
-            return INDEX_VIEW;
-        }
-    }
+		if (errors.hasErrors()) {
+			populateIndexPageModel(model, page, keyword, filterClassId);
+			return INDEX_VIEW;
+		}
 
-    @PostMapping("/update")
-    public String updateStudent(@RequestParam(defaultValue = "1") int page,
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false, name = "filterClassId") String filterClassId,
-            @Validated @ModelAttribute("studentDTO") StudentDTO studentDTO,
-            BindingResult errors,
-            ModelMap model) {
+		try {
+			studentService.addStudentWithAccount(studentDTO);
+			return REDIRECT_INDEX + buildQuery(page, keyword, filterClassId);
+		} catch (IllegalArgumentException e) {
+			model.addAttribute("error", e.getMessage());
+			populateIndexPageModel(model, page, keyword, filterClassId);
+			return INDEX_VIEW;
+		}
+	}
 
-        if (errors.hasErrors()) {
-            populateIndexPageModel(model, page, keyword, filterClassId);
-            return INDEX_VIEW;
-        }
+	@PostMapping("/update")
+	public String updateStudent(@RequestParam(defaultValue = "1") int page,
+			@RequestParam(required = false) String keyword,
+			@RequestParam(required = false, name = "filterClassId") String filterClassId,
+			@Validated @ModelAttribute("studentDTO") StudentDTO studentDTO, BindingResult errors, ModelMap model) {
 
-        try {
-            studentService.updateStudent(studentDTO);
-            return REDIRECT_INDEX + buildQuery(page, keyword, filterClassId);
-        } catch (IllegalArgumentException e) {
-            model.addAttribute("error", e.getMessage());
-            populateIndexPageModel(model, page, keyword, filterClassId);
-            return INDEX_VIEW;
-        }
-    }
+		if (errors.hasErrors()) {
+			populateIndexPageModel(model, page, keyword, filterClassId);
+			return INDEX_VIEW;
+		}
 
-    @PostMapping("/delete")
-    public String deleteStudent(@RequestParam(defaultValue = "1") int page,
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false, name = "filterClassId") String filterClassId,
-            @Valid @ModelAttribute("studentDTO") StudentDTO studentDTO,
-            BindingResult errors,
-            ModelMap model) {
+		try {
+			studentService.updateStudent(studentDTO);
+			return REDIRECT_INDEX + buildQuery(page, keyword, filterClassId);
+		} catch (IllegalArgumentException e) {
+			model.addAttribute("error", e.getMessage());
+			populateIndexPageModel(model, page, keyword, filterClassId);
+			return INDEX_VIEW;
+		}
+	}
 
-        if (errors.hasErrors()) {
-            populateIndexPageModel(model, page, keyword, filterClassId);
-            return INDEX_VIEW;
-        }
+	@PostMapping("/delete")
+	public String deleteStudent(@RequestParam(defaultValue = "1") int page,
+			@RequestParam(required = false) String keyword,
+			@RequestParam(required = false, name = "filterClassId") String filterClassId,
+			@Valid @ModelAttribute("studentDTO") StudentDTO studentDTO, BindingResult errors, ModelMap model) {
 
-        try {
-            studentService.deleteStudent(studentDTO);
-            return REDIRECT_INDEX + buildQuery(page, keyword, filterClassId);
-        } catch (IllegalArgumentException e) {
-            model.addAttribute("error", e.getMessage());
-            populateIndexPageModel(model, page, keyword, filterClassId);
-            return INDEX_VIEW;
-        }
-    }
+		if (errors.hasErrors()) {
+			populateIndexPageModel(model, page, keyword, filterClassId);
+			return INDEX_VIEW;
+		}
+
+		try {
+			studentService.deleteStudent(studentDTO);
+			return REDIRECT_INDEX + buildQuery(page, keyword, filterClassId);
+		} catch (IllegalArgumentException e) {
+			model.addAttribute("error", e.getMessage());
+			populateIndexPageModel(model, page, keyword, filterClassId);
+			return INDEX_VIEW;
+		}
+	}
 
 	@PostMapping("/save")
-	public String save(@RequestParam(defaultValue = "1") int page,
-			@RequestParam(required = false) String keyword,
+	public String save(@RequestParam(defaultValue = "1") int page, @RequestParam(required = false) String keyword,
 			@RequestParam(required = false, name = "filterClassId") String filterClassId,
 			@RequestParam("actionsData") String actionsData, ModelMap model, RedirectAttributes redirectAttributes) {
 
@@ -265,82 +267,83 @@ public class StudentController {
 		}
 	}
 
-    private void populateIndexPageModel(ModelMap model, int page, String keyword, String filterClassId) {
-        int pageSize = 10;
+	private void populateIndexPageModel(ModelMap model, int page, String keyword, String filterClassId) {
+		int pageSize = 10;
 
-        model.addAttribute("studentDTO", new StudentDTO());
-        model.addAttribute("students", studentService.getStudents(page, pageSize, keyword, filterClassId));
-        model.addAttribute("classrooms", classroomService.getAllClassrooms());
-        model.addAttribute("keyword", keyword);
-        model.addAttribute("classId", filterClassId);
+		model.addAttribute("studentDTO", new StudentDTO());
+		model.addAttribute("students", studentService.getStudents(page, pageSize, keyword, filterClassId));
+		model.addAttribute("classrooms", classroomService.getAllClassrooms());
+		model.addAttribute("keyword", keyword);
+		model.addAttribute("classId", filterClassId);
 
-        long total = studentService.countStudents(keyword, filterClassId);
-        int totalPages = (int) Math.ceil((double) total / pageSize);
+		long total = studentService.countStudents(keyword, filterClassId);
+		int totalPages = (int) Math.ceil((double) total / pageSize);
 
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", totalPages);
-    }
+		model.addAttribute("currentPage", page);
+		model.addAttribute("totalPages", totalPages);
+	}
 
-    private String buildQuery(int page, String keyword, String filterClassId) {
-        StringBuilder query = new StringBuilder("?page=").append(page);
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            query.append("&keyword=").append(URLEncoder.encode(keyword.trim(), StandardCharsets.UTF_8));
-        }
-        if (filterClassId != null && !filterClassId.trim().isEmpty()) {
-            query.append("&filterClassId=").append(URLEncoder.encode(filterClassId.trim(), StandardCharsets.UTF_8));
-        }
-        return query.toString();
-    }
+	private String buildQuery(int page, String keyword, String filterClassId) {
+		StringBuilder query = new StringBuilder("?page=").append(page);
+		if (keyword != null && !keyword.trim().isEmpty()) {
+			query.append("&keyword=").append(URLEncoder.encode(keyword.trim(), StandardCharsets.UTF_8));
+		}
+		if (filterClassId != null && !filterClassId.trim().isEmpty()) {
+			query.append("&filterClassId=").append(URLEncoder.encode(filterClassId.trim(), StandardCharsets.UTF_8));
+		}
+		return query.toString();
+	}
 
-    private void populateSettingsPageModel(ModelMap model, HttpSession session, String newEmail, String confirmEmail) {
-        String studentId = (String) session.getAttribute("LOGIN_USER");
-        Student student = studentService.getStudentById(studentId);
+	private void populateSettingsPageModel(ModelMap model, HttpSession session, String newEmail, String confirmEmail) {
+		String studentId = (String) session.getAttribute("LOGIN_USER");
+		Student student = studentService.getStudentById(studentId);
 
-        model.addAttribute("pageTitle", "Cài đặt sinh viên");
-        model.addAttribute("studentProfile", student);
+		model.addAttribute("pageTitle", "Cài đặt sinh viên");
+		model.addAttribute("studentProfile", student);
 
-        if (!model.containsAttribute("changeEmailDTO")) {
-            ChangeEmailDTO emailDTO = new ChangeEmailDTO();
-            emailDTO.setNewEmail(newEmail);
-            model.addAttribute("changeEmailDTO", emailDTO);
-        }
+		if (!model.containsAttribute("changeEmailDTO")) {
+			ChangeEmailDTO emailDTO = new ChangeEmailDTO();
+			emailDTO.setNewEmail(newEmail);
+			model.addAttribute("changeEmailDTO", emailDTO);
+		}
 
-        if (!model.containsAttribute("confirmEmailChangeDTO")) {
-            ConfirmEmailChangeDTO confirmEmailChangeDTO = new ConfirmEmailChangeDTO();
-            confirmEmailChangeDTO.setNewEmail(confirmEmail);
-            model.addAttribute("confirmEmailChangeDTO", confirmEmailChangeDTO);
-        }
+		if (!model.containsAttribute("confirmEmailChangeDTO")) {
+			ConfirmEmailChangeDTO confirmEmailChangeDTO = new ConfirmEmailChangeDTO();
+			confirmEmailChangeDTO.setNewEmail(confirmEmail);
+			model.addAttribute("confirmEmailChangeDTO", confirmEmailChangeDTO);
+		}
 
-        if (!model.containsAttribute("changePasswordDTO")) {
-            model.addAttribute("changePasswordDTO", new ChangePasswordDTO());
-        }
-    }
+		if (!model.containsAttribute("changePasswordDTO")) {
+			model.addAttribute("changePasswordDTO", new ChangePasswordDTO());
+		}
+	}
 
-    private String validateStudentAccess(HttpSession session) {
-        String role = (String) session.getAttribute("ROLE");
-        if ("SINHVIEN".equals(role)) {
-            return null;
-        }
+	private String validateStudentAccess(HttpSession session) {
+		String role = (String) session.getAttribute("ROLE");
+		if ("SINHVIEN".equals(role)) {
+			return null;
+		}
 
-        if ("GIAOVIEN".equals(role)) {
-            return "redirect:/lecturers/home";
-        }
+		if ("GIAOVIEN".equals(role)) {
+			return "redirect:/lecturers/home";
+		}
 
-        if ("PGV".equals(role)) {
-            return "redirect:/admin/home";
-        }
+		if ("PGV".equals(role)) {
+			return "redirect:/admin/home";
+		}
 
-        return "redirect:/hello";
-    }
+		return "redirect:/hello";
+	}
 
-    private String normalize(String value) {
-        if (value == null) {
-            return null;
-        }
+	private String normalize(String value) {
+		if (value == null) {
+			return null;
+		}
 
-        String trimmed = value.trim();
-        return trimmed.isEmpty() ? null : trimmed;
-    }
+		String trimmed = value.trim();
+		return trimmed.isEmpty() ? null : trimmed;
+	}
+
 	@GetMapping("/export")
 	public void exportToExcel(HttpServletResponse response) throws IOException {
 		response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
@@ -353,7 +356,7 @@ public class StudentController {
 
 			// Header
 			Row header = sheet.createRow(0);
-			String[] headers = {"Mã sinh viên", "Họ", "Tên", "Ngày sinh", "Địa chỉ", "Mã lớp"};
+			String[] headers = { "Mã sinh viên", "Họ", "Tên", "Ngày sinh", "Địa chỉ", "Mã lớp" };
 			for (int j = 0; j < headers.length; j++) {
 				Cell cell = header.createCell(j);
 				cell.setCellValue(headers[j]);
@@ -371,12 +374,13 @@ public class StudentController {
 				row.createCell(0).setCellValue(student.getStudentId());
 				row.createCell(1).setCellValue(student.getLastName());
 				row.createCell(2).setCellValue(student.getFirstName());
-				
+
 				String dateStr = student.getBirthDate() != null ? sdf.format(student.getBirthDate()) : "";
 				row.createCell(3).setCellValue(dateStr);
-				
+
 				row.createCell(4).setCellValue(student.getAddress());
-				row.createCell(5).setCellValue(student.getClassRoom() != null ? student.getClassRoom().getClassId() : "");
+				row.createCell(5)
+						.setCellValue(student.getClassRoom() != null ? student.getClassRoom().getClassId() : "");
 			}
 
 			for (int j = 0; j < headers.length; j++) {
@@ -427,7 +431,8 @@ public class StudentController {
 
 				Date birthDate = null;
 				if (birthCell != null) {
-					if (birthCell.getCellType() == org.apache.poi.ss.usermodel.CellType.NUMERIC && DateUtil.isCellDateFormatted(birthCell)) {
+					if (birthCell.getCellType() == org.apache.poi.ss.usermodel.CellType.NUMERIC
+							&& DateUtil.isCellDateFormatted(birthCell)) {
 						birthDate = birthCell.getDateCellValue();
 					} else {
 						String dateStr = getCellValueAsString(birthCell).trim();
@@ -438,7 +443,8 @@ public class StudentController {
 								try {
 									birthDate = new SimpleDateFormat("dd/MM/yyyy").parse(dateStr);
 								} catch (ParseException e2) {
-									throw new IllegalArgumentException("Ngày sinh dòng " + (i + 1) + " không đúng định dạng (yyyy-MM-dd hoặc dd/MM/yyyy): " + dateStr);
+									throw new IllegalArgumentException("Ngày sinh dòng " + (i + 1)
+											+ " không đúng định dạng (yyyy-MM-dd hoặc dd/MM/yyyy): " + dateStr);
 								}
 							}
 						}
@@ -456,10 +462,12 @@ public class StudentController {
 			}
 
 			if (dtos.isEmpty()) {
-				redirectAttributes.addFlashAttribute("errorMessage", "Không tìm thấy dữ liệu sinh viên hợp lệ trong tệp Excel.");
+				redirectAttributes.addFlashAttribute("errorMessage",
+						"Không tìm thấy dữ liệu sinh viên hợp lệ trong tệp Excel.");
 			} else {
 				studentService.importStudents(dtos);
-				redirectAttributes.addFlashAttribute("successMessage", "Nhập danh sách sinh viên từ Excel thành công (Đã nhập " + dtos.size() + " sinh viên).");
+				redirectAttributes.addFlashAttribute("successMessage",
+						"Nhập danh sách sinh viên từ Excel thành công (Đã nhập " + dtos.size() + " sinh viên).");
 			}
 
 		} catch (IllegalArgumentException e) {

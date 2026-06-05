@@ -36,6 +36,18 @@ document.addEventListener("DOMContentLoaded", function () {
       return e.returnValue;
     }
   });
+
+  // Handle click on Student ID for quick view
+  if (tableBody) {
+    tableBody.addEventListener("click", function (e) {
+      const trigger = e.target.closest(".student-quick-view-trigger");
+      if (trigger) {
+        e.preventDefault();
+        const studentId = trigger.getAttribute("data-student-id");
+        showStudentQuickView(studentId);
+      }
+    });
+  }
 });
 
 let pendingActions = [];
@@ -391,4 +403,63 @@ function handleSave() {
     actionsDataInput.value = dataStr;
     saveForm.submit();
   }
+}
+
+function showStudentQuickView(studentId) {
+  const modalElement = document.getElementById("studentQuickViewModal");
+  if (!modalElement) return;
+  
+  // Set temporary loading state
+  document.getElementById("qvStudentId").innerText = studentId;
+  document.getElementById("qvFullName").innerText = "Đang tải...";
+  document.getElementById("qvClassName").innerText = "Đang tải...";
+  document.getElementById("qvBirthDate").innerText = "Đang tải...";
+  document.getElementById("qvEmail").innerText = "Đang tải...";
+  document.getElementById("qvAddress").innerText = "Đang tải...";
+  document.getElementById("qvExamHistoryBody").innerHTML = `<tr><td colspan="5" class="text-center text-muted"><div class="spinner-border spinner-border-sm text-primary me-2"></div>Đang tải dữ liệu...</td></tr>`;
+  
+  // Initialize and show modal
+  const modal = new bootstrap.Modal(modalElement);
+  modal.show();
+  
+  // Fetch details
+  fetch(`${window.APP_BASE_PATH}/students/${studentId}/quick-view`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.error) {
+        document.getElementById("qvFullName").innerText = "Lỗi tải dữ liệu";
+        document.getElementById("qvExamHistoryBody").innerHTML = `<tr><td colspan="5" class="text-danger text-center">${data.error}</td></tr>`;
+        return;
+      }
+      
+      document.getElementById("qvFullName").innerText = data.lastName + " " + data.firstName;
+      document.getElementById("qvClassName").innerText = `${data.classId} (${data.className || ''})`;
+      document.getElementById("qvBirthDate").innerText = data.birthDate;
+      document.getElementById("qvEmail").innerText = data.email || "-";
+      document.getElementById("qvAddress").innerText = data.address || "-";
+      
+      const historyBody = document.getElementById("qvExamHistoryBody");
+      if (data.exams && data.exams.length > 0) {
+        let rowsHtml = "";
+        data.exams.forEach(exam => {
+          rowsHtml += `
+            <tr>
+              <td><span class="badge bg-secondary">${exam.subjectId}</span></td>
+              <td>${exam.subjectName}</td>
+              <td class="text-center">${exam.tryNumber}</td>
+              <td class="fw-bold text-primary">${exam.score != null ? exam.score.toFixed(1) : '-'}</td>
+              <td>${exam.examDate}</td>
+            </tr>
+          `;
+        });
+        historyBody.innerHTML = rowsHtml;
+      } else {
+        historyBody.innerHTML = `<tr><td colspan="5" class="text-center text-muted">Chưa làm bài thi nào.</td></tr>`;
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      document.getElementById("qvFullName").innerText = "Lỗi hệ thống";
+      document.getElementById("qvExamHistoryBody").innerHTML = `<tr><td colspan="5" class="text-danger text-center">Không thể kết nối đến máy chủ.</td></tr>`;
+    });
 }

@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.tracnghiem.dao.QuestionDAO;
 import com.tracnghiem.dto.QuestionActionDTO;
@@ -47,8 +48,82 @@ public class QuestionService {
         question.setOptionD(dto.getOptionD());
         question.setCorrectAnswer(dto.getCorrectAnswer());
         question.setLecturer(lecturer);
+        question.setImageUrl(dto.getImageUrl());
 
         return question;
+    }
+
+    public String saveUploadedImage(MultipartFile file, String realPath) {
+        if (file == null || file.isEmpty() || realPath == null) {
+            return null;
+        }
+        try {
+            String originalFilename = file.getOriginalFilename();
+            String ext = "";
+            if (originalFilename != null && originalFilename.lastIndexOf(".") > 0) {
+                ext = originalFilename.substring(originalFilename.lastIndexOf("."));
+            }
+            String newFilename = "question_" + System.currentTimeMillis() + "_" + (int)(Math.random() * 1000) + ext;
+            java.io.File dir = new java.io.File(realPath);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+            java.io.File serverFile = new java.io.File(dir, newFilename);
+            file.transferTo(serverFile);
+            return "/uploads/questions/" + newFilename;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public double calculateSimilarity(String s1, String s2) {
+        if (s1 == null || s2 == null) return 0.0;
+        s1 = s1.trim().toLowerCase();
+        s2 = s2.trim().toLowerCase();
+        if (s1.equals(s2)) return 1.0;
+        int len1 = s1.length();
+        int len2 = s2.length();
+        if (len1 == 0 || len2 == 0) return 0.0;
+        
+        int[] dp = new int[len2 + 1];
+        for (int j = 0; j <= len2; j++) {
+            dp[j] = j;
+        }
+        
+        for (int i = 1; i <= len1; i++) {
+            int prev = dp[0];
+            dp[0] = i;
+            for (int j = 1; j <= len2; j++) {
+                int temp = dp[j];
+                if (s1.charAt(i - 1) == s2.charAt(j - 1)) {
+                    dp[j] = prev;
+                } else {
+                    dp[j] = Math.min(prev + 1, Math.min(dp[j] + 1, dp[j - 1] + 1));
+                }
+                prev = temp;
+            }
+        }
+        
+        int distance = dp[len2];
+        int maxLen = Math.max(len1, len2);
+        return (double) (maxLen - distance) / maxLen;
+    }
+
+    public List<Question> findPotentialDuplicates(String content, String subjectId, Integer excludeQuestionId) {
+        List<Question> list = questionDAO.findAllQuestions(null);
+        List<Question> duplicates = new ArrayList<>();
+        for (Question q : list) {
+            if (q.isDeleted()) continue;
+            if (excludeQuestionId != null && q.getQuestionId().equals(excludeQuestionId)) continue;
+            if (q.getSubject() != null && q.getSubject().getSubjectId().trim().equals(subjectId.trim())) {
+                double similarity = calculateSimilarity(content, q.getContent());
+                if (similarity >= 0.8) {
+                    duplicates.add(q);
+                }
+            }
+        }
+        return duplicates;
     }
 
     public List<Question> getQuestions(int page, int pageSize) {
@@ -87,18 +162,25 @@ public class QuestionService {
         }
     }
 
-    public void addQuestion(QuestionDTO dto, String role, String userId) {
+    @Transactional
+    public void addQuestion(QuestionDTO dto, String role, String userId, String realPath) {
         if ("GIAOVIEN".equals(role)) {
             throw new IllegalArgumentException("Giáo viên không có quyền thêm câu hỏi");
         }
         ensureQuestionNotExists(dto.getQuestionId());
+
+        if (dto.getImageFile() != null && !dto.getImageFile().isEmpty() && realPath != null) {
+            String imageUrl = saveUploadedImage(dto.getImageFile(), realPath);
+            dto.setImageUrl(imageUrl);
+        }
 
         Question question = mapToEntity(dto);
 
         questionDAO.create(question);
     }
 
-    public void updateQuestion(QuestionDTO dto, String role, String userId) {
+    @Transactional
+    public void updateQuestion(QuestionDTO dto, String role, String userId, String realPath) {
         Question existing = questionDAO.findById(dto.getQuestionId());
         if (existing == null) {
             throw new IllegalArgumentException("Câu hỏi không tồn tại");
@@ -110,6 +192,11 @@ public class QuestionService {
             if (dto.getLecturerId() == null || !userId.equals(dto.getLecturerId())) {
                 throw new IllegalArgumentException("Giáo viên chỉ được cập nhật câu hỏi do mình soạn");
             }
+        }
+
+        if (dto.getImageFile() != null && !dto.getImageFile().isEmpty() && realPath != null) {
+            String imageUrl = saveUploadedImage(dto.getImageFile(), realPath);
+            dto.setImageUrl(imageUrl);
         }
 
         Subject subject = subjectService.getSubjectById(dto.getSubjectId());
@@ -124,10 +211,14 @@ public class QuestionService {
         existing.setOptionD(dto.getOptionD());
         existing.setCorrectAnswer(dto.getCorrectAnswer());
         existing.setLecturer(lecturer);
+        if (dto.getImageUrl() != null) {
+            existing.setImageUrl(dto.getImageUrl());
+        }
 
         questionDAO.update(existing);
     }
 
+    @Transactional
     public void deleteQuestion(QuestionDTO dto, String role, String userId) {
         if ("GIAOVIEN".equals(role)) {
             throw new IllegalArgumentException("Giáo viên không có quyền xóa câu hỏi");
@@ -169,8 +260,9 @@ public class QuestionService {
 			String optionD = parts.length > 8 ? parts[8].trim() : "";
 			String correctAnswer = parts.length > 9 ? parts[9].trim() : "";
 			String lecturerId = parts.length > 10 ? parts[10].trim() : "";
+			String imageUrl = parts.length > 11 ? parts[11].trim() : "";
 
-			actions.add(new QuestionActionDTO(type, questionId, subjectId, level, content, optionA, optionB, optionC, optionD, correctAnswer, lecturerId));
+			actions.add(new QuestionActionDTO(type, questionId, subjectId, level, content, optionA, optionB, optionC, optionD, correctAnswer, lecturerId, imageUrl));
 		}
 
 		for (QuestionActionDTO action : actions) {
@@ -185,12 +277,13 @@ public class QuestionService {
 			dto.setOptionD(action.getOptionD());
 			dto.setCorrectAnswer(action.getCorrectAnswer());
 			dto.setLecturerId(action.getLecturerId());
+			dto.setImageUrl(action.getImageUrl());
 
 			if ("ADD".equals(action.getType())) {
 				dto.setQuestionId(null);
-				addQuestion(dto, role, userId);
+				addQuestion(dto, role, userId, null);
 			} else if ("UPDATE".equals(action.getType())) {
-				updateQuestion(dto, role, userId);
+				updateQuestion(dto, role, userId, null);
 			} else if ("DELETE".equals(action.getType())) {
 				deleteQuestion(dto, role, userId);
 			}
@@ -278,7 +371,7 @@ public class QuestionService {
 			cleanDto.setCorrectAnswer(correctAnswer);
 			cleanDto.setLecturerId(lecturerId);
 
-			addQuestion(cleanDto, role, loggedUser);
+			addQuestion(cleanDto, role, loggedUser, null);
 		}
 	}
 
