@@ -14,6 +14,19 @@ public class StudentDAO extends GenericDAO<Student> {
         return findById(studentId) != null;
     }
 
+    public Student findNormalizedById(String studentId) {
+        String hql = "FROM Student s "
+                + "WHERE function('ltrim', function('rtrim', s.studentId)) = :studentId";
+
+        List<Student> students = getSession()
+                .createQuery(hql, Student.class)
+                .setParameter("studentId", studentId)
+                .setMaxResults(1)
+                .list();
+
+        return students.isEmpty() ? null : students.get(0);
+    }
+
     @Override
     public List<Student> findAll() {
         String hql = "FROM Student s WHERE s.deleted = false ORDER BY s.lastName, s.firstName";
