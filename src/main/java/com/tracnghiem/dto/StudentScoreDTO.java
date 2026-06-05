@@ -7,6 +7,7 @@ public class StudentScoreDTO {
     private Float score;
     private String letterGrade;
     private Integer examId;
+    private Boolean isViolation;
 
     public StudentScoreDTO() {
     }
@@ -19,13 +20,14 @@ public class StudentScoreDTO {
         this.letterGrade = letterGrade;
     }
 
-    public StudentScoreDTO(String studentId, String lastName, String firstName, Float score, String letterGrade, Integer examId) {
+    public StudentScoreDTO(String studentId, String lastName, String firstName, Float score, String letterGrade, Integer examId, Boolean isViolation) {
         this.studentId = studentId;
         this.lastName = lastName;
         this.firstName = firstName;
         this.score = score;
         this.letterGrade = letterGrade;
         this.examId = examId;
+        this.isViolation = isViolation;
     }
 
     public Integer getExamId() {
@@ -75,5 +77,13 @@ public class StudentScoreDTO {
 
     public void setLetterGrade(String letterGrade) {
         this.letterGrade = letterGrade;
+    }
+
+    public Boolean getIsViolation() {
+        return isViolation;
+    }
+
+    public void setIsViolation(Boolean isViolation) {
+        this.isViolation = isViolation;
     }
 }

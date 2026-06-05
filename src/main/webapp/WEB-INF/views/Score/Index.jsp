@@ -295,6 +295,7 @@
                                 <th scope="col" class="text-left" style="text-align: left !important; width: 20%;">Tên</th>
                                 <th scope="col" style="width: 15%; text-align: center;">Điểm</th>
                                 <th scope="col" style="width: 15%; text-align: center;">Điểm Chữ</th>
+                                <th scope="col" style="width: 15%; text-align: center;">Vi Phạm</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -316,6 +317,7 @@
                                                     ${scoreRow.letterGrade}
                                                 </span>
                                             </td>
+                                            <td style="text-align: center;">-</td>
                                         </tr>
                                     </c:when>
                                     <c:otherwise>
@@ -334,13 +336,23 @@
                                                     ${scoreRow.letterGrade}
                                                 </span>
                                             </td>
+                                            <td style="text-align: center;">
+                                                <c:choose>
+                                                    <c:when test="${scoreRow.isViolation}">
+                                                        <span class="badge bg-danger">Có</span>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <span class="text-muted">-</span>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </td>
                                         </tr>
                                     </c:otherwise>
                                 </c:choose>
                             </c:forEach>
                             <c:if test="${empty scores}">
                                 <tr>
-                                    <td colspan="6" class="text-center text-muted py-4">
+                                    <td colspan="7" class="text-center text-muted py-4">
                                         <i class="bi bi-info-circle me-1"></i> Lớp học này hiện tại chưa có sinh viên nào.
                                     </td>
                                 </tr>
